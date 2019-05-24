@@ -1,0 +1,15 @@
+{
+  "name": "ui-lib",
+  "devDependencies": {
+    "microbundle": "^0.11.0"
+  },
+  "scripts": {
+    "build": "microbundle -f es --target web --raw true -i src/index.js -o @ui",
+    "dev": "microbundle watch -f es --raw  true --target web -i src/index.js -o @ui",
+    "hm": "microbundle -h"
+  },
+  "__wat": {
+    "build:router": "microbundle -f es --target web --raw true -i outer.js --pwd ./pkg/router -o router",
+    "build:asyncComponent": "microbundle -f es --target web --raw true -i asyncComponent.js --pwd ./pkg/AsyncComponent -o AsyncComponent"
+  }
+}

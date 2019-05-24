@@ -1,0 +1,159 @@
+<html>
+  <head>
+    <style>
+      * {
+        font-family: Ubuntu;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+      }
+
+      a {
+        color: #2f6daa;
+        text-decoration: none;
+      }
+    </style>
+    <title>Test</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      import * as ok from "./src/index.js";
+      import AsyncComponent from "./src/pkg/AsyncComponent.js";
+      import Router, {
+        A,
+        absolutePath,
+        RouterSubscription
+      } from "./src/pkg/router.js";
+      window.a = ok;
+      const Component = a.default;
+      const h = a.createElement;
+      const f = a.Fragment;
+      class UL extends Component {
+        render({ todos = [], show }) {
+          const c = h(
+            "ul",
+            null,
+            show ? todos.map(x => h("li", null, x.text)) : null
+          );
+          return c;
+        }
+      }
+      export default class Foo extends Component {
+        state = {
+          todos: [],
+          navigateTo: "/page1",
+          text: "",
+          show: true
+        };
+
+        setText = e => {
+          this.setState({
+            text: e.target.value
+          });
+        };
+
+        addTodo = () => {
+          let { todos, text } = this.state;
+          if (!text) {
+            return;
+          }
+          todos = todos.concat({
+            text
+          });
+          this.setState({
+            todos,
+            text: ""
+          });
+        };
+
+        componentWillMount() {
+          console.log("willMount");
+          RouterSubscription.subscribe(e =>
+            this.setState({ navigateTo: e !== "/" ? "/" : "/page1" })
+          );
+        }
+        componentDidMount() {
+          console.log("mounted");
+        }
+        render({}, { todos = [], text, navigateTo }) {
+          return h(
+            f,
+            null,
+            h(
+              "div",
+              null,
+              h(
+                "button",
+                {
+                  onClick: () => this.setState(p => ({ show: !p.show }))
+                },
+                "Todo List is",
+                this.state.show ? " Shown" : " Hidden"
+              )
+            ),
+            h(
+              "form",
+              {
+                onSubmit: this.addTodo,
+                action: "javascript:"
+              },
+              h("input", {
+                value: text,
+                onInput: this.setText
+              }),
+              h(
+                "button",
+                {
+                  type: "submit"
+                },
+                "Add"
+              )
+            ),
+            h(UL, { todos, show: this.state.show }),
+            h(
+              Router,
+              null,
+              h(
+                function() {
+                  return h(
+                    "div",
+                    null,
+                    h(A, { href: "/page2" }, "go to page2")
+                  );
+                },
+                { path: absolutePath("/page1(/?)") }
+              ),
+              h(
+                function() {
+                  return h(
+                    "div",
+                    null,
+                    h(A, { href: "/page1" }, "go to page1")
+                  );
+                },
+                {
+                  path: absolutePath("/page2(/?)")
+                }
+              )
+            ),
+            h(A, { href: navigateTo }, "Navigate To:", navigateTo)
+          );
+        }
+      }
+
+      a.render(
+        h(AsyncComponent, {
+          fallbackComponent: () =>
+            h("div", null, "Async Component..will load in 1 second"),
+          componentPromise: async function() {
+            console.log("Load Start");
+            // await new Promise(r => setTimeout(r, 1000));
+            console.log("Load End");
+            return Foo;
+          }
+        }),
+        document.getElementById("app")
+      );
+    </script>
+  </body>
+</html>
