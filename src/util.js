@@ -62,13 +62,22 @@ export const $ = {
    * @param {any} value
    */
   setAttribute(dom, key, value) {
+    if (value == null) {
+      if (dom.hasAttribute(key)) {
+        dom.removeAttribute(key);
+      }
+      if (key in dom) {
+        dom[key] = null;
+      }
+      return;
+    }
     if (key in dom) {
       if (dom[key] !== value) {
         return (dom[key] = value);
       }
     } else {
       if (dom.getAttribute(key) !== value) {
-        if (value == null || value === false) {
+        if (!value && value !== false) {
           dom.removeAttribute(key);
         } else {
           return dom.setAttribute(key, value);

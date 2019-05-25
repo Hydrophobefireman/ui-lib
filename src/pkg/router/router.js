@@ -135,7 +135,8 @@ class Router extends Component {
 export function A(props) {
   const { native, ...p } = props;
   return h("a", {
-    onclick: !native ? e => onLinkClick(e, props.href) : null,
+    onclick:
+      !native && props.href != null ? e => onLinkClick(e, props.href) : null,
     ...p
   });
 }

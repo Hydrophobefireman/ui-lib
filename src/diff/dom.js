@@ -83,7 +83,6 @@ function diffAttributes(currentDom, currVnode, prevVnode) {
             }
           }
         }
-
         for (const i in newValue) {
           const prop = newValue[i];
           if (!oldValue || prop !== oldValue[i]) {
@@ -98,6 +97,11 @@ function diffAttributes(currentDom, currVnode, prevVnode) {
       (!(attr in prevAttributes) || oldValue !== newValue)
     ) {
       $.setAttribute(currentDom, attr, newValue);
+    }
+  }
+  for (const attr in prevAttributes) {
+    if (isSafeAttr(attr) && !(attr in newAttributes)) {
+      $.setAttribute(currentDom, attr, null);
     }
   }
 
@@ -142,7 +146,7 @@ export function diffEventListeners(newListeners, oldListeners, dom) {
   for (const event in newListeners) {
     const listener = newListeners[event];
     const oldListener = oldListeners[event];
-    if (oldListener == null || oldListener !== listener) {
+    if (oldListener !== listener && listener != null) {
       dom.addEventListener(event, eventListenerProxy);
       dom._listeners[event] = listener;
     }
