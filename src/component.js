@@ -63,7 +63,9 @@ class Component {
 export function enqueueRender(c) {
   c._dirty = true;
   if (RENDER_QUEUE.push(c) === 1) {
-    defer(process);
+    window.requestAnimationFrame != null
+      ? window.requestAnimationFrame(process)
+      : defer(process);
   }
 }
 
