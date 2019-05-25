@@ -55,7 +55,7 @@ class Router extends Component {
     ).toString();
   }
   getCurrentComponent() {
-    const currentPath = this.getPath;
+    const currentPath = Router.getPath;
     return this.getPathComponent(currentPath) || [];
   }
   _routeChangeHandler() {
@@ -67,7 +67,7 @@ class Router extends Component {
     return h(
       "div",
       null,
-      `The Requested URL "${this.absolute(this.getPath)}" was not found`
+      `The Requested URL "${this.absolute(Router.getPath)}" was not found`
     );
   }
   static get getPath() {
@@ -107,7 +107,6 @@ class Router extends Component {
   constructor(routerProps, context) {
     let { children, fallbackComponent, ...props } = routerProps;
     super(props, context);
-
     fallbackComponent = fallbackComponent || this._notFoundComponent.bind(this);
     this.state = { routes: [], fallbackComponent };
     this.initComponents(children);
@@ -117,14 +116,18 @@ class Router extends Component {
     this._routeChangeHandler = this._routeChangeHandler.bind(this);
   }
   render() {
+    /**
+     * @type {import("../../ui").vNode}
+     */
     let c;
     if (this.state.component != null && this.state.match != null) {
       c = this.state.component;
     } else if (this.component) {
-      c = h(this.component, { ...this.props, match: this.match });
+      c = this.component;
     } else {
       c = h(this.state.fallbackComponent, this.props);
     }
+    if (!c.__uAttr) c = h(c, { match: this.state.match, ...this.props });
     return h(Fragment, null, c);
   }
 }

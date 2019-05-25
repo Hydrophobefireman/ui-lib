@@ -26,6 +26,9 @@ export function diff(
   previousComponent,
   force
 ) {
+  if (typeof newVnode === "boolean") {
+    newVnode = null;
+  }
   if (
     oldVnode == null ||
     newVnode == null ||
@@ -33,9 +36,8 @@ export function diff(
     oldVnode.key !== newVnode.key
   ) {
     if (oldVnode != null && oldVnode !== EMPTY_OBJ) {
-      unmountDomTree(
-        oldVnode._prevVnode != null ? oldVnode._prevVnode : oldVnode
-      );
+      unmountDomTree(oldVnode._prevVnode);
+      unmountDomTree(oldVnode);
     }
     if (newVnode == null) {
       return null;
@@ -82,7 +84,15 @@ export function diff(
   }
   if (typeof newType === "function") {
     let node;
-    node = toSimpleVnode(newVnode, oldVnode, parentDom, mounts, context, force);
+    node = toSimpleVnode(
+      newVnode,
+      oldVnode,
+      parentDom,
+      mounts,
+      context,
+      force,
+      previousComponent
+    );
     if (newVnode._component != null) newVnode._component._vnode = newVnode;
     if (node == null) return oldVnode._dom;
     node._dom = newVnode._dom = diff(
@@ -95,6 +105,7 @@ export function diff(
       force
     );
     if (newVnode._component != null) newVnode._component.base = newVnode._dom;
+    runLifeCycle(newVnode._component, "componentDidUpdate");
     newVnode._prevVnode = node;
     newVnode._dom._vNode = newVnode;
     return newVnode._dom;
@@ -118,9 +129,9 @@ export function diff(
     newVnode._component,
     force
   );
-  if (oldVnode._component != null) {
-    runLifeCycle(c, "componentDidUpdate");
-  }
+  // if (oldVnode._component != null) {
+  //   runLifeCycle(newVnode._component, "componentDidUpdate");
+  // }
   return newVnode._dom;
 }
 

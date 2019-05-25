@@ -1,5 +1,4 @@
-import { diffEventListeners } from "./diff/dom.js";
-import { EMPTY_OBJ, EMPTY_ARR, nulliFy } from "./util.js";
+import { EMPTY_OBJ, EMPTY_ARR } from "./util.js";
 import { Fragment } from "./create-element.js";
 
 const _rLifeCycle = (c, m) => {
@@ -15,7 +14,6 @@ const _rLifeCycle = (c, m) => {
       }
     }
   }
-  c = c._previousComponent;
 };
 /**
  *
@@ -27,7 +25,8 @@ export function runLifeCycle(c, method, recurses = false) {
   if (!c) return;
   c = _rLifeCycle(c, method);
   while (recurses && c && c._previousComponent) {
-    c = _rLifeCycle(c, method);
+    _rLifeCycle(c, method);
+    c = c._previousComponent;
   }
 }
 
@@ -38,22 +37,25 @@ export function runLifeCycle(c, method, recurses = false) {
 export function unmountDomTree(node) {
   if (node === EMPTY_OBJ || node == null) return;
   const dom = node._dom;
+  const cc = node._component;
+  runLifeCycle(cc, "componentWillUnmount", true);
+  if (cc != null) cc.base = cc._vnode = null;
   if (!dom) {
     return;
   }
-  const cc = node._component || dom ? dom._component : null;
-  runLifeCycle(cc, "componentWillUnmount", true);
+  /**
+   * @type {import("./ui").UiComponent}
+   */
+
   // if (dom._listeners != null && dom._listeners !== EMPTY_OBJ) {
   //   diffEventListeners(EMPTY_OBJ, dom._listeners, dom);
   // }
+
   if (node != null) {
     for (const child of node._children || EMPTY_ARR) {
       unmountDomTree(child);
     }
-    nulliFy(node);
-  }
-  if (cc != null) {
-    nulliFy(cc);
+    node._prevVnode = node._component = node._dom = node._prevDomNode = node._nextDomNode = null;
   }
   if (node.type === Fragment) {
     let d;

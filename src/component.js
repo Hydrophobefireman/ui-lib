@@ -69,6 +69,7 @@ export function enqueueRender(c) {
 
 function process() {
   let p;
+  RENDER_QUEUE.sort((x, y) => x._depth - y._depth);
   while ((p = RENDER_QUEUE.pop())) {
     // forceUpdate's callback argument is reused here to indicate a non-forced update.
     assign(p.state, p._nextState || {});

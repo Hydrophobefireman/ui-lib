@@ -26,7 +26,7 @@ export function flattenArray(arr, depth, map, removeHoles = true) {
     if (map == null) {
       const flt = arr.flat(depth);
       if (removeHoles) {
-        return flt.filter(x => x != null);
+        return flt.filter(x => x != null && typeof x !== "boolean");
       }
       return flt;
     } else {
@@ -124,12 +124,12 @@ function setDomNodeDescriptor(node, sibDom, desc) {
   const c = node._prevVnode;
   if (c != null) c[desc] = sibDom;
 }
-/**
- *
- * @param {object} obj
- */
-export function nulliFy(obj) {
-  for (const i in obj) {
-    obj[i] = null;
-  }
-}
+// /**
+//  *
+//  * @param {object} obj
+//  */
+// export function nulliFy(obj) {
+//   for (const i in obj) {
+//     obj[i] = null;
+//   }
+// }

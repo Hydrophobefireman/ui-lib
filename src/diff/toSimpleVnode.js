@@ -18,7 +18,8 @@ export function toSimpleVnode(
   parentDom,
   mounts,
   context,
-  force
+  force,
+  previouComponent
 ) {
   /**
    * @type {import("../ui").UiComponent}
@@ -67,6 +68,7 @@ export function toSimpleVnode(
 
   vnode = c._prevVnode = toVnode(c.render(newVnode.props, c.state));
   vnode._dom = newVnode._dom;
+  c._depth = previouComponent ? ~~previouComponent._depth + 1 : 0;
   return vnode;
 }
 
