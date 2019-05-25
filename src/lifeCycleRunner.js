@@ -36,6 +36,7 @@ export function runLifeCycle(c, method, recurses = false) {
  */
 export function unmountDomTree(node) {
   if (node === EMPTY_OBJ || node == null) return;
+  if (node._prevVnode) unmountDomTree(node._prevVnode);
   const dom = node._dom;
   const cc = node._component;
   runLifeCycle(cc, "componentWillUnmount", true);

@@ -36,7 +36,6 @@ export function diff(
     oldVnode.key !== newVnode.key
   ) {
     if (oldVnode != null && oldVnode !== EMPTY_OBJ) {
-      unmountDomTree(oldVnode._prevVnode);
       unmountDomTree(oldVnode);
     }
     if (newVnode == null) {
