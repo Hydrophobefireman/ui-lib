@@ -29,6 +29,9 @@ export function diff(
   if (typeof newVnode === "boolean") {
     newVnode = null;
   }
+  if (oldVnode != null && newVnode != null) {
+    newVnode._nextDomNode = oldVnode._nextDomNode;
+  }
   if (
     oldVnode == null ||
     newVnode == null ||
@@ -76,7 +79,6 @@ export function diff(
         context,
         mounts,
         previousComponent,
-
         force
       );
     }
@@ -104,7 +106,12 @@ export function diff(
       force
     );
     if (newVnode._component != null) newVnode._component.base = newVnode._dom;
-    runLifeCycle(newVnode._component, "componentDidUpdate");
+    runLifeCycle(
+      newVnode._component,
+      "componentDidUpdate",
+      oldVnode.props,
+      (oldVnode._component || EMPTY_OBJ).state
+    );
     newVnode._prevVnode = node;
     newVnode._dom._vNode = newVnode;
     return newVnode._dom;

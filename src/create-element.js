@@ -23,6 +23,9 @@ export function createElement(type, props, ...children) {
 export function Fragment() {}
 
 export function getVNode(type, props, events, key, ref) {
+  /**
+   * @type {import("./ui").vNode}
+   */
   const vnode = {
     type,
     props,
@@ -31,7 +34,11 @@ export function getVNode(type, props, events, key, ref) {
     ref,
     _children: null,
     _dom: null,
-    _component: null
+    _component: null,
+    __uAttr: null,
+    _nextDomNode: null,
+    _prevDomNode: null,
+    _prevVnode: null
   };
   return (vnode.__uAttr = vnode);
 }

@@ -1,7 +1,9 @@
 import { defer, assign, EMPTY_OBJ, appendChild } from "./util.js";
-import { commitMounts, runLifeCycle } from "./lifeCycleRunner.js";
+import { commitMounts } from "./lifeCycleRunner.js";
 import { diff } from "./diff/index.js";
-
+/**
+ * @type {Array<import("./ui").UiComponent>}
+ */
 const RENDER_QUEUE = [];
 class Component {
   constructor(props, context) {
@@ -29,14 +31,15 @@ class Component {
     return;
   }
   setState(updater) {
-    this._nextState = assign({}, this.state || {});
-    assign(
-      this._nextState,
+    const next =
       typeof updater === "function"
         ? (updater = updater(this._nextState, this.props))
-        : updater
-    );
+        : updater;
+    if (next == null) return;
+    this._nextState = assign({}, this.state || EMPTY_OBJ);
+    assign(this._nextState, next);
     enqueueRender(this);
+    assign(this.state, this._nextState || EMPTY_OBJ);
   }
   forceUpdate(callback) {
     const parentDom = this.parentDom;
@@ -47,7 +50,8 @@ class Component {
        * @type {import("./ui").vNode}
        */
       const vn = this._vnode;
-      const _sibDom = vn._nextDomNode;
+      const _sibDom = vn != null ? vn._nextDomNode : null;
+
       /**
        * @type {import("./ui").UiNode}
        */
@@ -73,8 +77,6 @@ function process() {
   let p;
   RENDER_QUEUE.sort((x, y) => x._depth - y._depth);
   while ((p = RENDER_QUEUE.pop())) {
-    // forceUpdate's callback argument is reused here to indicate a non-forced update.
-    assign(p.state, p._nextState || {});
     p._nextState = null;
     p._dirty = false;
     p.forceUpdate(false);

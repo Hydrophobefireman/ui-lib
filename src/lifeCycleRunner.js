@@ -1,11 +1,11 @@
 import { EMPTY_OBJ, EMPTY_ARR } from "./util.js";
 import { Fragment } from "./create-element.js";
 
-const _rLifeCycle = (c, m) => {
+const _rLifeCycle = (c, m, ...a) => {
   c.__currentLifeCycle = m;
   if (c[m] != null) {
     try {
-      c[m]();
+      c[m](...a);
     } catch (e) {
       if (c.componentDidCatch != null) {
         c.componentDidCatch(e);
@@ -21,13 +21,9 @@ const _rLifeCycle = (c, m) => {
  * @param {import("./ui").lifeCycleMethod} method
  * @param {boolean} [recurses]
  */
-export function runLifeCycle(c, method, recurses = false) {
+export function runLifeCycle(c, method, ...args) {
   if (!c) return;
-  c = _rLifeCycle(c, method);
-  while (recurses && c && c._previousComponent) {
-    _rLifeCycle(c, method);
-    c = c._previousComponent;
-  }
+  c = _rLifeCycle(c, method, ...args);
 }
 
 /**

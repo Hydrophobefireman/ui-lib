@@ -51,18 +51,14 @@ export function diffChildren(
       previousComponent,
       force
     );
-    let next;
-    if (oldChild != null) {
-      next = oldChild._nextDomNode;
-    }
     const isFragmentChildren = Array.isArray(dom);
     if (isFragmentChildren) {
       for (const c of dom) {
-        appendChild(parentDom, c, next);
+        appendChild(parentDom, c);
         retArr.push(c);
       }
     } else {
-      appendChild(parentDom, dom, next);
+      appendChild(parentDom, dom);
       retArr.push(dom);
     }
   }

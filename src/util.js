@@ -1,3 +1,5 @@
+import { Fragment } from "./create-element.js";
+
 /**
  * @type {(cb) => any}
  * @returns {Promise<any>}
@@ -66,9 +68,6 @@ export const $ = {
       if (dom.hasAttribute(key)) {
         dom.removeAttribute(key);
       }
-      if (key in dom) {
-        dom[key] = null;
-      }
       return;
     }
     if (key in dom) {
@@ -97,9 +96,12 @@ export function isStringLike(a) {
  *
  * @param {import("./ui").UiElement} parentDom
  * @param {import("./ui").UiNode} child
- * @param {import("./ui").UiNode} insertBefore
  */
-export function appendChild(parentDom, child, insertBefore) {
+export function appendChild(parentDom, child) {
+  let insertBefore;
+  if (child._vNode != null) {
+    insertBefore = child._vNode._nextDomNode;
+  }
   if (child != null && child.parentNode !== parentDom && child !== parentDom) {
     if (insertBefore != null) {
       parentDom.insertBefore(child, insertBefore);
@@ -129,9 +131,10 @@ export function appendChild(parentDom, child, insertBefore) {
  * @param {import("./ui").vNode} node
  */
 function setDomNodeDescriptor(node, sibDom, desc) {
+  if (node == null || (node.__uAttr !== node && node.type !== Fragment)) return;
   node[desc] = sibDom;
   const c = node._prevVnode;
-  if (c != null) c[desc] = sibDom;
+  setDomNodeDescriptor(c, sibDom, desc);
 }
 // /**
 //  *

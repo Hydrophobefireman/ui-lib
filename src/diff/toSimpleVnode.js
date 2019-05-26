@@ -19,7 +19,7 @@ export function toSimpleVnode(
   mounts,
   context,
   force,
-  previouComponent
+  previousComponent
 ) {
   /**
    * @type {import("../ui").UiComponent}
@@ -40,7 +40,7 @@ export function toSimpleVnode(
     if (!force) {
       if (
         c.shouldComponentUpdate != null &&
-        c.shouldComponentUpdate() !== false
+        c.shouldComponentUpdate(newVnode.props, c.state) !== false
       ) {
       } else if (c.shouldComponentUpdate != null) {
         return null;
@@ -60,15 +60,27 @@ export function toSimpleVnode(
   c.parentDom = parentDom;
   if (c.state == null) c.state = {};
   c._nextState = assign({}, c.state);
+  if (newType.getDerivedStateFromProps != null) {
+    c._nextState = newType.getDerivedStateFromProps(
+      newVnode.props,
+      c._nextState
+    );
+  }
   if (isNew) {
     runLifeCycle(c, "componentWillMount");
   } else {
-    runLifeCycle(c, "componentWillUpdate");
+    runLifeCycle(
+      c,
+      "componentWillUpdate",
+      newVnode.props,
+      c._nextState,
+      context
+    );
   }
-
+  c.state = c._nextState;
   vnode = c._prevVnode = toVnode(c.render(newVnode.props, c.state));
   vnode._dom = newVnode._dom;
-  c._depth = previouComponent ? ~~previouComponent._depth + 1 : 0;
+  c._depth = previousComponent ? ~~previousComponent._depth + 1 : 0;
   return vnode;
 }
 
