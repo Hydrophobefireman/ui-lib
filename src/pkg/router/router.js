@@ -133,18 +133,19 @@ class Router extends Component {
 }
 
 export function A(props) {
-  const { native, ...p } = props;
-  return h("a", {
-    onclick:
-      !native && props.href != null ? e => onLinkClick(e, props.href) : null,
-    ...p
-  });
+  const { native, href, onClick, ...p } = props;
+  const setProps = p;
+  setProps.href = href;
+  if (!native && href != null) {
+    setProps.onClick = e => onLinkClick(e, props.href, onClick);
+  }
+  return h("a", setProps);
 }
 /**
  *
  * @param {MouseEvent} e
  */
-function onLinkClick(e, href) {
+function onLinkClick(e, href, func) {
   if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) {
     return;
   }
@@ -156,9 +157,10 @@ function onLinkClick(e, href) {
   }
   e.preventDefault();
   loadURL(href);
+  if (func != null) func(e, href);
 }
 export function absolutePath(route) {
-  return RegExp(`^${route}$`);
+  return RegExp(`^${route}(/?)$`);
 }
 
 export default Router;

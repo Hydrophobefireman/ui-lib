@@ -1,5 +1,3 @@
-import { Fragment } from "./create-element.js";
-
 /**
  * @type {(cb) => any}
  * @returns {Promise<any>}
@@ -9,11 +7,22 @@ export const defer =
     ? Promise.prototype.then.bind(Promise.resolve())
     : setTimeout;
 
-export function assign(obj, props) {
-  for (const i in props) {
-    obj[i] = props[i];
-  }
-  return obj;
+const hasKeys = Object.keys != null;
+export let assign;
+if (hasKeys) {
+  assign = function(target, src) {
+    for (const i of Object.keys(src)) {
+      target[i] = src[i];
+    }
+    return target;
+  };
+} else {
+  assign = function(target, src) {
+    for (const i in src) {
+      target[i] = src[i];
+    }
+    return target;
+  };
 }
 
 /**
@@ -65,9 +74,8 @@ export const $ = {
    */
   setAttribute(dom, key, value) {
     if (value == null) {
-      if (dom.hasAttribute(key)) {
-        dom.removeAttribute(key);
-      }
+      if (key in dom) dom[key] = 0;
+      else dom.removeAttribute(key);
       return;
     }
     if (key in dom) {
@@ -98,6 +106,7 @@ export function isStringLike(a) {
  * @param {import("./ui").UiNode} child
  */
 export function appendChild(parentDom, child) {
+  if (child == null) return;
   let insertBefore;
   if (child._vNode != null) {
     insertBefore = child._vNode._nextDomNode;
@@ -130,8 +139,8 @@ export function appendChild(parentDom, child) {
  *
  * @param {import("./ui").vNode} node
  */
-function setDomNodeDescriptor(node, sibDom, desc) {
-  if (node == null || (node.__uAttr !== node && node.type !== Fragment)) return;
+export function setDomNodeDescriptor(node, sibDom, desc) {
+  if (node == null) return;
   node[desc] = sibDom;
   const c = node._prevVnode;
   setDomNodeDescriptor(c, sibDom, desc);

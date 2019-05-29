@@ -99,7 +99,8 @@ function diffAttributes(currentDom, currVnode, prevVnode) {
       $.setAttribute(currentDom, attr, newValue);
     }
   }
-  for (const attr in prevAttributes) {
+  for (let i = 0; i < prevAttributes.length; i++) {
+    const attr = prevAttributes[i].name;
     if (isSafeAttr(attr) && !(attr in newAttributes)) {
       $.setAttribute(currentDom, attr, null);
     }

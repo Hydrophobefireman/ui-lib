@@ -1,8 +1,12 @@
-import { isListener, flattenArray } from "./util.js";
+import { isListener, flattenArray, assign, EMPTY_OBJ } from "./util.js";
 
 export function createElement(type, props, ...children) {
   if (type == null || typeof type === "boolean") return null;
-  if (props == null) props = {};
+  if (props == null) {
+    props = {};
+  } else {
+    props = assign({}, props);
+  }
   if (children.length) {
     children = flattenArray(children, Infinity);
     props.children = children;

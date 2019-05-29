@@ -1,4 +1,4 @@
-import { EMPTY_OBJ, EMPTY_ARR } from "./util.js";
+import { EMPTY_OBJ, EMPTY_ARR, setDomNodeDescriptor } from "./util.js";
 import { Fragment } from "./create-element.js";
 
 const _rLifeCycle = (c, m, ...a) => {
@@ -49,11 +49,16 @@ export function unmountDomTree(node) {
   // }
 
   if (node != null) {
+    if (node._nextDomNode != null)
+      setDomNodeDescriptor(node._nextDomNode._vNode, null, "_prevDomNode");
+    if (node._prevDomNode != null)
+      setDomNodeDescriptor(node._prevDomNode._vNode, null, "_nextDomNode");
     for (const child of node._children || EMPTY_ARR) {
       unmountDomTree(child);
     }
     node._prevVnode = node._component = node._dom = node._prevDomNode = node._nextDomNode = null;
   }
+
   if (node.type === Fragment) {
     let d;
     while ((d = node._children.pop())) {

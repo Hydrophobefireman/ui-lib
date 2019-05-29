@@ -79,16 +79,20 @@
           return h(
             f,
             null,
-            h(
-              "div",
-              null,
-              h(
-                "button",
-                {
-                  onClick: () => this.setState(p => ({ show: !p.show }))
-                },
-                "Todo List is",
-                this.state.show ? " Shown" : " Hidden"
+            h(() =>
+              h(() =>
+                h(
+                  "div",
+                  null,
+                  h(
+                    "button",
+                    {
+                      onClick: () => this.setState(p => ({ show: !p.show }))
+                    },
+                    "Todo List is",
+                    this.state.show ? " Shown" : " Hidden"
+                  )
+                )
               )
             ),
             h(

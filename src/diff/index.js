@@ -95,6 +95,7 @@ export function diff(
       previousComponent
     );
     if (newVnode._component != null) newVnode._component._vnode = newVnode;
+    if (node === EMPTY_OBJ) return null; //scu returned false
     if (node == null) return oldVnode._dom;
     node._dom = newVnode._dom = diff(
       parentDom,
@@ -113,7 +114,9 @@ export function diff(
       (oldVnode._component || EMPTY_OBJ).state
     );
     newVnode._prevVnode = node;
-    newVnode._dom._vNode = newVnode;
+    if (newVnode._dom != null) {
+      newVnode._dom._vNode = newVnode;
+    }
     return newVnode._dom;
   } else {
     if (shouldGenerateNewTree) {

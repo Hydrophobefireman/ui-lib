@@ -1,6 +1,6 @@
 import { runLifeCycle } from "../lifeCycleRunner.js";
 import Component from "../component.js";
-import { assign } from "../util.js";
+import { assign, EMPTY_OBJ } from "../util.js";
 import { toVnode } from "../create-element.js";
 
 /**
@@ -43,7 +43,7 @@ export function toSimpleVnode(
         c.shouldComponentUpdate(newVnode.props, c.state) !== false
       ) {
       } else if (c.shouldComponentUpdate != null) {
-        return null;
+        return EMPTY_OBJ;
       }
     }
   } else {
@@ -53,6 +53,7 @@ export function toSimpleVnode(
       mounts.push(c);
     } else {
       c = new Component(newVnode.props, context);
+      newVnode._component = null;
       c.constructor = newType;
       c.render = getRenderer;
     }
@@ -79,7 +80,7 @@ export function toSimpleVnode(
   }
   c.state = c._nextState;
   vnode = c._prevVnode = toVnode(c.render(newVnode.props, c.state));
-  vnode._dom = newVnode._dom;
+  if (vnode) vnode._dom = newVnode._dom; //we maybe rendering null
   c._depth = previousComponent ? ~~previousComponent._depth + 1 : 0;
   return vnode;
 }
