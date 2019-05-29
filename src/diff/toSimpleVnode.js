@@ -1,6 +1,6 @@
 import { runLifeCycle } from "../lifeCycleRunner.js";
 import Component from "../component.js";
-import { assign, EMPTY_OBJ } from "../util.js";
+import { assign, EMPTY_OBJ, EMPTY_ARR } from "../util.js";
 import { toVnode } from "../create-element.js";
 
 /**
@@ -61,12 +61,16 @@ export function toSimpleVnode(
   c.parentDom = parentDom;
   if (c.state == null) c.state = {};
   c._nextState = assign({}, c.state);
+
   if (newType.getDerivedStateFromProps != null) {
-    c._nextState = newType.getDerivedStateFromProps(
-      newVnode.props,
-      c._nextState
+    assign(
+      c._nextState,
+      newType.getDerivedStateFromProps(newVnode.props, c._nextState) ||
+        EMPTY_OBJ
     );
+    assign(c._oldState || (c._oldState = {}), c._nextState);
   }
+
   if (isNew) {
     runLifeCycle(c, "componentWillMount");
   } else {

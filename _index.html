@@ -22,7 +22,17 @@
         componentWillUnmount() {
           console.log("componentWillUnmount");
         }
-        componentDidUpdate() {
+        componentDidUpdate(p, s) {
+          console.log(
+            "current Props:",
+            { ...this.props },
+            "\nOld Props:",
+            { ...p },
+            "\n Current State:",
+            { ...this.state },
+            "\n Old State:",
+            { ...s }
+          );
           console.log("componentDidUpdate");
         }
         componentWillUpdate() {

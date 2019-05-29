@@ -37,6 +37,7 @@ class Component {
         : updater;
     if (next == null) return;
     this._nextState = assign({}, this.state || EMPTY_OBJ);
+    this._oldState = assign({}, this._nextState);
     assign(this._nextState, next);
     enqueueRender(this);
     assign(this.state, this._nextState || EMPTY_OBJ);

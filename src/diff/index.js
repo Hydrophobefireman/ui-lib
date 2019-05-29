@@ -111,8 +111,9 @@ export function diff(
       newVnode._component,
       "componentDidUpdate",
       oldVnode.props,
-      (oldVnode._component || EMPTY_OBJ).state
+      (oldVnode._component || EMPTY_OBJ)._oldState
     );
+    if (oldVnode._component != null) delete oldVnode._component._oldState;
     newVnode._prevVnode = node;
     if (newVnode._dom != null) {
       newVnode._dom._vNode = newVnode;
