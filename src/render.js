@@ -10,7 +10,7 @@ export function render(vn, parentDom) {
   const vnode = createElement(Fragment, null, [vn]);
   const mounts = [];
   const oldVnode = parentDom._prevVnode;
-  // parentDom._prevVnode = vnode;
+  parentDom._prevVnode = vnode;
   diff(
     parentDom,
     vnode,
