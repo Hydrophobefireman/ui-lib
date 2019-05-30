@@ -1,6 +1,10 @@
 export { render } from "./render.js";
 export { default } from "./component.js";
-export { createElement, Fragment } from "./create-element.js";
+export {
+  createElement,
+  Fragment,
+  createElement as h
+} from "./create-element.js";
 export {
   default as AsyncComponent
 } from "./pkg/AsyncComponent/AsyncComponent.js";
