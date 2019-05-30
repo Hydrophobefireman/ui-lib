@@ -17,17 +17,17 @@
   <body>
     <div id="app"></div>
     <script type="module">
-      import * as ok from "./src/index.js";
-      import AsyncComponent from "./src/pkg/AsyncComponent/AsyncComponent.js";
-      import Router, {
+      import Component, {
+        Fragment,
+        createElement as h,
+        Router,
+        AsyncComponent,
         A,
         absolutePath,
-        RouterSubscription
-      } from "./src/pkg/router/router.js";
-      window.a = ok;
-      const Component = a.default;
-      const h = a.createElement;
-      const f = a.Fragment;
+        RouterSubscription,
+        render
+      } from "../../@ui/index.js";
+      const f = Fragment;
       class UL extends Component {
         render({ todos = [], show }) {
           const c = h(
@@ -145,7 +145,7 @@
         }
       }
 
-      a.render(
+      render(
         h(AsyncComponent, {
           fallbackComponent: () =>
             h("div", null, "Async Component..will load in 1 second"),

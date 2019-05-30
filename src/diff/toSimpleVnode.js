@@ -61,7 +61,6 @@ export function toSimpleVnode(
   c.parentDom = parentDom;
   if (c.state == null) c.state = {};
   c._nextState = assign({}, c.state);
-
   if (newType.getDerivedStateFromProps != null) {
     assign(
       c._nextState,
