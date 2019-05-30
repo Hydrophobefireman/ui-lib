@@ -12,7 +12,7 @@ function _defineProperty(obj, key, value) {
   }
   return obj;
 } /** @jsx h */
-import Component, { render, createElement as h } from "../../@ui/index.js";
+import Component, { render, createElement as h } from "../../ui/index.js";
 const { memoize } = (globalThis || self).decko;
 let { pow, sqrt, sin, cos, atan2 } = Math;
 

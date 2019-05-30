@@ -3,7 +3,7 @@ import Component, {
   createElement as h,
   render,
   Fragment
-} from "../../@ui/index.js";
+} from "../../ui/index.js";
 const SEARCH = "https://api.github.com/search/repositories";
 
 class GithubResults extends Component {
