@@ -1,5 +1,8 @@
 <html>
   <head>
+  		
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ 
     <style>
       * {
         font-family: Ubuntu;
@@ -17,6 +20,7 @@
   <body>
     <div id="app"></div>
     <script type="module">
+      const base=location.pathname
       import Component, {
         Fragment,
         createElement as h,
@@ -41,7 +45,7 @@
       export default class Foo extends Component {
         state = {
           todos: [],
-          navigateTo: "/page1",
+          navigateTo: "page1",
           text: "",
           show: true
         };
@@ -69,7 +73,7 @@
         componentWillMount() {
           console.log("willMount");
           RouterSubscription.subscribe(e =>
-            this.setState({ navigateTo: e !== "/" ? "/" : "/page1" })
+            this.setState({ navigateTo: e !== base ? base : "page1" })
           );
         }
         componentDidMount() {
@@ -116,31 +120,31 @@
             h(UL, { todos, show: this.state.show }),
             h(
               Router,
-              null,
+              {fallbackComponent:()=>h("div",null,"Not Found")},
               h(
                 function() {
                   return h(
                     "div",
                     null,
-                    h(A, { href: "/page2" }, "go to page2")
+                    h(A, { href: "page2" }, "go to page2")
                   );
                 },
-                { path: absolutePath("/page1(/?)") }
+                { path: absolutePath(base+"page1(/?)") }
               ),
               h(
                 function() {
                   return h(
                     "div",
                     null,
-                    h(A, { href: "/page1" }, "go to page1")
+                    h(A, { href: "page1" }, "go to page1")
                   );
                 },
                 {
-                  path: absolutePath("/page2(/?)")
+                  path: absolutePath(base+"page2(/?)")
                 }
               )
             ),
-            h(A, { href: navigateTo }, "Navigate To:", navigateTo)
+            h(A, { href: navigateTo, }, "Navigate To:", navigateTo)
           );
         }
       }
@@ -148,10 +152,10 @@
       render(
         h(AsyncComponent, {
           fallbackComponent: () =>
-            h("div", null, "Async Component..will load in 1 second"),
+            h("div", null, "Loading"),
           componentPromise: async function() {
             console.log("Load Start");
-            // await new Promise(r => setTimeout(r, 1000));
+             await new Promise(r => setTimeout(r, 500));
             console.log("Load End");
             return Foo;
           }
@@ -159,5 +163,6 @@
         document.getElementById("app")
       );
     </script>
+    <a href="todo2.html">The other todo</a>
   </body>
 </html>
