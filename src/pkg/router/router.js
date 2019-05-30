@@ -24,7 +24,7 @@ export const RouterSubscription = {
     }
   },
   unsubscribeAll() {
-    _routerSubscriptions = [];
+    _routerSubscriptions .length = 0
   }
 };
 
