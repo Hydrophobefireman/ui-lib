@@ -75,6 +75,9 @@ export function diffChildren(
       retArr.push(dom);
     }
   }
+  for (const i of oldChildren) {
+    if (i != null) unmountDomTree(i);
+  }
   return retArr;
 }
 function isKeyedChild(o, n) {

@@ -67,9 +67,12 @@ function diffAttributes(currentDom, currVnode, prevVnode) {
   }
   for (let attr in newAttributes) {
     if (isListener(attr) || !isSafeAttr(attr)) continue;
-    const newValue = newAttributes[attr];
+    let newValue = newAttributes[attr];
     const oldValue = prevAttributes[attr];
     attr = attr === "class" ? "className" : attr;
+    if (attr === "className" && Array.isArray(newValue)) {
+      newValue = newValue.join(" ");
+    }
     if (attr === "style") {
       const st = currentDom.style;
       if (typeof newValue === "string") {
