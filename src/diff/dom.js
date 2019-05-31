@@ -45,12 +45,7 @@ export function diffDom(newVnode, oldVnode, previousDom, _DisableDiff) {
   }
   return el;
 }
-const isSafeAttr = attr =>
-  attr !== "key" &&
-  attr !== "children" &&
-  attr !== "class" &&
-  attr !== "className";
-
+const isSafeAttr = attr => attr !== "key" && attr !== "children";
 /**
  *
  * @param {import("../ui").UiElement} currentDom
@@ -63,12 +58,18 @@ function diffAttributes(currentDom, currVnode, prevVnode) {
   const newAttributes = currVnode.props;
   const prevAttributes = currentDom.attributes;
   const currEvents = currVnode.events;
-  const prevEvents = prevVnode ? prevVnode.events : EMPTY_OBJ;
-  diffEventListeners(currEvents, prevEvents, currentDom);
-  for (const attr in newAttributes) {
-    if (isListener(attr)) continue;
+  const prevEvents = prevVnode != null ? prevVnode.events : EMPTY_OBJ;
+  for (let i = 0; i < prevAttributes.length; i++) {
+    const attr = prevAttributes[i].name;
+    if (!(attr in newAttributes)) {
+      $.setAttribute(currentDom, attr, null);
+    }
+  }
+  for (let attr in newAttributes) {
+    if (isListener(attr) || !isSafeAttr(attr)) continue;
     const newValue = newAttributes[attr];
     const oldValue = prevAttributes[attr];
+    attr = attr === "class" ? "className" : attr;
     if (attr === "style") {
       const st = currentDom.style;
       if (typeof newValue === "string") {
@@ -92,29 +93,21 @@ function diffAttributes(currentDom, currVnode, prevVnode) {
       }
       continue;
     }
-    if (
-      isSafeAttr(attr) &&
-      (!(attr in prevAttributes) || oldValue !== newValue)
-    ) {
-      $.setAttribute(currentDom, attr, newValue);
-    }
-  }
-  for (let i = 0; i < prevAttributes.length; i++) {
-    const attr = prevAttributes[i].name;
-    if (isSafeAttr(attr) && !(attr in newAttributes)) {
-      $.setAttribute(currentDom, attr, null);
-    }
+    if (oldValue !== newValue) $.setAttribute(currentDom, attr, newValue);
   }
 
-  let clsattr = newAttributes.class || newAttributes.className || [];
-  const oldClass = currentDom.className;
-  if (oldClass && (!clsattr || !clsattr.length)) {
-    return void currentDom.removeAttribute("class");
-  }
-  if (typeof clsattr !== "string") {
-    clsattr = clsattr.join(" ");
-  }
-  if (clsattr) $.setAttribute(currentDom, "class", clsattr.trim());
+  // let clsattr = newAttributes.class || newAttributes.className;
+  // const oldClass = currentDom.className;
+  // if (oldClass && !clsattr) {
+  //   return void currentDom.removeAttribute("class");
+  // }
+  // if (clsattr) {
+  //   if (typeof clsattr !== "string") {
+  //     clsattr = clsattr.join(" ");
+  //   }
+  //   $.setAttribute(currentDom, "class", clsattr);
+  // }
+  diffEventListeners(currEvents, prevEvents, currentDom);
 }
 
 /**

@@ -32,7 +32,7 @@ if (hasKeys) {
  * @param {()=>T} map
  * @returns {Array<T>}
  */
-export function flattenArray(arr, depth, map, removeHoles = true) {
+export function flattenArray(arr, depth, map, removeHoles = false) {
   const flattend = [];
   const flat = (array, depth) => {
     for (const el of array) {
@@ -58,23 +58,11 @@ export const $ = {
    * @param {any} value
    */
   setAttribute(dom, key, value) {
-    if (value == null) {
-      if (key in dom) dom[key] = 0;
-      else dom.removeAttribute(key);
-      return;
-    }
     if (key in dom) {
-      if (dom[key] !== value) {
-        return (dom[key] = value);
-      }
+      return (dom[key] = value == null ? "" : value);
     } else {
-      if (dom.getAttribute(key) !== value) {
-        if (!value && value !== false) {
-          dom.removeAttribute(key);
-        } else {
-          return dom.setAttribute(key, value);
-        }
-      }
+      if (value == null) return dom.removeAttribute(key);
+      return dom.setAttribute(key, value);
     }
   }
 };

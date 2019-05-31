@@ -40,7 +40,6 @@ class Component {
     this._oldState = assign({}, this._nextState);
     assign(this._nextState, next);
     enqueueRender(this);
-    assign(this.state, this._nextState || EMPTY_OBJ);
   }
   forceUpdate(callback) {
     const parentDom = this.parentDom;
@@ -78,6 +77,7 @@ function process() {
   let p;
   RENDER_QUEUE.sort((x, y) => x._depth - y._depth);
   while ((p = RENDER_QUEUE.pop())) {
+    assign(p.state, p._nextState || EMPTY_OBJ);
     p._nextState = null;
     p._dirty = false;
     p.forceUpdate(false);

@@ -71,6 +71,15 @@ export function diff(
       for (const c of removeChildren) {
         unmountDomTree(c);
       }
+      return diff(
+        parentDom,
+        newVnode,
+        oldSimilarChild,
+        context,
+        mounts,
+        previousComponent,
+        force
+      );
     } else {
       return diffChildren(
         newVnode,
