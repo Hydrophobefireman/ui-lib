@@ -15,10 +15,11 @@ export type vNode = {
   __uAttr: vNode;
 };
 export interface UiElement extends HTMLElement {
-  _listeners: { [event: string]: (e: Event) => any };
-  _vNode: vNode;
-  _prevVnode: vNode;
-  _component: UiComponent;
+  _listeners?: { [event: string]: (e: Event) => any };
+  _vNode?: vNode;
+  _prevVnode?: vNode;
+  _oldVnode?: vNode; 
+  _component?: UiComponent;
 }
 
 export interface UiNode extends UiElement, Text {}

@@ -9,8 +9,8 @@ import { commitMounts } from "./lifeCycleRunner.js";
 export function render(vn, parentDom) {
   const vnode = createElement(Fragment, null, [vn]);
   const mounts = [];
-  const oldVnode = parentDom._prevVnode;
-  parentDom._prevVnode = vnode;
+  const oldVnode = parentDom._oldVnode;
+  parentDom._oldVnode = vn;
   diff(
     parentDom,
     vnode,
