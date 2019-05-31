@@ -75,7 +75,7 @@ export default class App extends Component {
     this.model.clearCompleted();
   };
 
-  render({}, { nowShowing = ALL_TODOS, newTodo, editing }) {
+  render({}, { nowShowing = "all", newTodo, editing }) {
     let { todos } = this.model,
       shownTodos = todos.filter(FILTERS[nowShowing]),
       activeTodoCount = todos.reduce(
