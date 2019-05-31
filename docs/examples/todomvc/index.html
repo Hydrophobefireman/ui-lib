@@ -2,7 +2,9 @@
 <html lang="en" data-framework="preact">
   <head>
     <meta charset="utf-8" />
-    <title>Preact • TodoMVC</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>ui-lib • TodoMVC</title>
+
     <style id="fetched-todo-mvc-base.css">
       hr {
         margin: 20px 0;
@@ -516,6 +518,12 @@
         }
       }
     </style>
+  <link rel="preload" href="./index.js"/>
+  <link rel="preload" href="./app/index.js"/>
+  <link rel="preload" href="./app/footer.js"/>
+  <link rel="preload" href="./app/item.js"/>
+  <link rel="preload" href="./app/model.js"/>
+  <link rel="preload" href="./app/util.js"/>
   </head>
   <body>
     <section class="todoapp"></section>
