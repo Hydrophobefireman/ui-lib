@@ -7,17 +7,17 @@ export const defer =
     ? Promise.prototype.then.bind(Promise.resolve())
     : setTimeout;
 
-const hasKeys = Object.keys != null;
+const hasKeys = "keys" in Object;
 export let assign;
 if (hasKeys) {
-  assign = function(target, src) {
+  assign = (target, src) => {
     for (const i of Object.keys(src)) {
       target[i] = src[i];
     }
     return target;
   };
 } else {
-  assign = function(target, src) {
+  assign = (target, src) => {
     for (const i in src) {
       target[i] = src[i];
     }
@@ -33,35 +33,20 @@ if (hasKeys) {
  * @returns {Array<T>}
  */
 export function flattenArray(arr, depth, map, removeHoles = true) {
-  if (Array.prototype.flat) {
-    if (map == null) {
-      const flt = arr.flat(depth);
-      if (removeHoles) {
-        return flt.filter(x => x != null && typeof x !== "boolean");
-      }
-      return flt;
-    } else {
-      if (Array.prototype.flatMap) {
-        return arr.flatMap(map);
+  const flattend = [];
+  const flat = (array, depth) => {
+    for (const el of array) {
+      if (Array.isArray(el) && depth > 0) {
+        flat(el, depth - 1);
       } else {
-        return arr.flat(depth).map(map);
+        if (!removeHoles || el != null) flattend.push(map ? map(el) : el);
       }
     }
-  } else {
-    const ret = [];
-    const itr = (el, level = 0) => {
-      if (Array.isArray(el) && level < depth) {
-        return el.forEach(c => itr(c, level + 1));
-      }
-      if (removeHoles && el != null) ret.push(el);
-    };
-    for (const i of arr) {
-      itr(i);
-    }
-    const flt = map != null ? ret.map(map) : ret;
-    return flt;
-  }
+  };
+  flat(arr, Math.floor(depth) || 1);
+  return flattend;
 }
+
 export const EMPTY_OBJ = {};
 export const EMPTY_ARR = [];
 
@@ -107,11 +92,13 @@ export function isStringLike(a) {
  */
 export function appendChild(parentDom, child) {
   if (child == null) return;
-  let insertBefore;
-  if (child._vNode != null) {
-    insertBefore = child._vNode._nextDomNode;
-  }
-  if (child != null && child.parentNode !== parentDom && child !== parentDom) {
+  let vn;
+  let hasVn;
+  if (child.parentNode !== parentDom) {
+    let insertBefore;
+    if ((hasVn = (vn = child._vNode) != null)) {
+      insertBefore = child._vNode._nextDomNode;
+    }
     if (insertBefore != null) {
       parentDom.insertBefore(child, insertBefore);
     } else {
@@ -120,18 +107,24 @@ export function appendChild(parentDom, child) {
   }
   /**@type {import("./ui").UiNode} */
   const prevDom = child.previousSibling;
-  let prevVnode;
-  if (prevDom != null && (prevVnode = prevDom._vNode) != null) {
-    setDomNodeDescriptor(prevVnode, child, "_nextDomNode");
-  }
+  /**@type {import("./ui").UiNode} */
   const nextDom = child.nextSibling;
-  let nextVnode;
-  if (nextDom != null && (nextVnode = nextDom._vNode) != null) {
-    setDomNodeDescriptor(nextVnode, child, "_prevDomNode");
+  if (prevDom == nextDom) return; //will only be equal if they are null
+  if (prevDom != null) {
+    const prevVnode = prevDom._vNode;
+    if (prevVnode != null && prevVnode._nextDomNode !== child) {
+      setDomNodeDescriptor(prevVnode, child, "_nextDomNode");
+    }
   }
-  let vn = child._vNode;
-  if (vn != null) {
+
+  if (nextDom != null) {
+    const nextVnode = nextDom._vNode;
+    if (nextVnode != null && nextVnode._nextDomNode !== child)
+      setDomNodeDescriptor(nextVnode, child, "_prevDomNode");
+  }
+  if (hasVn) {
     vn._prevDomNode = prevDom;
+    vn._nextDomNode = nextDom;
   }
 }
 
@@ -140,10 +133,9 @@ export function appendChild(parentDom, child) {
  * @param {import("./ui").vNode} node
  */
 export function setDomNodeDescriptor(node, sibDom, desc) {
-  if (node == null) return;
   node[desc] = sibDom;
   const c = node._prevVnode;
-  setDomNodeDescriptor(c, sibDom, desc);
+  if (c != null) setDomNodeDescriptor(c, sibDom, desc);
 }
 // /**
 //  *
