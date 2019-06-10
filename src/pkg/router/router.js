@@ -10,10 +10,13 @@ export const RouterSubscription = {
    * @param {(e:PopStateEvent|null)=>any} fun
    */
   subscribe(fun) {
-    _routerSubscriptions.push(fun);
+    if (!_routerSubscriptions.includes(fun)) _routerSubscriptions.push(fun);
   },
   unsubscribe(fun) {
-    _routerSubscriptions.filter(fn => fn !== fun);
+    for (let i = 0; i < _routerSubscriptions.length; i++) {
+      if (_routerSubscriptions[i] === fun)
+        return _routerSubscriptions.splice(i, 1);
+    }
   },
   /**
    * @param {PopStateEvent|null} e
@@ -24,7 +27,7 @@ export const RouterSubscription = {
     }
   },
   unsubscribeAll() {
-    _routerSubscriptions .length = 0
+    _routerSubscriptions.length = 0;
   }
 };
 

@@ -25,7 +25,6 @@ export function createElement(type, props, ...children) {
   return getVNode(type, props, events, key, ref);
 }
 export function Fragment() {}
-
 export function getVNode(type, props, events, key, ref) {
   /**
    * @type {import("./ui").vNode}
@@ -35,6 +34,7 @@ export function getVNode(type, props, events, key, ref) {
     props,
     events,
     key,
+    _reorder: false,
     ref,
     _children: null,
     _dom: null,

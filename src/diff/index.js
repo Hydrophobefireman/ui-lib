@@ -29,7 +29,7 @@ export function diff(
   if (typeof newVnode === "boolean") {
     newVnode = null;
   }
-  if (oldVnode != null && newVnode != null) {
+  if (oldVnode != null && newVnode != null && newVnode._nextDomNode == null) {
     newVnode._nextDomNode = oldVnode._nextDomNode;
   }
   if (
@@ -44,6 +44,7 @@ export function diff(
     if (newVnode == null) {
       return null;
     }
+
     oldVnode = EMPTY_OBJ;
   }
   const shouldGenerateNewTree = oldVnode === EMPTY_OBJ;
@@ -59,38 +60,38 @@ export function diff(
     toVnode
   );
   const newType = newVnode.type;
-  if (newType === Fragment || oldVnode.type == Fragment) {
-    if (newVnode.type !== Fragment) {
-      const oldSimilarChild = getSimilarChildTo(
-        newType,
-        oldVnode._children || EMPTY_ARR
-      );
-      const removeChildren = (oldVnode._children || EMPTY_ARR).filter(
-        x => x !== oldSimilarChild
-      );
-      for (const c of removeChildren) {
-        unmountDomTree(c);
-      }
-      return diff(
-        parentDom,
-        newVnode,
-        oldSimilarChild,
-        context,
-        mounts,
-        previousComponent,
-        force
-      );
-    } else {
-      return diffChildren(
-        newVnode,
-        shouldGenerateNewTree ? EMPTY_ARR : oldVnode._children || EMPTY_ARR,
-        parentDom,
-        context,
-        mounts,
-        previousComponent,
-        force
-      );
-    }
+  if (newType === Fragment || oldVnode.type === Fragment) {
+    // if (newVnode.type !== Fragment) {
+    //   const oldSimilarChild = getSimilarChildTo(
+    //     newType,
+    //     oldVnode._children || EMPTY_ARR
+    //   );
+    //   const removeChildren = (oldVnode._children || EMPTY_ARR).filter(
+    //     x => x !== oldSimilarChild
+    //   );
+    //   for (const c of removeChildren) {
+    //     unmountDomTree(c);
+    //   }
+    //   return diff(
+    //     parentDom,
+    //     newVnode,
+    //     oldSimilarChild,
+    //     context,
+    //     mounts,
+    //     previousComponent,
+    //     force
+    //   );
+    // } else {
+    return diffChildren(
+      newVnode,
+      shouldGenerateNewTree ? EMPTY_ARR : oldVnode._children || EMPTY_ARR,
+      parentDom,
+      context,
+      mounts,
+      previousComponent,
+      force
+    );
+    // }
   }
   if (typeof newType === "function") {
     let node;
@@ -105,16 +106,18 @@ export function diff(
     );
     if (newVnode._component != null) newVnode._component._vnode = newVnode;
     if (node === EMPTY_OBJ) return null; //scu returned false
-    if (node == null) return oldVnode._dom;
-    node._dom = newVnode._dom = diff(
+    let d;
+    d = newVnode._dom = diff(
       parentDom,
       node,
-      oldVnode._prevVnode || oldVnode,
+      "_prevVnode" in oldVnode ? oldVnode._prevVnode : oldVnode,
       context,
       mounts,
       newVnode._component,
       force
     );
+    if (node == null) return;
+    if (node) node._dom = d;
     if (newVnode._component != null) newVnode._component.base = newVnode._dom;
     runLifeCycle(
       newVnode._component,

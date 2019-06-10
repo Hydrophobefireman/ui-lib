@@ -1,9 +1,9 @@
 import { unmountDomTree } from "../lifeCycleRunner.js";
 import { diff } from "./index.js";
 
-import { appendChild, setDomNodeDescriptor } from "../util.js";
+import { appendChild } from "../util.js";
 import { Fragment } from "../create-element.js";
-const diffedVnode = {};
+// KEYS IMPLEMENTATION PENDING
 /**
  *
  * @param {import("../ui").vNode} newParentVnode
@@ -27,18 +27,14 @@ export function diffChildren(
   const newChildrenLength = newParentVnode._children.length;
   const oldChildrenLength = oldChildren.length;
   const retArr = [];
-  for (let i = 0; i < newChildrenLength; i++) {
+  for (let i = 0; i < Math.max(newChildrenLength, oldChildrenLength); i++) {
     const newChild = newParentVnode._children[i];
-
     let oldChild = oldChildren[i];
     let nextOldChild;
     if (newChild == null) {
-      if (oldChild != null) {
-        unmountDomTree(oldChild);
-      }
+      if (oldChild != null) unmountDomTree(oldChild);
       continue;
     }
-    newChild._reorder = false;
     if (oldChild == null && (nextOldChild = oldChildren[i + 1]) != null) {
       const nextDom =
         nextOldChild.type !== Fragment
@@ -46,23 +42,6 @@ export function diffChildren(
           : nextOldChild._dom[0];
       newChild._nextDomNode = nextDom;
     }
-    const c = oldChild;
-    if (isKeyedChild(oldChild, newChild)) {
-      mark(oldChild, c);
-      oldChildren[i] = diffedVnode;
-    } else {
-      for (let j = 0; j < oldChildrenLength; j++) {
-        oldChild = oldChildren[j];
-        if (isKeyedChild(oldChild, newChild)) {
-          mark(oldChild, c);
-          newChild._reorder = true;
-          oldChildren[j] = diffedVnode;
-          break;
-        }
-        oldChild = null;
-      }
-    }
-    if (oldChild == null) oldChild = c;
     const dom = diff(
       parentDom,
       newChild,
@@ -84,28 +63,10 @@ export function diffChildren(
     }
   }
   // for (const i of oldChildren) {
-  //   if (i != diffedVnode) unmountDomTree(i);
+  //   if (i != null) unmountDomTree(i);
   // }
   return retArr;
 }
 function isKeyedChild(o, n) {
-  return o && n.key && n.key === o.key && n.type === o.type;
-}
-/**
- *
- * @param {import("../ui").vNode} o
- * @param {import("../ui").vNode} c
- */
-function mark(o, c) {
-  if (c == o || o == null || c == null) return; //both are null
-  const tmpN = o._nextDomNode;
-  const tmpP = o._prevDomNode;
-  let next, prev;
-  next = o._nextDomNode = c._nextDomNode;
-  prev = o._prevDomNode = c._prevDomNode;
-  c._nextDomNode = tmpN;
-  c._prevDomNode = tmpP;
-  const d = o._dom;
-  setDomNodeDescriptor(next, d, "_prevDomNode");
-  setDomNodeDescriptor(prev, d, "_nextDomNode");
+  return o && n.key === o.key && n.type === o.type;
 }

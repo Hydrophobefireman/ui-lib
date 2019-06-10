@@ -1,8 +1,7 @@
 <html>
   <head>
-  		
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
- 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <style>
       * {
         font-family: Ubuntu;
@@ -20,7 +19,7 @@
   <body>
     <div id="app"></div>
     <script type="module">
-      const base=location.pathname
+      const base = location.pathname;
       import Component, {
         Fragment,
         createElement as h,
@@ -83,20 +82,16 @@
           return h(
             f,
             null,
-            h(() =>
-              h(() =>
-                h(
-                  "div",
-                  null,
-                  h(
-                    "button",
-                    {
-                      onClick: () => this.setState(p => ({ show: !p.show }))
-                    },
-                    "Todo List is",
-                    this.state.show ? " Shown" : " Hidden"
-                  )
-                )
+            h(
+              "div",
+              null,
+              h(
+                "button",
+                {
+                  onClick: () => this.setState(p => ({ show: !p.show }))
+                },
+                "Todo List is",
+                this.state.show ? " Shown" : " Hidden"
               )
             ),
             h(
@@ -120,42 +115,33 @@
             h(UL, { todos, show: this.state.show }),
             h(
               Router,
-              {fallbackComponent:()=>h("div",null,"Not Found")},
+              { fallbackComponent: () => h("div", null, "Not Found") },
               h(
                 function() {
-                  return h(
-                    "div",
-                    null,
-                    h(A, { href: "page2" }, "go to page2")
-                  );
+                  return h("div", null, h(A, { href: "page2" }, "go to page2"));
                 },
-                { path: absolutePath(base+"page1(/?)") }
+                { path: absolutePath(base + "page1(/?)") }
               ),
               h(
                 function() {
-                  return h(
-                    "div",
-                    null,
-                    h(A, { href: "page1" }, "go to page1")
-                  );
+                  return h("div", null, h(A, { href: "page1" }, "go to page1"));
                 },
                 {
-                  path: absolutePath(base+"page2(/?)")
+                  path: absolutePath(base + "page2(/?)")
                 }
               )
             ),
-            h(A, { href: navigateTo, }, "Navigate To:", navigateTo)
+            h(A, { href: navigateTo }, "Navigate To:", navigateTo)
           );
         }
       }
 
       render(
         h(AsyncComponent, {
-          fallbackComponent: () =>
-            h("div", null, "Loading"),
+          fallbackComponent: () => h("div", null, "Loading"),
           componentPromise: async function() {
             console.log("Load Start");
-             await new Promise(r => setTimeout(r, 500));
+            await new Promise(r => setTimeout(r, 500));
             console.log("Load End");
             return Foo;
           }

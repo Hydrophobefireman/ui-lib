@@ -5,10 +5,10 @@ export type vNode = {
   props?: { children: Array<UiComponent, vNode>; [key: string]: any };
   _children?: (vNode | null)[];
   events?: { [event: string]: (e: Event) => any };
+  _reorder?: boolean;
   _dom?: UiNode;
   key?: string;
   _component?: UiComponent;
-  _fragmentChildArray?: Array<UiNode>;
   _prevVnode?: vNode;
   _nextDomNode?: UiNode;
   _prevDomNode?: UiNode;
@@ -18,7 +18,7 @@ export interface UiElement extends HTMLElement {
   _listeners?: { [event: string]: (e: Event) => any };
   _vNode?: vNode;
   _prevVnode?: vNode;
-  _oldVnode?: vNode; 
+  _oldVnode?: vNode;
   _component?: UiComponent;
 }
 

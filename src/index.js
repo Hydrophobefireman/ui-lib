@@ -1,5 +1,5 @@
 export { render } from "./render.js";
-export { default } from "./component.js";
+export { default, default as Component } from "./component.js";
 export {
   createElement,
   Fragment,

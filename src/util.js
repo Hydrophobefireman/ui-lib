@@ -82,15 +82,15 @@ export function appendChild(parentDom, child) {
   if (child == null) return;
   let vn;
   let hasVn;
-  if (child.parentNode !== parentDom) {
-    let insertBefore;
-    if ((hasVn = (vn = child._vNode) != null)) {
-      insertBefore = child._vNode._nextDomNode;
-    }
+  let insertBefore;
+  if ((hasVn = (vn = child._vNode) != null)) {
+    insertBefore = child._vNode._nextDomNode;
+  }
+  if (child.parentNode !== parentDom || vn._reorder) {
     if (insertBefore != null) {
       parentDom.insertBefore(child, insertBefore);
     } else {
-      parentDom.appendChild(child);
+      if (!vn._reorder) parentDom.appendChild(child);
     }
   }
   /**@type {import("./ui").UiNode} */
@@ -119,11 +119,14 @@ export function appendChild(parentDom, child) {
 /**
  *
  * @param {import("./ui").vNode} node
+ * @param {import("./ui").UiNode} sibDom
+ * @param {"_prevDomNode"|"_nextDomNode"} desc
  */
 export function setDomNodeDescriptor(node, sibDom, desc) {
+  if (node == null) return;
   node[desc] = sibDom;
   const c = node._prevVnode;
-  if (c != null) setDomNodeDescriptor(c, sibDom, desc);
+  setDomNodeDescriptor(c, sibDom, desc);
 }
 // /**
 //  *

@@ -83,7 +83,10 @@ export function toSimpleVnode(
   }
   c.state = c._nextState;
   vnode = c._prevVnode = toVnode(c.render(newVnode.props, c.state));
-  if (vnode) vnode._dom = newVnode._dom; //we maybe rendering null
+  if (vnode) {
+    vnode._dom = newVnode._dom;
+    vnode._reorder = newVnode._reorder;
+  } //we maybe rendering null
   c._depth = previousComponent ? ~~previousComponent._depth + 1 : 0;
   return vnode;
 }

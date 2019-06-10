@@ -58,8 +58,7 @@ export function unmountDomTree(node) {
     }
     node._prevVnode = node._component = node._dom = node._prevDomNode = node._nextDomNode = null;
   }
-
-  if (node.type === Fragment) {
+  if (Array.isArray(dom)) {
     let d;
     while ((d = node._children.pop())) {
       removeNode(d);
