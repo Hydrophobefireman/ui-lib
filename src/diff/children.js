@@ -47,13 +47,16 @@ export function diffChildren(
       newChild._nextDomNode = nextDom;
     }
     const c = oldChild;
+    let isDiffingKeyedNode = false;
     if (isKeyedChild(oldChild, newChild)) {
       mark(oldChild, c);
+      isDiffingKeyedNode = true;
       oldChildren[i] = diffedVnode;
     } else {
       for (let j = 0; j < oldChildrenLength; j++) {
         oldChild = oldChildren[j];
         if (isKeyedChild(oldChild, newChild)) {
+          isDiffingKeyedNode = true;
           mark(oldChild, c);
           newChild._reorder = true;
           oldChildren[j] = diffedVnode;
@@ -62,6 +65,7 @@ export function diffChildren(
         oldChild = null;
       }
     }
+    if (!isDiffingKeyedNode) oldChildren[i] = diffedVnode;
     if (oldChild == null) oldChild = c;
     const dom = diff(
       parentDom,
@@ -83,9 +87,9 @@ export function diffChildren(
       retArr.push(dom);
     }
   }
-  // for (const i of oldChildren) {
-  //   if (i != diffedVnode) unmountDomTree(i);
-  // }
+  for (const i of oldChildren) {
+    if (i != diffedVnode) unmountDomTree(i);
+  }
   return retArr;
 }
 function isKeyedChild(o, n) {
