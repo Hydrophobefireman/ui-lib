@@ -8,7 +8,10 @@
     <script type="module">
       import Component, { render, createElement as h } from "../../ui/index.js";
       class Clock extends Component {
-        state = { time: Date.now() };
+        constructor() {
+          super();
+          this.state = { time: Date.now() };
+        }
         render({}, { time }) {
           return h(
             "div",

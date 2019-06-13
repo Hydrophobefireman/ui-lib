@@ -15,6 +15,51 @@ export default class App extends Component {
   constructor() {
     super();
     this.state = {};
+    this.handleNewTodoKeyDown = e => {
+      if (e.keyCode !== ENTER_KEY) return;
+      e.preventDefault();
+
+      let val = this.state.newTodo.trim();
+      if (val) {
+        this.model.addTodo(val);
+        this.setState({ newTodo: "" });
+      }
+    };
+
+    this.handleNewTodoInput = e => {
+      this.setState({ newTodo: e.target.value });
+    };
+
+    this.toggleAll = event => {
+      let checked = event.target.checked;
+      this.model.toggleAll(checked);
+    };
+
+    this.toggle = todo => {
+      this.model.toggle(todo);
+    };
+
+    this.destroy = todo => {
+      this.model.destroy(todo);
+    };
+
+    this.edit = todo => {
+      this.setState({ editing: todo.id });
+    };
+
+    this.save = (todoToSave, text) => {
+      this.model.save(todoToSave, text);
+      this.setState({ editing: null });
+    };
+
+    this.cancel = () => {
+      this.setState({ editing: null });
+    };
+
+    this.clearCompleted = () => {
+      this.model.clearCompleted();
+    };
+
     this.model = new TodoModel("ui-todos", () => this.setState({}));
     addEventListener("hashchange", this.handleRoute.bind(this));
     this.handleRoute();
@@ -29,51 +74,6 @@ export default class App extends Component {
     }
     this.setState({ nowShowing });
   }
-
-  handleNewTodoKeyDown = e => {
-    if (e.keyCode !== ENTER_KEY) return;
-    e.preventDefault();
-
-    let val = this.state.newTodo.trim();
-    if (val) {
-      this.model.addTodo(val);
-      this.setState({ newTodo: "" });
-    }
-  };
-
-  handleNewTodoInput = e => {
-    this.setState({ newTodo: e.target.value });
-  };
-
-  toggleAll = event => {
-    let checked = event.target.checked;
-    this.model.toggleAll(checked);
-  };
-
-  toggle = todo => {
-    this.model.toggle(todo);
-  };
-
-  destroy = todo => {
-    this.model.destroy(todo);
-  };
-
-  edit = todo => {
-    this.setState({ editing: todo.id });
-  };
-
-  save = (todoToSave, text) => {
-    this.model.save(todoToSave, text);
-    this.setState({ editing: null });
-  };
-
-  cancel = () => {
-    this.setState({ editing: null });
-  };
-
-  clearCompleted = () => {
-    this.model.clearCompleted();
-  };
 
   render({}, { nowShowing = "all", newTodo, editing }) {
     let { todos } = this.model,

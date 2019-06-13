@@ -12,9 +12,13 @@
         Fragment
       } from "../../ui/index.js";
       class Obs extends Component {
-        state = { h: window.innerHeight, w: window.innerWidth };
-        handleResize = () =>
-          this.setState({ h: window.innerHeight, w: window.innerWidth });
+        constructor() {
+          super();
+          this.state = { h: window.innerHeight, w: window.innerWidth };
+          this.handleResize = () =>
+            this.setState({ h: window.innerHeight, w: window.innerWidth });
+        }
+
         componentDidMount() {
           window.addEventListener("resize", this.handleResize);
         }

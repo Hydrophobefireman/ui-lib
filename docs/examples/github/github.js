@@ -62,8 +62,11 @@ const Result = ({ result }) =>
   );
 
 class Form extends Component {
-  state = { i: "react", b: false };
-  set = () => this.setState({ b: true });
+  constructor() {
+    super();
+    this.state = { i: "react", b: false };
+    this.set = () => this.setState({ b: true });
+  }
   render({}, { i, b }) {
     return h(
       Fragment,

@@ -42,33 +42,30 @@
         }
       }
       export default class Foo extends Component {
-        state = {
-          todos: [],
-          navigateTo: "page1",
-          text: "",
-          show: true
-        };
+        constructor(p) {
+          super(p);
+          this.state = { todos: [], navigateTo: "page1", text: "", show: true };
 
-        setText = e => {
-          this.setState({
-            text: e.target.value
-          });
-        };
+          this.setText = e => {
+            this.setState({
+              text: e.target.value
+            });
+          };
 
-        addTodo = () => {
-          let { todos, text } = this.state;
-          if (!text) {
-            return;
-          }
-          todos = todos.concat({
-            text
-          });
-          this.setState({
-            todos,
-            text: ""
-          });
-        };
-
+          this.addTodo = () => {
+            let { todos, text } = this.state;
+            if (!text) {
+              return;
+            }
+            todos = todos.concat({
+              text
+            });
+            this.setState({
+              todos,
+              text: ""
+            });
+          };
+        }
         componentWillMount() {
           console.log("willMount");
           RouterSubscription.subscribe(e =>

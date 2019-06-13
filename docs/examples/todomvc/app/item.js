@@ -4,46 +4,47 @@ const ESCAPE_KEY = 27;
 const ENTER_KEY = 13;
 
 export default class TodoItem extends Component {
-  handleSubmit = () => {
-    let { onSave, onDestroy, todo } = this.props,
-      val = this.state.editText.trim();
-    if (val) {
-      onSave(todo, val);
-      this.setState({ editText: val });
-    } else {
-      onDestroy(todo);
-    }
-  };
-
-  handleEdit = () => {
-    let { onEdit, todo } = this.props;
-    onEdit(todo);
-    this.setState({ editText: todo.title });
-  };
-
-  toggle = e => {
-    let { onToggle, todo } = this.props;
-    onToggle(todo);
-    e.preventDefault();
-  };
-
-  handleTextInput = e => {
-    this.setState({ editText: e.target.value });
-  };
-
-  handleKeyDown = e => {
-    if (e.which === ESCAPE_KEY) {
-      let { todo } = this.props;
+  constructor(props) {
+    super(props);
+    this.state = {};
+    this.handleSubmit = () => {
+      let { onSave, onDestroy, todo } = this.props,
+        val = this.state.editText.trim();
+      if (val) {
+        onSave(todo, val);
+        this.setState({ editText: val });
+      } else {
+        onDestroy(todo);
+      }
+    };
+    this.handleEdit = () => {
+      let { onEdit, todo } = this.props;
+      onEdit(todo);
       this.setState({ editText: todo.title });
-      this.props.onCancel(todo);
-    } else if (e.which === ENTER_KEY) {
-      this.handleSubmit();
-    }
-  };
+    };
+    this.toggle = e => {
+      let { onToggle, todo } = this.props;
+      onToggle(todo);
+      e.preventDefault();
+    };
+    this.handleTextInput = e => {
+      this.setState({ editText: e.target.value });
+    };
 
-  handleDestroy = () => {
-    this.props.onDestroy(this.props.todo);
-  };
+    this.handleKeyDown = e => {
+      if (e.which === ESCAPE_KEY) {
+        let { todo } = this.props;
+        this.setState({ editText: todo.title });
+        this.props.onCancel(todo);
+      } else if (e.which === ENTER_KEY) {
+        this.handleSubmit();
+      }
+    };
+
+    this.handleDestroy = () => {
+      this.props.onDestroy(this.props.todo);
+    };
+  }
 
   // shouldComponentUpdate({ todo, editing, editText }) {
   // 	return (
