@@ -1,232 +1,119 @@
-/**
- *  @TODO refactor loops and fix variable naming
- */
-import { Fragment, toVnode } from "../create-element.js";
-import {
-  assign,
-  flattenArray,
-  EMPTY_OBJ,
-  EMPTY_ARR,
-  appendChild
-} from "../util.js";
-import { unmountDomTree, runLifeCycle } from "../lifeCycleRunner.js";
-import Component from "../component.js";
-import { diffDom } from "./dom.js";
-import { diffChildren } from "./children.js";
+import { unmountDomTree } from "../lifeCycleRunner.js";
+import { diff } from "./index.js";
+
+import { appendChild, setDomNodeDescriptor } from "../util.js";
+import { Fragment } from "../create-element.js";
+const diffedVnode = {};
 /**
  *
+ * @param {import("../ui").vNode} newParentVnode
+ * @param {import("../ui").vNode['_children']} oldChildren
  * @param {import("../ui").UiElement} parentDom
- * @param {import("../ui").vNode} newVnode
- * @param {import("../ui").vNode} oldVnode
  * @param {object} context
  * @param {Array<import("../ui").UiComponent>} mounts
  * @param {import("../ui").UiComponent} previousComponent
  * @param {boolean} force
- * @param {import("../ui").UiNode} oldDom
- 
  */
-export function diff(
+
+export function diffChildren(
+  newParentVnode,
+  oldChildren,
   parentDom,
-  newVnode,
-  oldVnode,
   context,
   mounts,
   previousComponent,
-  force,
-  oldDom
+  force
 ) {
-  if (
-    oldVnode == null ||
-    newVnode == null ||
-    oldVnode.type !== newVnode.type ||
-    oldVnode.key !== newVnode.key
-  ) {
-    if (oldVnode != null && oldVnode !== EMPTY_OBJ) {
-      unmountDomTree(oldVnode._dom);
-    }
-    if (newVnode == null) {
-      return null;
-    }
-    oldVnode = EMPTY_OBJ;
-  }
+  const newChildrenLength = newParentVnode._children.length;
+  const oldChildrenLength = oldChildren.length;
+  const retArr = [];
+  for (let i = 0; i < newChildrenLength; i++) {
+    const newChild = newParentVnode._children[i];
 
-  const shouldGenerateNewTree = oldVnode === EMPTY_OBJ;
-
-  if (newVnode.__uAttr !== newVnode) {
-    return null;
-  }
-  newVnode._children = flattenArray(
-    (newVnode.props && newVnode.props.children) || [],
-    Infinity,
-    toVnode
-  );
-  if (newVnode.type !== Fragment && oldVnode.type !== Fragment) {
-    if (typeof newVnode.type === "function") {
-      /**
-       * @type {import("../ui").lifeCycleMethod}
-       */
-      let lifeCycle = "componentWillMount";
-      if (newVnode._component != null && newVnode._component._didMount) {
-        lifeCycle = "componentWillUpdate";
+    let oldChild = oldChildren[i];
+    let nextOldChild;
+    if (newChild == null) {
+      if (oldChild != null) {
+        unmountDomTree(oldChild);
       }
-      const node = instantiateComponent(
-        newVnode,
-        oldVnode,
-        context,
-        mounts,
-        parentDom,
-        lifeCycle
-      );
-
-      const dom = diff(
-        parentDom,
-        node,
-        oldVnode,
-        context,
-        mounts,
-        newVnode._component,
-        force,
-        oldDom
-      );
-      newVnode._dom = node._dom;
-      dom._vnode = newVnode;
-      return dom;
+      continue;
+    }
+    newChild._reorder = false;
+    if (oldChild == null && (nextOldChild = oldChildren[i + 1]) != null) {
+      const nextDom =
+        nextOldChild.type !== Fragment
+          ? nextOldChild._dom
+          : nextOldChild._dom[0];
+      newChild._nextDomNode = nextDom;
+    }
+    const c = oldChild;
+    let isDiffingKeyedNode = false;
+    if (isKeyedChild(oldChild, newChild)) {
+      mark(oldChild, c);
+      isDiffingKeyedNode = true;
+      oldChildren[i] = diffedVnode;
     } else {
-      diffDom(
-        newVnode,
-        oldVnode,
-        oldDom,
-        shouldGenerateNewTree,
-        context,
-        mounts
-      );
-    }
-  }
-  let childArr;
-
-  const newDom = newVnode._dom;
-  childArr = diffChildren(
-    newVnode,
-    oldVnode._children || EMPTY_ARR,
-    parentDom,
-    context,
-    mounts,
-    previousComponent
-  );
-  if (newVnode._component != null) {
-    newVnode._component.base = newDom;
-  }
-  const cm = newVnode._component;
-  if (cm != null) {
-    cm.parent = parentDom;
-  }
-  if (childArr != null) {
-    if (newDom == null && newVnode.type === Fragment) {
-      for (const child of childArr) {
-        appendChild(parentDom, child);
-      }
-      return childArr;
-    }
-    for (const child of childArr) {
-      if (newDom !== child) {
-        appendChild(newDom, child);
+      for (let j = 0; j < oldChildrenLength; j++) {
+        oldChild = oldChildren[j];
+        if (isKeyedChild(oldChild, newChild)) {
+          isDiffingKeyedNode = true;
+          mark(oldChild, c);
+          newChild._reorder = true;
+          oldChildren[j] = diffedVnode;
+          break;
+        }
+        oldChild = null;
       }
     }
-  }
-  if (newDom != null) {
-    newDom._vNode = newVnode;
-    newDom._component = newVnode._component;
-    if (parentDom != null) {
-      appendChild(parentDom, newDom);
+    if (!isDiffingKeyedNode) oldChildren[i] = diffedVnode;
+    if (oldChild == null) oldChild = c;
+    const dom = diff(
+      parentDom,
+      newChild,
+      oldChild,
+      context,
+      mounts,
+      previousComponent,
+      force
+    );
+    const isFragmentChildren = Array.isArray(dom);
+    if (isFragmentChildren) {
+      for (const c of dom) {
+        appendChild(parentDom, c);
+        retArr.push(c);
+      }
+    } else {
+      appendChild(parentDom, dom);
+      retArr.push(dom);
     }
   }
-
-  if (cm != null && cm.__currentLifeCycle === "componentWillUpdate") {
-    runLifeCycle(cm, "componentDidUpdate");
+  for (const i of oldChildren) {
+    if (i != diffedVnode) unmountDomTree(i);
   }
-  return newDom;
+  return retArr;
 }
-function getRenderer() {
-  return this.constructor(this.props);
+function isKeyedChild(o, n) {
+  return o && n.key && n.key === o.key && n.type === o.type;
 }
 /**
  *
- * @param {import("../ui").vNode} vn
- * @param {import("../ui").vNode} oldVnode
- * @param {object} context
- * @param {Array<import("../ui").UiComponent>} mounts
- * @param {import("../ui").UiElement} parentDom
- * @param {import("../ui").lifeCycleMethod} lifeCycle
- * @returns {import("../ui").vNode}
+ * @param {import("../ui").vNode} o
+ * @param {import("../ui").vNode} c
  */
-function instantiateComponent(
-  vn,
-  oldVnode,
-  context,
-  mounts,
-  parentDom,
-  lifeCycle
-) {
-  /**
-   * @type {import("../ui").UiComponent}
-   */
-  let c,
-    isClassComponent = false;
-  if (oldVnode._component) {
-    vn._component = c = oldVnode._component;
-    vn._dom = oldVnode._dom;
-    c.props = vn.props;
-  } else {
-    if (vn.type.prototype && vn.type.prototype.render) {
-      vn._component = c = new vn.type(vn.props, context);
-      isClassComponent = true;
-      c.parent = parentDom;
-    } else {
-      c = new Component(vn.props, context);
-      c.constructor = vn.type;
-      c.render = getRenderer;
-    }
+function mark(o, c) {
+  if (o != null && o._dom != null) {
+    _mark(o);
   }
-  if (c.state == null) {
-    c.state = {};
+  if (c === o) return;
+  if (c != null && c._dom != null) {
+    _mark(c);
   }
-  if (c._nextState == null) {
-    c._nextState = c.state;
-  }
-  if (isClassComponent) {
-    if (lifeCycle == null || lifeCycle === "componentWillMount") {
-      mounts.push(c);
-      if (vn.type.getDerivedStateFromProps != null) {
-        assign(
-          c._nextState === c.state
-            ? (c._nextState = assign({}, c._nextState))
-            : c._nextState,
-          vn.type.getDerivedStateFromProps(currentVnode.props, c._nextState)
-        );
-      } else {
-        runLifeCycle(c, "componentWillMount");
-      }
-    } else {
-      runLifeCycle(c, lifeCycle, true);
-    }
-  }
-  const node = toVnode(c.render(c.props, c.state));
-  node._component = c;
-  c._vnode = node;
-  node._prevVnode = c._prevVnode = vn;
-  return node;
 }
-
-// /**
-//  *
-//  * @param {import("../ui").vNode} vn
-//  */
-// function recursivelySetFragmentDescriptor(vn) {
-//   for (const child of vn._children) {
-//     if (child.type !== Fragment) {
-//       child._lastFragmentParent = vn;
-//     } else {
-//       recursivelySetFragmentDescriptor(child);
-//     }
-//   }
-// }
+/**
+ *
+ * @param {import("../ui").vNode} o
+ */
+const _mark = o => {
+  o._nextDomNode = o._dom.nextSibling;
+  o._prevDomNode = o._dom.previousSibling;
+};

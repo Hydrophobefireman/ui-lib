@@ -79,7 +79,12 @@
               "Shuffle Array"
             ),
             f,
-            h("div", null, "Raw:", JSON.stringify(f.map(x => x.props)))
+            h(
+              "div",
+              null,
+              "Raw:",
+              JSON.stringify(f.map(x => x.props.children[0]))
+            )
           );
 
           return c;

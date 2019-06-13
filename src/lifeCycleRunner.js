@@ -40,13 +40,6 @@ export function unmountDomTree(node) {
   if (!dom) {
     return;
   }
-  /**
-   * @type {import("./ui").UiComponent}
-   */
-
-  // if (dom._listeners != null && dom._listeners !== EMPTY_OBJ) {
-  //   diffEventListeners(EMPTY_OBJ, dom._listeners, dom);
-  // }
 
   if (node != null) {
     if (node._nextDomNode != null)

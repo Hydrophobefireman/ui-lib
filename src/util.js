@@ -8,22 +8,20 @@ export const defer =
     : setTimeout;
 
 const hasKeys = "keys" in Object;
-export let assign;
-if (hasKeys) {
-  assign = (target, src) => {
-    for (const i of Object.keys(src)) {
-      target[i] = src[i];
+
+export const assign = hasKeys
+  ? (target, src) => {
+      for (const i of Object.keys(src)) {
+        target[i] = src[i];
+      }
+      return target;
     }
-    return target;
-  };
-} else {
-  assign = (target, src) => {
-    for (const i in src) {
-      target[i] = src[i];
-    }
-    return target;
-  };
-}
+  : (target, src) => {
+      for (const i in src) {
+        target[i] = src[i];
+      }
+      return target;
+    };
 
 /**
  *
@@ -43,7 +41,7 @@ export function flattenArray(arr, depth, map, removeHoles = false) {
       }
     }
   };
-  flat(arr, Math.floor(depth) || 1);
+  flat(arr, ~~depth || 1);
   return flattend;
 }
 
@@ -128,12 +126,3 @@ export function setDomNodeDescriptor(node, sibDom, desc) {
   const c = node._prevVnode;
   setDomNodeDescriptor(c, sibDom, desc);
 }
-// /**
-//  *
-//  * @param {object} obj
-//  */
-// export function nulliFy(obj) {
-//   for (const i in obj) {
-//     obj[i] = null;
-//   }
-// }
