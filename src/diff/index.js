@@ -16,6 +16,7 @@ import { toSimpleVnode } from "./toSimpleVnode.js";
  * @param {Array<import("../ui").UiComponent>} mounts
  * @param {import("../ui").UiComponent} previousComponent
  * @param {boolean} force
+ * @param {import("../ui").vNode} __next
  */
 export function diff(
   parentDom,
@@ -24,7 +25,8 @@ export function diff(
   context,
   mounts,
   previousComponent,
-  force
+  force,
+  __next
 ) {
   if (typeof newVnode === "boolean") newVnode = null;
   if (
@@ -58,37 +60,16 @@ export function diff(
   );
   const newType = newVnode.type;
   if (newType === Fragment || oldVnode.type === Fragment) {
-    if (newVnode.type !== Fragment) {
-      const oldSimilarChild = getSimilarChildTo(
-        newType,
-        oldVnode._children || EMPTY_ARR
-      );
-      const removeChildren = (oldVnode._children || EMPTY_ARR).filter(
-        x => x !== oldSimilarChild
-      );
-      for (const c of removeChildren) {
-        unmountDomTree(c);
-      }
-      return diff(
-        parentDom,
-        newVnode,
-        oldSimilarChild,
-        context,
-        mounts,
-        previousComponent,
-        force
-      );
-    } else {
-      return diffChildren(
-        newVnode,
-        shouldGenerateNewTree ? EMPTY_ARR : oldVnode._children || EMPTY_ARR,
-        parentDom,
-        context,
-        mounts,
-        previousComponent,
-        force
-      );
-    }
+    return diffChildren(
+      newVnode,
+      shouldGenerateNewTree ? EMPTY_ARR : oldVnode._children || EMPTY_ARR,
+      parentDom,
+      context,
+      mounts,
+      previousComponent,
+      force,
+      __next
+    );
   }
   if (typeof newType === "function") {
     let node;
@@ -138,7 +119,7 @@ export function diff(
     }
   }
   const dom = newVnode._dom;
-  if (!Array.isArray(dom)) dom._vNode = newVnode;
+  dom._vNode = newVnode;
   diffChildren(
     newVnode,
     shouldGenerateNewTree ? EMPTY_ARR : oldVnode._children || EMPTY_ARR,
@@ -146,7 +127,8 @@ export function diff(
     context,
     mounts,
     newVnode._component,
-    force
+    force,
+    __next
   );
   return dom;
 }

@@ -5,7 +5,7 @@ export {
   Fragment,
   createElement as h
 } from "./create-element.js";
-export {
+export { 
   default as AsyncComponent
 } from "./pkg/AsyncComponent/AsyncComponent.js";
 export {

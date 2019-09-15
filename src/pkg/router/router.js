@@ -131,7 +131,7 @@ class Router extends Component {
       c = h(this.state.fallbackComponent, this.props);
     }
     if (!c.__uAttr) c = h(c, { match: this.state.match, ...this.props });
-    return h(Fragment, null, c);
+    return c;
   }
 }
 

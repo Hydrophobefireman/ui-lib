@@ -23,7 +23,7 @@ const _rLifeCycle = (c, m, ...a) => {
  */
 export function runLifeCycle(c, method, ...args) {
   if (!c) return;
-  c = _rLifeCycle(c, method, ...args);
+  _rLifeCycle(c, method, ...args);
 }
 
 /**

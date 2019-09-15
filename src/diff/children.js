@@ -36,10 +36,15 @@ export function diffChildren(
       }
       continue;
     }
-    if (oldChild == null && (nextOldChild = oldChildren[i + 1]) != null) {
+    let nextDom = newChild._nextDomNode;
+    if (
+      oldChild == null &&
+      (nextOldChild = getNextChild(oldChildren, oldChildrenLength, i)) != null
+    ) {
       const nextOldDom = nextOldChild._dom;
-      const nextDom = Array.isArray(nextOldDom) ? nextOldDom[0] : nextOldDom;
+      nextDom = Array.isArray(nextOldDom) ? nextOldDom[0] : nextOldDom;
       newChild._nextDomNode = nextDom;
+      newChild._reorder = true;
     }
     const dom = diff(
       parentDom,
@@ -50,6 +55,7 @@ export function diffChildren(
       previousComponent,
       force
     );
+    newChild._nextDomNode = nextDom;
     if (!Array.isArray(dom)) {
       appendChild(parentDom, dom);
       retArr.push(dom);
@@ -57,4 +63,20 @@ export function diffChildren(
   }
 
   return retArr;
+}
+
+/**
+ *
+ * @param {import("../ui").vNode['_children']} oc
+ * @param {Number} len
+ * @param {Number} i
+ * @returns {import("../ui").vNode}
+ */
+function getNextChild(oc, len, i) {
+  let c;
+  for (; i < len; i++) {
+    c = oc[i];
+    if (c) break;
+  }
+  return c;
 }
