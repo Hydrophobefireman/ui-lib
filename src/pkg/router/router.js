@@ -1,5 +1,5 @@
 import Component from "../../component.js";
-import { createElement as h, Fragment } from "../../create-element.js";
+import { createElement as h } from "../../create-element.js";
 import { EMPTY_OBJ } from "../../util.js";
 /**
  * @type {Array<(e:PopStateEvent|null)=>any>}
@@ -19,7 +19,7 @@ export const RouterSubscription = {
     }
   },
   /**
-   * @param {PopStateEvent|null} e
+   * @param {string} e
    */
   emit(e, options) {
     for (const subscription of _routerSubscriptions) {
@@ -40,13 +40,19 @@ export function redirect(url) {
   RouterSubscription.emit(url, { type: "redirect", native: false });
 }
 class Router extends Component {
+  static __emitter() {
+    RouterSubscription.emit(Router.getPath + Router.getQs, {
+      type: "popstate",
+      native: true
+    });
+  }
   componentWillMount() {
     RouterSubscription.subscribe(this._routeChangeHandler);
-    window.addEventListener("popstate", RouterSubscription.emit);
+    window.addEventListener("popstate", Router.__emitter);
   }
 
   componentWillUnmount() {
-    window.removeEventListener("popstate", RouterSubscription.emit);
+    window.removeEventListener("popstate", Router.__emitter);
     if (this.props.destroySubscriptionOnUnmount) {
       RouterSubscription.unsubscribeAll();
     }
@@ -110,6 +116,7 @@ class Router extends Component {
   constructor(routerProps, context) {
     let { children, fallbackComponent, ...props } = routerProps;
     super(props, context);
+
     fallbackComponent = fallbackComponent || this._notFoundComponent.bind(this);
     this.state = { routes: [], fallbackComponent };
     this.initComponents(children);
