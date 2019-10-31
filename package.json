@@ -1,15 +1,23 @@
 {
-  "name": "ui-lib",
+  "name": "@hydrophobefireman/ui-lib",
+  "version": "0.0.1",
   "devDependencies": {
     "microbundle": "^0.11.0"
   },
-  "scripts": {
-    "build": "microbundle -f es --target web --raw true -i src/index.js -o @ui",
-    "dev": "microbundle watch -f es --raw  true --target web -i src/index.js -o @ui",
-    "hm": "microbundle -h"
+  "license": "ISC",
+  "sideEffects": false,
+  "main": "@ui/ui-lib.js",
+  "module": "@ui/ui-lib.mjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hydrophobefireman/ui-lib.git"
   },
-  "__wat": {
-    "build:router": "microbundle -f es --target web --raw true -i outer.js --pwd ./pkg/router -o router",
-    "build:asyncComponent": "microbundle -f es --target web --raw true -i asyncComponent.js --pwd ./pkg/AsyncComponent -o AsyncComponent"
-  }
+  "scripts": {
+    "build": "microbundle  --target web --raw true -i src/index.js -o @ui",
+    "dev": "microbundle watch -f es --raw  true --target web -i src/index.js -o @ui"
+  },
+  "bugs": {
+    "url": "https://github.com/Hydrophobefireman/js-code/issues"
+  },
+  "homepage": "https://github.com/Hydrophobefireman/js-code#readme"
 }
