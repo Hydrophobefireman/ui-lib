@@ -73,7 +73,7 @@ export function diff(
   }
   if (typeof newType === "function") {
     let node;
-    node = toSimpleVnode(
+    const _obj = toSimpleVnode(
       newVnode,
       oldVnode,
       parentDom,
@@ -82,6 +82,8 @@ export function diff(
       force,
       previousComponent
     );
+    node = _obj.node;
+    const shouldUpdate = _obj.shouldUpdate;
     if (newVnode._component != null) newVnode._component._vnode = newVnode;
     if (node === EMPTY_OBJ) return null; //scu returned false
     const dom = (newVnode._dom = diff(
@@ -96,12 +98,13 @@ export function diff(
     if (node == null) return;
     node._dom = dom;
     if (newVnode._component != null) newVnode._component.base = dom;
-    runLifeCycle(
-      newVnode._component,
-      "componentDidUpdate",
-      oldVnode.props,
-      (oldVnode._component || EMPTY_OBJ)._oldState
-    );
+    shouldUpdate &&
+      runLifeCycle(
+        newVnode._component,
+        "componentDidUpdate",
+        oldVnode.props,
+        (oldVnode._component || EMPTY_OBJ)._oldState
+      );
     if (oldVnode._component != null) delete oldVnode._component._oldState;
     newVnode._prevVnode = node;
     if (dom != null && !Array.isArray(dom)) {

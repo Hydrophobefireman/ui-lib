@@ -1,5 +1,4 @@
 import { EMPTY_OBJ, EMPTY_ARR, setDomNodeDescriptor } from "./util.js";
-import { Fragment } from "./create-element.js";
 
 const _rLifeCycle = (c, m, ...a) => {
   c.__currentLifeCycle = m;

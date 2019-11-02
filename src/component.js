@@ -31,16 +31,16 @@ class Component {
     return;
   }
   setState(updater) {
+    this._nextState = assign({}, this.state || EMPTY_OBJ);
+    this._oldState = assign({}, this._nextState);
     const next =
       typeof updater === "function"
         ? (updater = updater(this._nextState, this.props))
         : updater;
     if (next == null) return;
-    this._nextState = assign({}, this.state || EMPTY_OBJ);
-    this._oldState = assign({}, this._nextState);
     assign(this._nextState, next);
+    assign(this.state, this._nextState);
     enqueueRender(this);
-    assign(this.state, this._nextState || EMPTY_OBJ);
   }
   forceUpdate(callback) {
     const parentDom = this.parentDom;
@@ -78,9 +78,11 @@ function process() {
   let p;
   RENDER_QUEUE.sort((x, y) => x._depth - y._depth);
   while ((p = RENDER_QUEUE.pop())) {
-    p._nextState = null;
-    p._dirty = false;
-    p.forceUpdate(false);
+    if (p._dirty) {
+      p._nextState = null;
+      p._dirty = false;
+      p.forceUpdate(false);
+    }
   }
 }
 export default Component;

@@ -43,7 +43,7 @@ export function toSimpleVnode(
         c.shouldComponentUpdate(newVnode.props, c.state) !== false
       ) {
       } else if (c.shouldComponentUpdate != null) {
-        return EMPTY_OBJ;
+        return { node: EMPTY_OBJ, shouldUpdate: false };
       }
     }
   } else {
@@ -88,7 +88,7 @@ export function toSimpleVnode(
     vnode._reorder = newVnode._reorder;
   } //we maybe rendering null
   c._depth = previousComponent ? ~~previousComponent._depth + 1 : 0;
-  return vnode;
+  return { node: vnode, shouldUpdate: !isNew };
 }
 
 function getRenderer(props, _, context) {
