@@ -87,4 +87,3 @@ typings/
 .rts2_cache_umd/
 .rts2_cache_cjs/
 dist/
-@ui/
