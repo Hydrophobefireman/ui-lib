@@ -1,5 +1,5 @@
 import Component from "../../component.js";
-import { createElement as h } from "../../create-element.js";
+import { createElement as h, Fragment } from "../../create-element.js";
 import { EMPTY_OBJ } from "../../util.js";
 /**
  * @type {Array<(e:PopStateEvent|null)=>any>}
@@ -138,7 +138,7 @@ class Router extends Component {
       c = h(this.state.fallbackComponent, this.props);
     }
     if (!c.__uAttr) c = h(c, { match: this.state.match, ...this.props });
-    return c;
+    return h(Fragment, null, c);
   }
 }
 

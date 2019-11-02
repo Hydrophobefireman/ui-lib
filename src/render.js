@@ -7,7 +7,7 @@ import { commitMounts } from "./lifeCycleRunner.js";
  * @param {import("./ui").UiElement} parentDom
  */
 export function render(vn, parentDom) {
-  const vnode = createElement(Fragment, null, [vn]);
+  const vnode = createElement(Fragment, null, vn);
   const mounts = [];
   const oldVnode = parentDom._oldVnode;
   parentDom._oldVnode = vn;

@@ -84,6 +84,7 @@ export function appendChild(parentDom, child) {
   if ((hasVn = (vn = child._vNode) != null)) {
     insertBefore = child._vNode._nextDomNode;
   }
+
   if (child.parentNode !== parentDom || vn._reorder) {
     if (insertBefore != null) {
       parentDom.insertBefore(child, insertBefore);

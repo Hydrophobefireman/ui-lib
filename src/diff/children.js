@@ -1,6 +1,6 @@
 import { unmountDomTree } from "../lifeCycleRunner.js";
 import { diff } from "./index.js";
-import { appendChild } from "../util.js";
+import { appendChild, EMPTY_OBJ } from "../util.js";
 
 /**
  *
@@ -28,7 +28,7 @@ export function diffChildren(
   const retArr = [];
   for (let i = 0; i < Math.max(newChildrenLength, oldChildrenLength); i++) {
     const newChild = newChildren[i];
-    let oldChild = oldChildren[i];
+    let oldChild = oldChildren[i] || EMPTY_OBJ;
     let nextOldChild;
     if (newChild == null) {
       if (oldChild != null) {
@@ -36,16 +36,17 @@ export function diffChildren(
       }
       continue;
     }
-    let nextDom = newChild._nextDomNode;
+    let nextDom = newChild._nextDomNode || oldChild._nextDomNode;
+
     if (
-      oldChild == null &&
+      oldChild === EMPTY_OBJ &&
       (nextOldChild = getNextChild(oldChildren, oldChildrenLength, i)) != null
     ) {
       const nextOldDom = nextOldChild._dom;
       nextDom = Array.isArray(nextOldDom) ? nextOldDom[0] : nextOldDom;
-      newChild._nextDomNode = nextDom;
       newChild._reorder = true;
     }
+    newChild._nextDomNode = nextDom;
     const dom = diff(
       parentDom,
       newChild,
@@ -55,7 +56,7 @@ export function diffChildren(
       previousComponent,
       force
     );
-    newChild._nextDomNode = nextDom;
+
     if (!Array.isArray(dom)) {
       appendChild(parentDom, dom);
       retArr.push(dom);
