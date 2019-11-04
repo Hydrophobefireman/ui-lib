@@ -21,10 +21,11 @@ class Component {
     // this.__currentLifeCycle = null;
     this.props = props;
     this.context = context;
+    this.state = {};
   }
   /**
    * @param {import("./ui").UiComponent['props']} props
-   * @param {import("./ui").UiComponent['state']} state
+   * @param {this['state']} state
    * @returns {import("./ui").vNode}
    */
   render(props, state) {

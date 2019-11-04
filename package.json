@@ -14,7 +14,7 @@
     "url": "git+https://github.com/Hydrophobefireman/ui-lib.git"
   },
   "scripts": {
-    "build": "microbundle  --target web --raw true -i src/index.js -o @ui",
+    "build": "microbundle  --target web --raw true -i src/index.js -o @ui && cp ./@ui/ui-lib.modern.js ./docs/ui/index.js",
     "dev": "microbundle watch -f es --raw  true --target web -i src/index.js -o @ui"
   },
   "bugs": {

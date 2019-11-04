@@ -4,7 +4,10 @@ const _rLifeCycle = (c, m, ...a) => {
   c.__currentLifeCycle = m;
   if (c[m] != null) {
     try {
-      c[m](...a);
+      var fn = () => c[m](...a);
+      if (typeof Promise === "function")
+        return Promise.resolve(fn()).catch(e => c.componentDidCatch(e));
+      return fn();
     } catch (e) {
       if (c.componentDidCatch != null) {
         c.componentDidCatch(e);

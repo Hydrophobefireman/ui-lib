@@ -43,9 +43,6 @@ export function diff(
     }
     oldVnode = EMPTY_OBJ;
   }
-  if (oldVnode != null && newVnode != null && newVnode._nextDomNode == null) {
-    newVnode._nextDomNode = oldVnode._nextDomNode;
-  }
   const shouldGenerateNewTree = oldVnode === EMPTY_OBJ;
 
   if (newVnode.__uAttr !== newVnode) {
@@ -54,7 +51,7 @@ export function diff(
   }
 
   newVnode._children = flattenArray(
-    (newVnode.props && newVnode.props.children) || [],
+    (newVnode.props && newVnode.props.children) || EMPTY_ARR,
     Infinity,
     toVnode
   );
