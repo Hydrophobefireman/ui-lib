@@ -16,7 +16,6 @@ import { toSimpleVnode } from "./toSimpleVnode.js";
  * @param {Array<import("../ui").UiComponent>} mounts
  * @param {import("../ui").UiComponent} previousComponent
  * @param {boolean} force
- * @param {import("../ui").vNode} __next
  */
 export function diff(
   parentDom,
@@ -25,8 +24,7 @@ export function diff(
   context,
   mounts,
   previousComponent,
-  force,
-  __next
+  force
 ) {
   if (typeof newVnode === "boolean") newVnode = null;
   if (
@@ -64,8 +62,7 @@ export function diff(
       context,
       mounts,
       previousComponent,
-      force,
-      __next
+      force
     );
   }
   if (typeof newType === "function") {
@@ -127,8 +124,7 @@ export function diff(
     context,
     mounts,
     newVnode._component,
-    force,
-    __next
+    force
   );
   return dom;
 }

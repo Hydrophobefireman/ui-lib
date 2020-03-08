@@ -2,7 +2,7 @@ export type UiComponent = import("./component").default;
 
 export type vNode = {
   type: string | Function;
-  props?: { children: Array<UiComponent, vNode>; [key: string]: any };
+  props?: { children: Array<UiComponent | vNode>; [key: string]: any };
   _children?: (vNode | null)[];
   events?: { [event: string]: (e: Event) => any };
   _reorder?: boolean;
