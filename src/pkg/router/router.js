@@ -130,14 +130,15 @@ class Router extends Component {
      * @type {import("../../ui").vNode}
      */
     let c;
+    const sendProps = { match: this.state.match, ...this.props };
     if (this.state.component != null && this.state.match != null) {
       c = this.state.component;
     } else if (this.component) {
       c = this.component;
     } else {
-      c = h(this.state.fallbackComponent, this.props);
+      c = h(this.state.fallbackComponent, sendProps);
     }
-    if (!c.__uAttr) c = h(c, { match: this.state.match, ...this.props });
+    if (!c.__uAttr) c = h(c, sendProps);
     return h(Fragment, null, c);
   }
 }
