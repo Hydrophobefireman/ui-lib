@@ -1,6 +1,6 @@
 import Component from "../../component.js";
 import { createElement as h, Fragment } from "../../create-element.js";
-import { EMPTY_OBJ } from "../../util.js";
+import { EMPTY_OBJ, assign } from "../../util.js";
 /**
  * @type {Array<(e:PopStateEvent|null)=>any>}
  */
@@ -69,7 +69,6 @@ class Router extends Component {
   }
   _routeChangeHandler() {
     const [component, match] = this.getCurrentComponent();
-    this.component = this.match = null;
     this.setState({ component, match });
   }
   _notFoundComponent() {
@@ -99,14 +98,16 @@ class Router extends Component {
     return [];
   }
   initComponents(c) {
+    const _routes = [];
     for (const child of c) {
       if (child.props != null && child.props.path != null) {
-        this.state.routes.push({
+        _routes.push({
           regex: child.props.path,
           component: child
         });
       }
     }
+    return _routes;
   }
   /**
    *
@@ -116,14 +117,15 @@ class Router extends Component {
   constructor(routerProps, context) {
     let { children, fallbackComponent, ...props } = routerProps;
     super(props, context);
-
     fallbackComponent = fallbackComponent || this._notFoundComponent.bind(this);
-    this.state = { routes: [], fallbackComponent };
-    this.initComponents(children);
+    this.state = { routes: this.initComponents(children), fallbackComponent };
     const [component, match] = this.getCurrentComponent();
-    this.component = component;
-    this.match = match;
+    this.state.component = component;
+    this.state.match = match;
     this._routeChangeHandler = this._routeChangeHandler.bind(this);
+  }
+  componentDidMount() {
+    // this._routeChangeHandler();
   }
   render() {
     /**
@@ -133,12 +135,12 @@ class Router extends Component {
     const sendProps = { match: this.state.match, ...this.props };
     if (this.state.component != null && this.state.match != null) {
       c = this.state.component;
-    } else if (this.component) {
-      c = this.component;
+      assign(c.props, sendProps);
     } else {
       c = h(this.state.fallbackComponent, sendProps);
     }
     if (!c.__uAttr) c = h(c, sendProps);
+
     return h(Fragment, null, c);
   }
 }

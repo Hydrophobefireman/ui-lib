@@ -8,7 +8,6 @@ export const defer =
     : setTimeout;
 
 const hasKeys = "keys" in Object;
-
 export const assign = hasKeys
   ? (target, src) => {
       for (const i of Object.keys(src)) {
