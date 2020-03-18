@@ -1,22 +1,5 @@
 import { EMPTY_OBJ, EMPTY_ARR, setDomNodeDescriptor } from "./util.js";
 
-const _rLifeCycle = (c, m, ...a) => {
-  c.__currentLifeCycle = m;
-  if (c[m] != null) {
-    try {
-      var fn = () => c[m](...a);
-      if (typeof Promise === "function")
-        return Promise.resolve(fn()).catch(e => c.componentDidCatch(e));
-      return fn();
-    } catch (e) {
-      if (c.componentDidCatch != null) {
-        c.componentDidCatch(e);
-      } else {
-        throw e;
-      }
-    }
-  }
-};
 /**
  *
  * @param {import("./component").default} c
@@ -25,7 +8,22 @@ const _rLifeCycle = (c, m, ...a) => {
  */
 export function runLifeCycle(c, method, ...args) {
   if (!c) return;
-  _rLifeCycle(c, method, ...args);
+  c.__currentLifeCycle = method;
+  if (c[method] != null) {
+    const fn = function() {
+      c[method].apply(c, args);
+    };
+    if (typeof Promise !== "undefined") {
+      return Promise.resolve(fn()).catch(
+        e => c.componentDidCatch && c.componentDidCatch(e)
+      );
+    }
+    try {
+      fn();
+    } catch (e) {
+      c.componentDidCatch && c.componentDidCatch(e);
+    }
+  }
 }
 
 /**
@@ -42,7 +40,6 @@ export function unmountDomTree(node) {
   if (!dom) {
     return;
   }
-
   if (node != null) {
     if (node._nextDomNode != null)
       setDomNodeDescriptor(node._nextDomNode._vNode, null, "_prevDomNode");
@@ -55,7 +52,7 @@ export function unmountDomTree(node) {
   }
   if (Array.isArray(dom)) {
     let d;
-    while ((d = node._children.pop())) {
+    while ((d = EMPTY_ARR.pop.call(node._children || dom))) {
       removeNode(d);
     }
   } else {

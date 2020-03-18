@@ -31,3 +31,8 @@ export type lifeCycleMethod =
   | "componentWillUpdate"
   | "componentDidUpdate";
 export type keyedChildren = [{ [index: number]: vNode }, Array<vNode>];
+type functionReturningVnode = (props: any) => vNode;
+export type createElementArgType =
+  | string
+  | functionReturningVnode
+  | UiComponent;

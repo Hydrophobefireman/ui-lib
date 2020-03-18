@@ -1,5 +1,11 @@
-import { isListener, flattenArray, assign, EMPTY_OBJ } from "./util.js";
+import { isListener, flattenArray, assign } from "./util.js";
 
+/**
+ *
+ * @param {import("./ui").createElementArgType} type
+ * @param {{}} props
+ * @param  {Array<import("./ui").createElementArgType>} children
+ */
 export function createElement(type, props, ...children) {
   if (type == null || typeof type === "boolean") return null;
   if (props == null) {
@@ -30,7 +36,7 @@ export function getVNode(type, props, events, key, ref) {
    * @type {import("./ui").vNode}
    */
   const vnode = {
-    type,
+    type: (typeof type === "string" ? type.toLowerCase() : type),
     props,
     events,
     key,

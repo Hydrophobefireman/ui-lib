@@ -128,16 +128,3 @@ export function diff(
   );
   return dom;
 }
-
-/**
- *
- * @param {import("../ui").vNode['type']} type
- * @param {import("../ui").vNode['_children']} childArr
- */
-function getSimilarChildTo(type, childArr) {
-  for (const child of childArr) {
-    if (child.type === type) {
-      return child;
-    }
-  }
-}

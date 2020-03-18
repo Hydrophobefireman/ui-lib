@@ -14,7 +14,6 @@ export function render(vn, parentDom) {
     return hydrate(parentDom, vnode);
   }
   const mounts = [];
-
   const oldVnode = parentDom._oldVnode;
   parentDom._oldVnode = vn;
   diff(
@@ -34,10 +33,10 @@ export function render(vn, parentDom) {
  * @param {import("./ui").UiNode} dom
  */
 function _getVnodeFromDom(dom) {
-  if (dom.nodeName === "#comment") return null;
-  if (dom instanceof Text) return dom.nodeValue;
+  if (dom.nodeName === "#comment")
+    if (dom instanceof Text) return dom.nodeValue;
   const node = createElement(
-    dom.tagName.toLowerCase(),
+    dom.tagName,
     null,
     Array.from(dom.childNodes).map(_getVnodeFromDom)
   );
