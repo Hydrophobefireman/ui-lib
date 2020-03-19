@@ -1,6 +1,6 @@
 import { diff } from "./diff/index.js";
 import { Fragment, createElement, toVnode } from "./create-element.js";
-import { commitMounts, removeNode } from "./lifeCycleRunner.js";
+import { commitMounts } from "./lifeCycleRunner.js";
 import { flattenArray, EMPTY_ARR } from "./util.js";
 
 /**
@@ -14,17 +14,8 @@ export function render(vn, parentDom) {
     return hydrate(parentDom, vnode);
   }
   const mounts = [];
-  const oldVnode = parentDom._oldVnode;
-  parentDom._oldVnode = vn;
-  diff(
-    parentDom,
-    vnode,
-    oldVnode,
-    {},
-    mounts,
-    oldVnode == null ? null : oldVnode._component,
-    false
-  );
+  const oldVnode = null;
+  diff(parentDom, vnode, oldVnode, {}, mounts, null, false);
   commitMounts(mounts);
 }
 
@@ -41,7 +32,7 @@ function _getVnodeFromDom(dom) {
     Array.from(dom.childNodes).map(_getVnodeFromDom)
   );
   node._dom = dom;
-  dom._vNode = dom._oldVnode = node;
+  dom._vNode = node;
   return node;
 }
 /**
@@ -58,7 +49,6 @@ export function hydrate(dom, vnode) {
     Infinity,
     toVnode
   );
-  dom._oldVnode = vn;
   const mounts = [];
   diff(dom, vnode, vn, {}, mounts, null, false);
   commitMounts(mounts);

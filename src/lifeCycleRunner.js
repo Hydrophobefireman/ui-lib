@@ -58,7 +58,7 @@ export function unmountDomTree(node) {
   } else {
     removeNode(dom);
   }
-  dom.onclick = dom._component = dom._listeners = dom._prevVnode = dom._vNode = null;
+  dom.onclick = dom._component = dom._listeners = dom._prevVnode = dom._vNode = dom._currentProps = null;
 }
 
 /**

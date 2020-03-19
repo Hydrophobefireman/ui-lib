@@ -7,8 +7,6 @@ import { Fragment } from "../create-element.js";
  * @param {import("../ui").vNode} oldVnode
  * @param {import("../ui").UiNode} previousDom
  * @param {boolean} _DisableDiff
- 
- 
  */
 export function diffDom(newVnode, oldVnode, previousDom, _DisableDiff) {
   /**
@@ -56,11 +54,11 @@ const isSafeAttr = attr => attr !== "key" && attr !== "children";
 function diffAttributes(currentDom, currVnode, prevVnode) {
   if (currentDom instanceof Text) return;
   const newAttributes = currVnode.props;
-  const prevAttributes = currentDom.attributes;
+  const prevAttributes = currentDom._currentProps || EMPTY_OBJ;
+  currentDom._currentProps = newAttributes;
   const currEvents = currVnode.events;
   const prevEvents = prevVnode != null ? prevVnode.events : EMPTY_OBJ;
-  for (let i = 0; i < prevAttributes.length; i++) {
-    const attr = prevAttributes[i].name;
+  for (const attr in prevAttributes) {
     if (!(attr in newAttributes)) {
       $.setAttribute(currentDom, attr, null);
     }
@@ -68,47 +66,42 @@ function diffAttributes(currentDom, currVnode, prevVnode) {
   for (let attr in newAttributes) {
     if (isListener(attr) || !isSafeAttr(attr)) continue;
     let newValue = newAttributes[attr];
+    const oldValue = prevAttributes[attr] || EMPTY_OBJ;
+    if (newValue === oldValue) continue;
     attr = attr === "class" ? "className" : attr;
-    const oldValue =
-      attr in currentDom ? currentDom[attr] : currentDom.getAttribute(attr);
     if (attr === "className" && Array.isArray(newValue)) {
       newValue = newValue.join(" ");
     } else if (attr === "style") {
-      const st = currentDom.style;
-      if (typeof newValue === "string") {
-        st.cssText = newValue;
-      } else {
-        if (typeof oldValue === "string") {
-          st.cssText = "";
-        } else {
-          if (oldValue) {
-            oldValue.cssText = "";
-          }
-        }
-        for (const i in newValue) {
-          const prop = newValue[i];
-          if (!oldValue || prop !== oldValue[i]) {
-            st[i] = prop;
-          }
-        }
-      }
+      diffStyle(currentDom, newValue, oldValue);
       continue;
     }
-    if (oldValue !== newValue) $.setAttribute(currentDom, attr, newValue);
+    $.setAttribute(currentDom, attr, newValue);
   }
-
-  // let clsattr = newAttributes.class || newAttributes.className;
-  // const oldClass = currentDom.className;
-  // if (oldClass && !clsattr) {
-  //   return void currentDom.removeAttribute("class");
-  // }
-  // if (clsattr) {
-  //   if (typeof clsattr !== "string") {
-  //     clsattr = clsattr.join(" ");
-  //   }
-  //   $.setAttribute(currentDom, "class", clsattr);
-  // }
   diffEventListeners(currEvents, prevEvents, currentDom);
+}
+
+function diffStyle(currentDom, newValue, oldValue) {
+  const st = currentDom.style;
+  if (typeof newValue === "string") {
+    st.cssText = newValue;
+    return;
+  }
+  const oldValueIsString = typeof oldValue === "string";
+  if (oldValueIsString) {
+    st.cssText = "";
+  } else {
+    for (const styleProp in oldValue) {
+      if (!(styleProp in newValue)) {
+        st[styleProp] = "";
+      }
+    }
+  }
+  for (const i in newValue) {
+    const prop = newValue[i];
+    if (oldValueIsString || prop !== oldValue[i]) {
+      st[i] = prop;
+    }
+  }
 }
 
 /**
@@ -117,7 +110,7 @@ function diffAttributes(currentDom, currVnode, prevVnode) {
  * @this {import("../ui").UiElement}
  */
 export function eventListenerProxy(e) {
-  return this._listeners[e.type](e);
+  return this._listeners[e.type].call(this, e);
 }
 
 /**
@@ -129,8 +122,7 @@ export function eventListenerProxy(e) {
 export function diffEventListeners(newListeners, oldListeners, dom) {
   if (newListeners == oldListeners) return;
   if (dom._listeners == null) {
-    dom._listeners = {};
-    dom.onclick = Fragment;
+    dom._listeners = { onclick: Fragment };
   }
   if (oldListeners == null) {
     oldListeners = EMPTY_OBJ;
