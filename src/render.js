@@ -1,6 +1,6 @@
 import { diff } from "./diff/index.js";
 import { Fragment, createElement, toVnode } from "./create-element.js";
-import { commitMounts } from "./lifeCycleRunner.js";
+import { commitMounts, removeNode } from "./lifeCycleRunner.js";
 import { flattenArray, EMPTY_ARR } from "./util.js";
 
 /**
@@ -33,8 +33,8 @@ export function render(vn, parentDom) {
  * @param {import("./ui").UiNode} dom
  */
 function _getVnodeFromDom(dom) {
-  if (dom.nodeName === "#comment")
-    if (dom instanceof Text) return dom.nodeValue;
+  if (dom.nodeName === "#comment") return;
+  if (dom instanceof Text) return dom.nodeValue;
   const node = createElement(
     dom.tagName,
     null,
