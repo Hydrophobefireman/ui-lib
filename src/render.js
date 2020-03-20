@@ -1,7 +1,6 @@
-import { diff } from "./diff/index.js";
-import { Fragment, createElement, toVnode } from "./create-element.js";
+import { diff, flattenVNodeChildren } from "./diff/index.js";
+import { Fragment, createElement } from "./create-element.js";
 import { commitMounts } from "./lifeCycleRunner.js";
-import { flattenArray, EMPTY_ARR } from "./util.js";
 
 /**
  *
@@ -11,6 +10,10 @@ import { flattenArray, EMPTY_ARR } from "./util.js";
 export function render(vn, parentDom) {
   const vnode = createElement(Fragment, null, vn);
   if (parentDom.hasChildNodes()) {
+    /**
+     * Even though we had render called, we can still diff against the existing dom instead of
+     * removing the nodes and creating brand new dom
+     */
     return hydrate(parentDom, vnode);
   }
   const mounts = [];
@@ -24,13 +27,18 @@ export function render(vn, parentDom) {
  * @param {import("./ui").UiNode} dom
  */
 function _getVnodeFromDom(dom) {
-  if (dom.nodeName === "#comment") return;
-  if (dom instanceof Text) return dom.nodeValue;
+  if (dom.nodeName === "#comment") {
+    /**should we call .remove on the node?  */ return;
+  }
+  if (dom instanceof Text) {
+    return dom.nodeValue;
+  }
   const node = createElement(
     dom.tagName,
     null,
     Array.from(dom.childNodes).map(_getVnodeFromDom)
   );
+  node._children = flattenVNodeChildren(node);
   node._dom = dom;
   dom._vNode = node;
   return node;
@@ -44,11 +52,7 @@ export function hydrate(dom, vnode) {
   const children = Array.from(dom.childNodes);
   const vn = createElement(Fragment, null, children.map(_getVnodeFromDom));
   vn._dom = children;
-  vn._children = flattenArray(
-    (vn.props && vn.props.children) || EMPTY_ARR,
-    Infinity,
-    toVnode
-  );
+  vn._children = flattenVNodeChildren(vn);
   const mounts = [];
   diff(dom, vnode, vn, {}, mounts, null, false);
   commitMounts(mounts);

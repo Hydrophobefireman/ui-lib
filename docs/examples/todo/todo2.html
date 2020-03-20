@@ -35,6 +35,7 @@
             { ...s }
           );
           console.log("componentDidUpdate");
+          document.title = `Number of items:${this.state.items.length}`;
         }
         componentWillUpdate() {
           console.log("componentWillUpdate");
@@ -53,7 +54,6 @@
         }
 
         render() {
-          document.title = `Number of items:${this.state.items.length}`;
           const e = h(
             "div",
             null,

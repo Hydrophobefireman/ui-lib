@@ -66,11 +66,12 @@ function diffAttributes(currentDom, currVnode, prevVnode) {
   for (let attr in newAttributes) {
     if (isListener(attr) || !isSafeAttr(attr)) continue;
     let newValue = newAttributes[attr];
-    const oldValue = prevAttributes[attr] || EMPTY_OBJ;
+    let oldValue = prevAttributes[attr] || EMPTY_OBJ;
     if (newValue === oldValue) continue;
     attr = attr === "class" ? "className" : attr;
-    if (attr === "className" && Array.isArray(newValue)) {
-      newValue = newValue.join(" ");
+    if (attr === "className") {
+      diffClass(currentDom, newValue, oldValue);
+      continue;
     } else if (attr === "style") {
       diffStyle(currentDom, newValue, oldValue);
       continue;
@@ -78,6 +79,17 @@ function diffAttributes(currentDom, currVnode, prevVnode) {
     $.setAttribute(currentDom, attr, newValue);
   }
   diffEventListeners(currEvents, prevEvents, currentDom);
+}
+function diffClass(currentDom, newValue, oldValue) {
+  const isArray = Array.isArray;
+  if (isArray(newValue)) {
+    newValue = newValue.join(" ").trim();
+  }
+  if (isArray(oldValue)) {
+    oldValue = oldValue.join(" ").trim();
+  }
+  if (newValue === oldValue) return;
+  $.setAttribute(currentDom, "className", newValue);
 }
 
 function diffStyle(currentDom, newValue, oldValue) {

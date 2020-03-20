@@ -1,5 +1,18 @@
-export type UiComponent = import("./component").default;
+declare class Component {
+  props: {};
+  context: {};
+  state: {};
+  constructor(props: {}, context: {});
+  render(props: Component["props"], state: Component["state"]): any;
+  componentWillMount?(): any;
+  componentDidMount?(): any;
+  shouldComponentUpdate?(): boolean;
+  componentWillUpdate?(): any;
+  componentDidUpdate?(): any;
+  componentWillUnmount?(): any;
+}
 
+export type UiComponent = Component;
 export type vNode = {
   type: string | Function;
   props?: { children: Array<UiComponent | vNode>; [key: string]: any };

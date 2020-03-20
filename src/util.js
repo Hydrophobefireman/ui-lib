@@ -7,17 +7,27 @@ export const defer =
     ? Promise.prototype.then.bind(Promise.resolve())
     : setTimeout;
 
-const hasKeys = "keys" in Object;
-export const assign = hasKeys
-  ? (target, src) => {
-      for (const i of Object.keys(src)) {
-        target[i] = src[i];
-      }
-      return target;
-    }
-  : (target, src) => {
-      for (const i in src) {
-        target[i] = src[i];
+export const EMPTY_OBJ = {};
+export const EMPTY_ARR = [];
+
+const _Obj = EMPTY_OBJ.constructor;
+const hasOwnProp = EMPTY_OBJ.hasOwnProperty;
+const hasAssign = "assign" in _Obj;
+
+/**
+ * from @hydrophobefireman/j-utils
+ * @type {ObjectConstructor['assign']}
+ */
+export const assign = hasAssign
+  ? _Obj.assign
+  : function(target) {
+      for (let i = 1; i < arguments.length; i++) {
+        const source = arguments[i];
+        for (const key in source) {
+          if (hasOwnProp.call(source, key)) {
+            target[key] = source[key];
+          }
+        }
       }
       return target;
     };
@@ -44,9 +54,6 @@ export function flattenArray(arr, depth, map, removeHoles = false) {
   return flattend;
 }
 
-export const EMPTY_OBJ = {};
-export const EMPTY_ARR = [];
-
 export const $ = {
   /**
    *
@@ -63,9 +70,15 @@ export const $ = {
     }
   }
 };
-
+/**
+ * @type {string}
+ */
 export const isListener = attr => attr[0] === "o" && attr[1] === "n";
 
+/**
+ * @type {any}
+ * @returns {boolean}
+ */
 export function isStringLike(a) {
   return typeof a === "string" || typeof a === "number";
 }

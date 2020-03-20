@@ -48,11 +48,7 @@ export function diff(
     return null;
   }
 
-  newVnode._children = flattenArray(
-    (newVnode.props && newVnode.props.children) || EMPTY_ARR,
-    Infinity,
-    toVnode
-  );
+  newVnode._children = flattenVNodeChildren(newVnode);
   const newType = newVnode.type;
   if (newType === Fragment || oldVnode.type === Fragment) {
     return diffChildren(
@@ -100,7 +96,7 @@ export function diff(
         (oldVnode._component || EMPTY_OBJ)._oldState
       );
     if (oldVnode._component != null) delete oldVnode._component._oldState;
-    newVnode._prevVnode = node;
+    if (node !== newVnode._prevVnode) newVnode._prevVnode = node;
     if (dom != null && !Array.isArray(dom)) {
       dom._vNode = newVnode;
     }
@@ -127,4 +123,15 @@ export function diff(
     force
   );
   return dom;
+}
+/**
+ *
+ * @param {import('../ui').vNode} vn
+ */
+export function flattenVNodeChildren(vn) {
+  return flattenArray(
+    (vn.props && vn.props.children) || EMPTY_ARR,
+    Infinity,
+    toVnode
+  );
 }

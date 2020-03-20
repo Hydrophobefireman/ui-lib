@@ -40,19 +40,18 @@ export function unmountDomTree(node) {
   if (!dom) {
     return;
   }
-  if (node != null) {
-    if (node._nextDomNode != null)
-      setDomNodeDescriptor(node._nextDomNode._vNode, null, "_prevDomNode");
-    if (node._prevDomNode != null)
-      setDomNodeDescriptor(node._prevDomNode._vNode, null, "_nextDomNode");
-    for (const child of node._children || EMPTY_ARR) {
-      unmountDomTree(child);
-    }
-    node._prevVnode = node._component = node._dom = node._prevDomNode = node._nextDomNode = null;
+  if (node._nextDomNode != null)
+    setDomNodeDescriptor(node._nextDomNode._vNode, null, "_prevDomNode");
+  if (node._prevDomNode != null)
+    setDomNodeDescriptor(node._prevDomNode._vNode, null, "_nextDomNode");
+  for (const child of node._children || EMPTY_ARR) {
+    unmountDomTree(child);
   }
+  node._prevVnode = node._component = node._dom = node._prevDomNode = node._nextDomNode = null;
+
   if (Array.isArray(dom)) {
     let d;
-    while ((d = EMPTY_ARR.pop.call(node._children || dom))) {
+    while ((d = EMPTY_ARR.pop.call(dom || EMPTY_ARR))) {
       removeNode(d);
     }
   } else {

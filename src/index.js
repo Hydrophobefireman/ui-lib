@@ -1,3 +1,7 @@
+/**
+ * You do not need to import hydrate as render will detect if any hydration is needed or not,
+ * however you can stll explicitly call hydrate
+ */
 export { render, hydrate } from "./render.js";
 export { default, default as Component } from "./component.js";
 export {

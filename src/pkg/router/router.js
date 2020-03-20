@@ -132,7 +132,8 @@ class Router extends Component {
      * @type {import("../../ui").vNode}
      */
     let c;
-    const sendProps = { match: this.state.match, ...this.props };
+    const { children, ..._props } = this.props;
+    const sendProps = { match: this.state.match, ..._props };
     if (this.state.component != null && this.state.match != null) {
       c = this.state.component;
       assign(c.props, sendProps);
