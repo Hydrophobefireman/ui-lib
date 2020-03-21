@@ -134,7 +134,8 @@ export function eventListenerProxy(e) {
 export function diffEventListeners(newListeners, oldListeners, dom) {
   if (newListeners == oldListeners) return;
   if (dom._listeners == null) {
-    dom._listeners = { onclick: Fragment };
+    dom._listeners = {};
+    dom.onclick = Fragment;
   }
   if (oldListeners == null) {
     oldListeners = EMPTY_OBJ;
