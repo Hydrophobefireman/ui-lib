@@ -135,15 +135,15 @@ export function eventListenerProxy(e) {
  */
 export function diffEventListeners(newListeners, oldListeners, dom) {
   if (newListeners == oldListeners) return;
-
+  if (dom._listeners == null) {
+    dom.onclick = Fragment;
+    dom._listeners = {};
+  }
   if (oldListeners == null) {
     oldListeners = EMPTY_OBJ;
   }
   if (newListeners == null) {
     newListeners = EMPTY_OBJ;
-  } else {
-    dom.onclick = Fragment;
-    dom._listeners = {};
   }
   for (const event in newListeners) {
     const listener = newListeners[event];
