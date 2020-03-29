@@ -30,12 +30,13 @@ function _getVnodeFromDom(dom) {
   if (dom.nodeName === "#comment") {
     /**should we call .remove on the node?  */ return;
   }
+
   if (dom instanceof Text) {
     return dom.nodeValue;
   }
   const node = createElement(
     dom.tagName,
-    null,
+    attributesAsProps(dom.attributes),
     Array.from(dom.childNodes).map(_getVnodeFromDom)
   );
   node._children = flattenVNodeChildren(node);
@@ -43,6 +44,22 @@ function _getVnodeFromDom(dom) {
   dom._vNode = node;
   return node;
 }
+/**
+ *
+ * @param {NamedNodeMap} attributes
+ */
+function attributesAsProps(attributes) {
+  const props = {};
+  const length = attributes.length;
+  for (let i = 0; i < length; i++) {
+    const attr = attributes[i];
+    const key = attr.name;
+    const value = attr.value;
+    props[key] = value;
+  }
+  return props;
+}
+
 /**
  *
  * @param {import("./ui").UiElement} dom

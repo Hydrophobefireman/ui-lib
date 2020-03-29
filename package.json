@@ -1,21 +1,22 @@
 {
   "name": "@hydrophobefireman/ui-lib",
   "author": "Hydrophobefireman",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "devDependencies": {
     "microbundle": "^0.12.0-next.6"
   },
   "license": "ISC",
   "sideEffects": false,
-  "main": "dist/ui-lib.js",
-  "module": "dist/ui-lib.modern.js",
+  "main": "dist/ui-lib.m.js",
+  "module": "dist/ui-lib.m.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Hydrophobefireman/ui-lib.git"
   },
   "scripts": {
-    "build": "microbundle  --target web --raw true -i src/index.js -o dist && cp ./dist/ui-lib.modern.js ./docs/ui/index.js",
-    "dev": "microbundle watch -f es --raw  true --target web -i src/index.js -o dist"
+    "microbundle-start": "microbundle -f modern --target web --raw true -i src/index.js -o dist",
+    "build": "python3 build.py",
+    "dev": "microbundle watch -f modern --raw  true --target web -i src/index.js -o dist"
   },
   "bugs": {
     "url": "https://github.com/Hydrophobefireman/js-code/issues"
