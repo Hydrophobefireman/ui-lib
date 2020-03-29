@@ -8,3 +8,4 @@
 
 export { createElement as jsx } from "../";
 export { createElement as jsxs } from "../";
+export { Fragment } from "../";
