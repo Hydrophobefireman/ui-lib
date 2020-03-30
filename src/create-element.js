@@ -1,7 +1,5 @@
-import { isListener, flattenArray, assign } from "./util.js";
-
+import { isListener, flattenArray, EMPTY_OBJ } from "./util.js";
 /**
- *
  * @param {import("./ui").createElementArgType} type
  * @param {{}} props
  * @param  {Array<import("./ui").createElementArgType>} children
@@ -9,18 +7,15 @@ import { isListener, flattenArray, assign } from "./util.js";
 export function createElement(type, props, ...children) {
   if (type == null || typeof type === "boolean") return null;
   if (props == null) {
-    props = {};
-  } else {
-    props = assign({}, props);
+    props = EMPTY_OBJ;
   }
+  const ref = props.ref;
+  const key = props.key;
+  props = getPropsWithoutSpecialElements(props);
   if (children.length || (children = [props.children])) {
     children = flattenArray(children, Infinity);
     props.children = children;
   }
-  const ref = props.ref;
-  if (ref) delete props.ref;
-  const key = props.key;
-  if (key) delete props.key;
   const events = {};
   for (const i in props) {
     if (isListener(i)) {
@@ -82,4 +77,16 @@ export function toVnode(nodeType) {
   }
 
   return nodeType;
+}
+
+const SPECIAL_ELEMENTS = { key: 1, ref: 1 };
+
+function getPropsWithoutSpecialElements(props) {
+  const obj = {};
+  for (const i in props) {
+    if (SPECIAL_ELEMENTS[i] == null) {
+      obj[i] = props[i];
+    }
+  }
+  return obj;
 }

@@ -40,9 +40,9 @@ class AsyncComponent extends Component {
     if (ready) {
       return h(finalComponent, props);
     }
-    const { children, ..._props } = props;
+    const { children, ...fallbackProps } = props;
     return this.state.fallbackComponent != null
-      ? h(this.state.fallbackComponent, _props)
+      ? h(this.state.fallbackComponent, fallbackProps)
       : _defaultLoader;
   }
 

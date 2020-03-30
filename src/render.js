@@ -30,7 +30,6 @@ function _getVnodeFromDom(dom) {
   if (dom.nodeName === "#comment") {
     /**should we call .remove on the node?  */ return;
   }
-
   if (dom instanceof Text) {
     return dom.nodeValue;
   }
