@@ -13,7 +13,7 @@ export function createElement(type, props, ...children) {
   } else {
     props = assign({}, props);
   }
-  if (children.length) {
+  if (children.length || (children = [props.children])) {
     children = flattenArray(children, Infinity);
     props.children = children;
   }

@@ -3,8 +3,8 @@ import { createElement as h } from "../../create-element.js";
 
 class AsyncComponent extends Component {
   constructor(props, context) {
-    const { componentPromise, fallbackComponent, ..._props } = props;
-    super(_props, context);
+    const { componentPromise, fallbackComponent } = props;
+    super(props, context);
     this.state = {
       ready: false,
       componentPromise,
@@ -23,10 +23,17 @@ class AsyncComponent extends Component {
     }
     return s;
   }
-  render(
-    { eager = true, loadComponent = false, ...props },
-    { ready, finalComponent }
-  ) {
+  render(_props, state) {
+    const {
+      eager = true,
+      loadComponent = false,
+      componentPromise,
+      fallbackComponent,
+      ...props
+    } = props;
+
+    const { ready, finalComponent } = state;
+
     if ((eager || loadComponent) && !ready) {
       this.loadComponent();
     }
