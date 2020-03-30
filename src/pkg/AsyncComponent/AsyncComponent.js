@@ -30,7 +30,7 @@ class AsyncComponent extends Component {
       componentPromise,
       fallbackComponent,
       ...props
-    } = props;
+    } = _props;
 
     const { ready, finalComponent } = state;
 
