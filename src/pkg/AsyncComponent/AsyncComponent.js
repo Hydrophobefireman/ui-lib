@@ -1,5 +1,5 @@
-import Component from "../../component.js";
-import { createElement as h } from "../../create-element.js";
+import { Component } from "../../component";
+import { createElement as h } from "../../create_element";
 
 class AsyncComponent extends Component {
   constructor(props, context) {
@@ -9,7 +9,7 @@ class AsyncComponent extends Component {
       ready: false,
       componentPromise,
       finalComponent: null,
-      fallbackComponent
+      fallbackComponent,
     };
   }
   static getDerivedStateFromProps(props, state) {
@@ -47,7 +47,7 @@ class AsyncComponent extends Component {
   }
 
   loadComponent() {
-    return this.state.componentPromise().then(ct => {
+    return this.state.componentPromise().then((ct) => {
       this.setState({ ready: true, finalComponent: ct });
     });
   }

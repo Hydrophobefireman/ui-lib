@@ -1,25 +1,27 @@
 {
   "name": "@hydrophobefireman/ui-lib",
-  "author": "Hydrophobefireman",
-  "version": "0.1.85",
-  "devDependencies": {
-    "microbundle": "^0.12.0-next.6"
+  "version": "0.2.0",
+  "description": "",
+  "main": "dist/index.m.js",
+  "scripts": {
+    "microbundle-start": "microbundle src/index.ts --compress false -o ./dist -f modern --target web --raw true  --tsconfig tsconfig.json",
+    "dev": "microbundle watch src/index.ts -o ./dist -f modern --raw  true --target web --tsconfig tsconfig.json",
+    "build": "python3 build.py",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "license": "ISC",
-  "sideEffects": false,
-  "main": "dist/ui-lib.m.js",
-  "module": "dist/ui-lib.m.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Hydrophobefireman/ui-lib.git"
   },
-  "scripts": {
-    "microbundle-start": "microbundle -f modern --target web --raw true -i src/index.js -o dist",
-    "build": "python3 build.py",
-    "dev": "microbundle watch -f modern --raw  true --target web -i src/index.js -o dist"
-  },
+  "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Hydrophobefireman/js-code/issues"
+    "url": "https://github.com/Hydrophobefireman/ui-lib/issues"
   },
-  "homepage": "https://github.com/Hydrophobefireman/js-code#readme"
+  "module": "dist/index.m.js",
+  "types": "dist/index.d.ts",
+  "sideEffects": false,
+  "homepage": "https://github.com/Hydrophobefireman/ui-lib#readme",
+  "devDependencies": {
+    "microbundle": "^0.12.0-next.8"
+  }
 }

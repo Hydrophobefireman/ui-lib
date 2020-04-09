@@ -1,6 +1,6 @@
-import Component from "../../component.js";
-import { createElement as h, Fragment } from "../../create-element.js";
-import { EMPTY_OBJ, assign } from "../../util.js";
+import { Component } from "../../component";
+import { createElement as h, Fragment } from "../../create_element";
+import { EMPTY_OBJ, assign } from "../../util";
 /**
  * @type {Array<(e:PopStateEvent|null)=>any>}
  */
@@ -28,7 +28,7 @@ export const RouterSubscription = {
   },
   unsubscribeAll() {
     _routerSubscriptions.length = 0;
-  }
+  },
 };
 
 export function loadURL(url) {
@@ -43,7 +43,7 @@ class Router extends Component {
   static __emitter() {
     RouterSubscription.emit(Router.getPath + Router.getQs, {
       type: "popstate",
-      native: true
+      native: true,
     });
   }
   componentWillMount() {
@@ -103,7 +103,7 @@ class Router extends Component {
       if (child.props != null && child.props.path != null) {
         _routes.push({
           regex: child.props.path,
-          component: child
+          component: child,
         });
       }
     }
@@ -140,7 +140,7 @@ class Router extends Component {
     } else {
       c = h(this.state.fallbackComponent, sendProps);
     }
-    if (!c.__uAttr) c = h(c, sendProps);
+    if (!c.__self) c = h(c, sendProps);
 
     return h(Fragment, null, c);
   }
@@ -151,7 +151,7 @@ export function A(props) {
   const setProps = p;
   setProps.href = href;
   if (!native && href != null) {
-    setProps.onClick = e => onLinkClick(e, props.href, onClick);
+    setProps.onClick = (e) => onLinkClick(e, props.href, onClick);
   }
   return h("a", setProps);
 }
