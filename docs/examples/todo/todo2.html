@@ -1,0 +1,216 @@
+<html>
+  <head>
+    <title>Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      import * as ok from "../../ui/index.js";
+      window.a = ok;
+      const Component = a.default;
+      const h = a.createElement;
+      const f = a.Fragment;
+      const Fragment = f;
+      class SampleComponent extends Component {
+        constructor(props) {
+          super(props);
+          this.state = { items: [], text: "" };
+          this.handleChange = this.handleChange.bind(this);
+          this.handleSubmit = this.handleSubmit.bind(this);
+        }
+
+        componentWillUnmount() {
+          console.log("componentWillUnmount");
+        }
+        componentDidUpdate(p, s) {
+          console.log(
+            "current Props:",
+            { ...this.props },
+            "\nOld Props:",
+            { ...p },
+            "\n Current State:",
+            { ...this.state },
+            "\n Old State:",
+            { ...s }
+          );
+          console.log("componentDidUpdate");
+          document.title = `Number of items:${this.state.items.length}`;
+        }
+        componentWillUpdate() {
+          console.log("componentWillUpdate");
+        }
+        componentDidMount() {
+          console.log("dicomponentDidMountdm");
+        }
+        componentWillMount() {
+          console.log("componentWillMount");
+        }
+        marker(i) {
+          this.setState(k => {
+            k.items[i]._del = !k.items[i]._del;
+            return k;
+          });
+        }
+
+        render() {
+          const e = h(
+            "div",
+            null,
+            h("h3", null, "TODO"),
+            // h(SizeObserver),
+            h(TodoList, {
+              items: this.state.items,
+              marker: this.marker.bind(this)
+            }),
+            h(
+              "form",
+              { onsubmit: this.handleSubmit, action: "javascript:" },
+              h("label", { for: "new-todo" }, "What needs to be done?"),
+              h("input", {
+                id: "new-todo",
+                oninput: this.handleChange,
+                value: this.state.text
+              }),
+              h("button", null, `Add #`, this.state.items.length + 1)
+            ),
+            this.state.items.length % 2 ? "hello" : "world"
+          );
+          return e;
+        }
+
+        handleChange(e) {
+          this.setState({ text: e.target.value });
+        }
+
+        handleSubmit(e) {
+          // e.preventDefault();
+          if (!this.state.text.length) {
+            return;
+          }
+          const newItem = {
+            text: this.state.text,
+            id: Date.now()
+          };
+          this.setState(state => ({
+            items: state.items.concat(newItem),
+            text: ""
+          }));
+        }
+      }
+      class SizeObserver extends Component {
+        constructor(props) {
+          super(props);
+        }
+      }
+      class Li extends Component {
+        constructor(...a) {
+          super(...a);
+          this.oc = this.oc.bind(this);
+        }
+        oc() {
+          this.props.mark(this.props.index);
+        }
+        render() {
+          return h(
+            "li",
+            {
+              onclick: this.oc,
+              id: this.props.id,
+              style: {
+                textDecoration: this.props._del ? "line-through" : null
+              }
+            },
+            this.props.children
+          );
+        }
+      }
+      function TodoList(props) {
+        const y = h(
+          "ul",
+          null,
+          props.items.map((item, i) =>
+            h(
+              Li,
+              {
+                mark: props.marker,
+                index: i,
+                id: item.id,
+                // key: item.id,
+                _del: item._del
+              },
+              item.text
+            )
+          )
+        );
+        return y;
+      }
+      class Counter extends Component {
+        constructor() {
+          super();
+
+          this.state = { clicked: 0 };
+        }
+        handleClick = () => {
+          this.setState(c => {
+            console.log(c);
+            return { clicked: c.clicked + 1 };
+          });
+        };
+        render() {
+          const c = h(
+            f,
+            null,
+            h(
+              "button",
+              {
+                onclick: this.handleClick
+              },
+              "Clicked :",
+              this.state.clicked,
+              " times"
+            ),
+            h(
+              "div",
+              null,
+              h("span", null, "ok"),
+              this.state.clicked % 2 ? h(OddNumber) : void 0,
+              "test"
+            )
+          );
+          return c;
+        }
+      }
+      class OddNumber extends Component {
+        componentWillUnmount() {
+          console.log("bye");
+        }
+        render() {
+          const c = h(f, null, " odd number");
+          return c;
+        }
+      }
+      class Wrapper extends Component {
+        constructor(a) {
+          super(a);
+          this.state = { c: true };
+        }
+        render() {
+          return h(
+            Fragment,
+            null,
+            h(SampleComponent),
+            h("div", null, h(Counter))
+          );
+        }
+      }
+      function helloWorld(props) {
+        return h("div", null, `Hello world! -${props.routerMatch[1]}`);
+      }
+      function hahaYes(a) {
+        return h("div", null, "Haha yes!");
+      }
+      a.render(h(Wrapper), document.getElementById("app"));
+    </script>
+  </body>
+</html>

@@ -1,5 +1,7 @@
 import { JSXInternal } from "./jsx";
-
+export interface ExtendedDocFrag extends DocumentFragment {
+  _parent?: UIElement;
+}
 export interface VNode<P = {}> {
   type?: string | ComponentType<P>;
   // json injection prevention
@@ -19,20 +21,22 @@ export interface VNode<P = {}> {
   _component: Component<P>;
   // if our class/function/fragment returns multiple dom, collect them here
   _FragmentDomNodeChildren: (UIElement | Text)[];
-  // document fragment for when our component returns an array of children
-  _docFrag: DocumentFragment;
+  // // document fragment for when our component returns an array of children
+  // _docFrag: DocumentFragment;
   // these are returned by function/class components
   _renders: VNode<any>;
   // which class component return this vnode
   _renderedBy: VNode<any>;
   // next DOM node's vnode pointer
-  _nextSibDomVnode: VNode<any>;
+  _nextSibDomVNode: VNode<any>;
   // previous DOM node's vnode pointer
-  _prevSibDomVnode: VNode<any>;
+  _prevSibDomVNode: VNode<any>;
   // passes the depth arg to the component
-  _depth?: number;
+  _depth: number;
   // parentDom node -> to call append child on if we can not reorder
-  _parentDom?: Node;
+  _parentDom: Node;
+  //  the fragment parent VNode this VNode is a child of
+  _fragmentParent: VNode;
 }
 
 export type EventListenerDict = JSXInternal.DOMEvents<EventTarget>;
@@ -54,6 +58,7 @@ export interface Component<P = {}, S = {}> {
   props: Props<P>;
   state: S;
   _nextState?: S;
+  _oldState?: S;
   _depth?: number;
   _VNode?: VNode<P>;
   base?: UIElement | null;
@@ -106,3 +111,5 @@ export interface UIElement extends HTMLElement {
   _VNode: VNode;
   data?: string | number;
 }
+
+export type DiffMeta = { depth: number };

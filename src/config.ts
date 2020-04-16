@@ -2,6 +2,7 @@ type anyFunc<T> = (...args: T[]) => T;
 type configType = {
   deferImplementation<T>(fn: anyFunc<T>): Promise<T>;
   scheduleRender(cb: anyFunc<any>): any;
+  eagerlyHydrate: boolean;
 };
 
 const HAS_PROMISE = typeof Promise !== "undefined";
@@ -15,6 +16,7 @@ const defaultRenderDeferrer = HAS_PROMISE
 const config: configType = {
   deferImplementation: defaultRenderDeferrer,
   scheduleRender: HAS_RAF ? reqAnimFrame : defaultRenderDeferrer,
+  eagerlyHydrate: true,
 };
 
 function reqAnimFrame(cb: FrameRequestCallback) {

@@ -6,7 +6,7 @@ import {
   UIElement,
   VNode,
 } from "./types";
-import { assign, getFinalVnode } from "./util";
+import { assign } from "./util";
 import config from "./config";
 import { diff } from "./diff/index";
 import { processMountsQueue } from "./lifeCycleCallbacks";
@@ -19,12 +19,14 @@ export class Component<P = {}, S = {}> implements Component_Interface<P, S> {
   _depth?: number;
   props: Props<P>;
   state: S;
+  _oldState?: S;
   _nextState?: S;
   base?: UIElement | null;
   render(props?: Props<P>, state?: Readonly<S>): ComponentChild {
     return null;
   }
   setState<K extends keyof S>(nextState: setStateArgType<P, S, K>): void {
+    this._oldState = assign({}, this.state);
     this._nextState = assign({}, this.state);
     if (typeof nextState === "function") {
       const next = nextState(this._nextState, this.props);
@@ -33,6 +35,8 @@ export class Component<P = {}, S = {}> implements Component_Interface<P, S> {
     } else {
       assign(this._nextState, nextState);
     }
+    this.state = this._nextState;
+    this._nextState = null;
     enqueueRender(this);
   }
   forceUpdate(callback?: (() => void) | false): void {
@@ -40,10 +44,10 @@ export class Component<P = {}, S = {}> implements Component_Interface<P, S> {
     this.base = diff(
       this._VNode,
       assign({}, this._VNode),
-      getParentDom(this._VNode),
+      this._VNode._parentDom,
       shouldForce,
       { depth: this._depth }
-    );
+    ) as UIElement;
     typeof callback === "function" && callback();
     processMountsQueue();
   }
@@ -93,10 +97,4 @@ function process() {
       p.forceUpdate(false);
     }
   }
-}
-
-function getParentDom(vn: VNode): Node {
-  var next = vn;
-  if (!next) return null;
-  return next._parentDom ? next._parentDom : getParentDom(next._renders);
 }

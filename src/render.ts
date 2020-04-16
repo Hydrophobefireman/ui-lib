@@ -14,34 +14,34 @@ import {
 import { diff } from "./diff/index";
 
 import { processMountsQueue } from "./lifeCycleCallbacks";
+
 export function render(VNode: VNode, parentDom: UIElement) {
-  const normalizedVnode = createElement(Fragment, null, VNode);
-  normalizedVnode._parentDom = parentDom;
+  const normalizedVNode = createElement(Fragment, null, VNode);
+
   if (parentDom.hasChildNodes()) {
-    /** We have some content in the parent dom.. could  */
-    return hydrate(normalizedVnode, parentDom);
-  }
-  diff(normalizedVnode, null, parentDom, false, { depth: 0 });
+    /** We have some content in the parent dom.. attempt diffing  */
+    hydrate(normalizedVNode, parentDom);
+  } else diff(normalizedVNode, null, parentDom, false, { depth: 0 });
   processMountsQueue();
 }
 
 export function hydrate(VNode: VNode, parentDom: UIElement) {
-  const normalizedVnode = createElement(
+  const fauxOldVNode = createElement(
     Fragment,
     null,
-    getVNodeChildrenFromDom(parentDom)
+    convertChildNodesToVNode(parentDom)
   );
-  normalizedVnode._parentDom = parentDom;
-  normalizedVnode._children = flattenVNodeChildren(normalizedVnode);
-  const c = normalizedVnode._children;
-  normalizedVnode._FragmentDomNodeChildren = c.map(getDomORNullFromVNode);
-  diff(VNode, normalizedVnode, parentDom, false, { depth: 0 });
-  processMountsQueue();
+  fauxOldVNode._children = flattenVNodeChildren(fauxOldVNode);
+  const c = fauxOldVNode._children;
+  fauxOldVNode._FragmentDomNodeChildren = c.map(
+    (child: VNode | null): UIElement | Text | null => child && child._dom
+  );
+  diff(VNode, fauxOldVNode, parentDom, false, { depth: 0 });
 }
 
-function getVNodeFromPreExistingDom(dom: Node): ComponentChild | string {
+function createVNodeFromDOM(dom: Node): ComponentChild | string {
   const nm = dom.nodeName;
-  if (nm === "#comment" || nm === "script") {
+  if (nm === "#comment" || nm === "script" || nm === "style") {
     return;
   }
   if (dom instanceof Text) return dom.nodeValue;
@@ -49,7 +49,7 @@ function getVNodeFromPreExistingDom(dom: Node): ComponentChild | string {
     const VNode = createElement(
       dom.tagName,
       getDomAttributesAsProps(dom.attributes),
-      getVNodeChildrenFromDom(dom)
+      convertChildNodesToVNode(dom)
     );
     VNode._children = flattenVNodeChildren(VNode);
     (dom as UIElement)._VNode = VNode;
@@ -69,11 +69,6 @@ function getDomAttributesAsProps(attributes: NamedNodeMap): Props<any> {
   }
   return props;
 }
-function getVNodeChildrenFromDom(dom: HTMLElement): ComponentChildren {
-  return Array.from(dom.childNodes).map(getVNodeFromPreExistingDom);
-}
-
-function getDomORNullFromVNode(child: VNode | null): UIElement | Text | null {
-  if (child == null) return null;
-  return child._dom;
+function convertChildNodesToVNode(dom: HTMLElement): ComponentChildren {
+  return Array.from(dom.childNodes).map(createVNodeFromDOM);
 }

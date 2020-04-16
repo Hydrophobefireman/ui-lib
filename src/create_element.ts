@@ -16,6 +16,7 @@ export function createElement<P>(
   ...children: ComponentChildren[]
 ): VNode<P> | null {
   if (type == null || typeof type === "boolean") return null;
+
   if (props == null) {
     (props as any) = EMPTY_OBJ;
   }
@@ -45,14 +46,15 @@ function getVNode<P>(
     _dom: null,
     _children: null,
     _component: null,
-    _nextSibDomVnode: null,
+    _nextSibDomVNode: null,
     _renders: null,
     _renderedBy: null,
-    _prevSibDomVnode: null,
+    _prevSibDomVNode: null,
     _FragmentDomNodeChildren: null,
-    _docFrag: null,
-    __self: null,
+    _parentDom: null,
+    _fragmentParent: null,
     _depth: 0,
+    __self: null,
   };
   VNode.__self = VNode;
   return VNode;

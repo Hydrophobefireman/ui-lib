@@ -1,97 +1,107 @@
-import { VNode, ComponentType } from "../types";
-import { EMPTY_OBJ } from "../util";
+import { VNode, ComponentType, DiffMeta } from "../types";
+import { EMPTY_OBJ, copyVNodePointers, isValidVNode } from "../util";
 import { unmountVNodeAndDestroyDom } from "./updater";
 import { Fragment, flattenVNodeChildren } from "../create_element";
 import { diffChildren } from "./children";
 import {
   diffDomNode,
   flushChangesToDomIfNeeded,
-  __updateInternalVnodes,
+  updateParentDomPointers,
 } from "./dom";
 import { toSimpleVNode, isFn } from "../toSimpleVNode";
+import { processUpdatesQueue } from "../lifeCycleCallbacks";
 
+/**
+ *
+ * @param newVNode current state of dom represented as virtual nodes
+ * @param oldVNode last state of dom represented as virtual nodes
+ * @param parentDom parent dom element to append child on
+ * @param force true if Component#forceUpdate()  was called
+ * @param meta random data useful for tagging vnodes
+ */
 export function diff(
   newVNode: VNode,
   oldVNode: VNode,
-  parentDom?: Node,
-  force?: boolean,
-  meta?: { depth: number }
-) {
-  const newVnodeISNULL = newVNode == null;
+  parentDom: Node,
+  force: boolean,
+  meta: DiffMeta
+): Element | Text {
+  if (typeof newVNode === "boolean") newVNode = null;
+
+  const newVNodeISNULL = newVNode == null;
   const oldVNodeISNULL = oldVNode == null;
+
   let oldType: string | ComponentType;
   let newType: string | ComponentType;
-  if (!newVnodeISNULL && !oldVNodeISNULL) {
-    oldType = oldVNode.type;
+  let isComplex: boolean;
+  /** SCU returned False */
+  if (newVNode === EMPTY_OBJ) return;
+  copyVNodePointers(newVNode, oldVNode);
+  if (newVNodeISNULL || oldVNodeISNULL || newVNode.type !== oldVNode.type) {
+    unmountVNodeAndDestroyDom(oldVNode);
+
+    oldVNode = EMPTY_OBJ;
+    if (newVNodeISNULL) return null;
+  }
+
+  if (!newVNodeISNULL) {
     newType = newVNode.type;
-    if (!newVNode._nextSibDomVnode)
-      newVNode._nextSibDomVnode = oldVNode._nextSibDomVnode;
-    if (newType === oldType) {
-      newVNode._component = oldVNode._component;
+    isComplex = isFn(newType);
+    /**Prevention against json injection */
+    if (!isValidVNode(newVNode)) {
+      return null;
     }
   }
-  if (newVNode === EMPTY_OBJ) return;
-
-  // oldVNode = getFinalVnode(oldVNode);
-  if (newVNode === oldVNode)
-    return; /**@NOTE remember to convert your vnode to simplest form before calling diff */
-  if (typeof newVNode === "boolean") newVNode = null;
-  if (newVnodeISNULL || oldVNodeISNULL || newVNode.type !== oldVNode.type) {
-    unmountVNodeAndDestroyDom(oldVNode);
-    oldVNode = EMPTY_OBJ;
-    if (newVnodeISNULL) return null;
+  if (!oldVNodeISNULL) {
+    oldType = oldVNode.type;
   }
-  if (newVNode.__self !== newVNode) {
-    console.warn("component not of expected type =>", newVNode);
-    return null;
+  /**strict equality,  leave diffing */
+  if (newVNode === oldVNode && !isComplex) {
+    return newVNodeISNULL ? null : newVNode._dom;
   }
 
-  if (newVNode._parentDom == null) {
-    const pd = parentDom || oldVNode._parentDom;
-    newVNode._parentDom = !(pd instanceof DocumentFragment) ? pd : null;
+  if (newType === oldType && isComplex) {
+    /** preserve component state and instance */
+    newVNode._component = oldVNode._component;
   }
-  newVNode = toSimpleVNode(newVNode, oldVNode, force, meta);
+
+  const tmp = newVNode;
+  /** normalize VNode.props.children */
   newVNode._children = flattenVNodeChildren(newVNode);
+  /** if we have a function/class Component, get the next rendered VNode */
+  newVNode = toSimpleVNode(newVNode, oldVNode, force, meta);
 
-  oldVNode = oldVNode._renders || oldVNode;
-  if (newVNode == null || isFn(newVNode.type)) {
+  if (isFn(oldVNode.type)) {
+    oldVNode = oldVNode._renders;
+  }
+
+  if (newVNode == null || newVNode !== tmp) {
+    /** toSimpleVNode gave us a null, unmount the vnode or it gave us a function.
+     * - simplify our vnode again  */
+
     return diff(newVNode, oldVNode, parentDom, force, meta);
   }
-
+  /** If we reached here, our component is either a Fragment or a simple dom node */
   oldType = oldVNode.type;
   newType = newVNode.type;
-  if (newType == Fragment) {
-    /** && newVnodeType===Fragment (will be true) */
+  updateParentDomPointers(newVNode, parentDom);
+  if (newType === Fragment) {
     diffChildren(newVNode, oldVNode, parentDom, meta);
     return;
   }
   let needsAppending: boolean = true;
-  let docFrag: DocumentFragment = null;
+
   if (oldType === newType) {
-    // newVNode._component = oldVNode._component;
     diffDomNode(newVNode, oldVNode);
     diffChildren(newVNode, oldVNode, newVNode._dom, meta);
-    needsAppending = !!newVNode._nextSibDomVnode;
+    needsAppending = false;
   } else {
-    const _prevSibDomVnode = oldVNode._prevSibDomVnode;
-    const propPSD = "_prevSibDomVnode";
-    const propNSD = "_nextSibDomVnode";
-
-    __updateInternalVnodes(newVNode, propPSD, _prevSibDomVnode, "_renders");
-    __updateInternalVnodes(newVNode, propPSD, _prevSibDomVnode, "_renderedBy");
-
-    const _nextSibDomVnode = oldVNode._nextSibDomVnode;
-    __updateInternalVnodes(newVNode, propNSD, _nextSibDomVnode, "_renders");
-    __updateInternalVnodes(newVNode, propNSD, _nextSibDomVnode, "_renderedBy");
-
     diffDomNode(newVNode, null);
+
     diffChildren(newVNode, null, newVNode._dom, meta);
   }
-  const fragLikeDom = newVNode._FragmentDomNodeChildren;
-  if (fragLikeDom && fragLikeDom.length) {
-    docFrag = document.createDocumentFragment();
-    fragLikeDom.forEach((dom) => docFrag.appendChild(dom));
-  }
-  flushChangesToDomIfNeeded(newVNode, parentDom, docFrag, needsAppending);
+  flushChangesToDomIfNeeded(newVNode, parentDom, needsAppending);
+  processUpdatesQueue();
+
   return newVNode._dom;
 }

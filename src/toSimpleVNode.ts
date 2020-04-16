@@ -1,8 +1,8 @@
-import { VNode, Props, FunctionComponent } from "./types";
+import { VNode, Props, FunctionComponent, DiffMeta } from "./types";
 import { Component } from "./component";
 import { scheduleLifeCycleCallbacks } from "./lifeCycleCallbacks";
 import { convertToVNodeIfNeeded, Fragment } from "./create_element";
-import { EMPTY_OBJ, assign, getFinalVnode } from "./util";
+import { EMPTY_OBJ, assign } from "./util";
 
 export const isFn = (vnType: any) =>
   typeof vnType === "function" && vnType !== Fragment;
@@ -11,80 +11,93 @@ export function toSimpleVNode(
   VNode: VNode,
   oldVNode: VNode,
   forceUpdate: boolean,
-  meta: { depth: number }
+  meta: DiffMeta
 ): VNode {
-  if (VNode == null) return VNode;
-  const type = VNode.type;
-  if (isFn(type)) {
+  let type: VNode["type"];
+  if (VNode != null && isFn((type = VNode.type))) {
     oldVNode = oldVNode || EMPTY_OBJ;
-    const proto = ((type as any) as typeof Component).prototype;
-    if (proto && proto.render) {
-      return convertClassComponentToSimpleVnode(
-        VNode,
-        oldVNode,
-        forceUpdate,
-        meta
-      );
+    if (isClassComponent(type)) {
+      /** class component, call lifecycle methods */
+      return renderClassComponent(VNode, oldVNode, forceUpdate, meta);
     } else {
-      return convertFunctionalComponentToSimpleVnode(VNode, oldVNode, meta);
+      /** Hooks - TODO */
+      return renderFunctionalComponent(VNode, meta);
     }
   } else {
+    /** VNode is already simple */
     return VNode;
   }
 }
-
-function convertFunctionalComponentToSimpleVnode(
-  VNode: VNode,
-  oldVNode: VNode,
-  meta?: { depth: number }
-) {
-  let nextVnode: VNode;
+function renderFunctionalComponent(VNode: VNode, meta?: DiffMeta) {
+  let nextVNode: VNode;
   const fn = VNode.type as FunctionComponent;
   let c: Component;
+
   if (!VNode._component) {
+    /** New Functional component, convert it into a fake component
+     * to save its instance
+     * (doesnt help now but will be useful while implementing hooks)
+     */
     c = new Component(VNode.props);
+
     VNode._component = c;
+
     c.render = getRenderer;
     c.constructor = fn;
     c.props = VNode.props;
   } else {
     c = VNode._component;
   }
-  nextVnode = convertToVNodeIfNeeded(c.render(VNode.props));
+  /**TODO - implement hooks */
+  nextVNode = convertToVNodeIfNeeded(c.render(VNode.props));
   c._depth = ++meta.depth;
 
-  setNextProps(nextVnode, VNode);
+  setNextRenderedVNodePointers(nextVNode, VNode);
 
-  return nextVnode;
+  return nextVNode;
 }
-function setNextProps(next: VNode, VNode: VNode) {
+const COPY_PROPS = {
+  _nextSibDomVNode: 1,
+  _prevSibDomVNode: 1,
+  _fragmentParent: 1,
+};
+function setNextRenderedVNodePointers(next: VNode, VNode: VNode) {
   VNode._renders = next;
-
-  next && (next._renderedBy = VNode);
+  if (next) {
+    next._renderedBy = VNode;
+    for (const i in COPY_PROPS) {
+      next[i] = VNode[i];
+    }
+  }
 }
+
 function getRenderer(props: Props<any>) {
   return this.constructor(props);
 }
-function convertClassComponentToSimpleVnode(
+function renderClassComponent(
   VNode: VNode,
   oldVNode: VNode,
   forceUpdate?: boolean,
-  meta?: { depth: number }
+  meta?: DiffMeta
 ) {
   let nextLifeCycle: "componentDidMount" | "componentDidUpdate";
+
   const cls = (VNode.type as unknown) as typeof Component;
+
   let component = VNode._component;
+
   if (component != null) {
+    /**existing component */
     if (component.shouldComponentUpdate != null && !forceUpdate) {
       const scu = component.shouldComponentUpdate(
         VNode.props,
-        component._nextState
+        component._nextState || component.state
       );
       if (scu === false) {
         return EMPTY_OBJ;
       }
     }
-    component.base = getFinalVnode(VNode)._dom || getFinalVnode(oldVNode)._dom;
+
     updateStateFromStaticLifeCycleMethods(component, cls, VNode);
     scheduleLifeCycleCallbacks({
       bind: component,
@@ -97,21 +110,26 @@ function convertClassComponentToSimpleVnode(
     component = new cls(VNode.props);
     VNode._component = component;
     updateStateFromStaticLifeCycleMethods(component, cls, VNode);
+
     scheduleLifeCycleCallbacks({
       bind: component,
       name: "componentWillMount",
     });
-    component._VNode = VNode;
 
     component._depth = ++meta.depth;
   }
-  const oldState = component.state;
+  component._VNode = VNode;
+
+  const oldState = component._oldState;
   const oldProps = oldVNode.props;
+
   component.state = component._nextState;
+
+  component._oldState = null;
   component._nextState = null;
   component.props = VNode.props;
 
-  const nextVnode = convertToVNodeIfNeeded(
+  const nextVNode = convertToVNodeIfNeeded(
     component.render(component.props, component.state)
   );
   scheduleLifeCycleCallbacks({
@@ -120,22 +138,21 @@ function convertClassComponentToSimpleVnode(
     args: nextLifeCycle === "componentDidUpdate" ? [oldProps, oldState] : [],
   });
 
-  setNextProps(nextVnode, VNode);
+  setNextRenderedVNodePointers(nextVNode, VNode);
 
-  return nextVnode;
+  return nextVNode;
 }
 
-function runGetDerivedStateFromProps(
+function _runGetDerivedStateFromProps(
   componentClass: typeof Component,
   props: Props<any>,
   state: any
 ) {
-  const nextState = {};
   const get = componentClass.getDerivedStateFromProps;
   if (get != null) {
-    assign(nextState, get(props, state));
+    return assign({}, get(props, state));
   }
-  return nextState;
+  return null;
 }
 
 function updateStateFromStaticLifeCycleMethods(
@@ -146,8 +163,14 @@ function updateStateFromStaticLifeCycleMethods(
   const state = component.state || {};
   // component.state = state;
   const nextState = assign({}, component._nextState || state);
-  component._nextState = assign(
-    nextState,
-    runGetDerivedStateFromProps(cls, VNode.props, nextState)
-  );
+  const ns = _runGetDerivedStateFromProps(cls, VNode.props, nextState);
+  if (ns) {
+    assign(nextState, ns);
+  }
+  component._nextState = nextState;
+}
+
+function isClassComponent(type: VNode["type"]): boolean {
+  const proto = ((type as any) as typeof Component).prototype;
+  return !!(proto && proto.render);
 }

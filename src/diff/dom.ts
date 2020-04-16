@@ -1,7 +1,6 @@
 import { VNode, UIElement, Props } from "../types";
-import { EMPTY_OBJ, isListener } from "../util";
+import { EMPTY_OBJ, isListener, getClosestDom } from "../util";
 import { diffEventListeners } from "./events";
-import { getFinalVnode } from "../util";
 
 export function diffDomNode(newVNode: VNode, oldVNode: VNode) {
   oldVNode = oldVNode || EMPTY_OBJ;
@@ -15,10 +14,24 @@ export function diffDomNode(newVNode: VNode, oldVNode: VNode) {
   } else {
     dom = oldDom;
   }
-  diffAttributes(dom, newVNode, oldVNode === EMPTY_OBJ ? null : oldVNode);
   dom._VNode = newVNode;
-  __updateInternalVnodes(newVNode, "_dom", dom, "_renders");
-  // __updateInternalVnodes(newVNode, "_dom", dom, "_renderedBy");
+
+  diffAttributes(dom, newVNode, oldVNode === EMPTY_OBJ ? null : oldVNode);
+
+  updateInternalVNodes(newVNode, "_dom", dom, "_renders");
+  updateInternalVNodes(newVNode, "_dom", dom, "_renderedBy");
+
+  setComponent_base(newVNode, dom);
+}
+
+function setComponent_base(VNode: VNode, dom: UIElement) {
+  if (!VNode) return;
+  if (VNode._component != null) {
+    /** set the base value of the first component we find while travelling up the tree */
+    VNode._component.base = dom;
+  } else {
+    setComponent_base(VNode._renderedBy, dom);
+  }
 }
 
 function createDomFromVNode(newVNode: VNode): UIElement {
@@ -138,47 +151,37 @@ function __diffTextNodes(dom: UIElement, newVal: string, oldVal: string) {
   return newVal === oldVal || (dom.nodeValue = newVal);
 }
 
+function getFragParentSibDom(VNode: VNode) {
+  const fp = VNode._fragmentParent;
+  return fp && fp._nextSibDomVNode;
+}
+
 export function flushChangesToDomIfNeeded(
   newVNode: VNode,
   parentDom: Node,
-  docFrag?: DocumentFragment,
-  needsAppending?: boolean
+  needsAppending: boolean
 ) {
-  const nextSibVNode = getFinalVnode(newVNode._nextSibDomVnode);
-  const nextSibDomNode = nextSibVNode
-    ? nextSibVNode._dom || nextSibVNode._FragmentDomNodeChildren
-    : null;
-  //   const prevSibDomNode = newVNode._prevSibDomVnode;
-  const domToPlace = docFrag || newVNode._dom;
+  const nextSibVNode =
+    newVNode._nextSibDomVNode || getFragParentSibDom(newVNode);
+  const nextSibDomNode = getClosestDom(nextSibVNode);
+  const domToPlace = newVNode._dom;
   if (!domToPlace) return;
   if (needsAppending) {
-    placeDomNodeAroundSibDomsifNeeded(
-      domToPlace,
-      nextSibDomNode,
-      parentDom || newVNode._parentDom
-    );
-    updatePointers(newVNode, parentDom);
+    appendNodeToDocument(domToPlace, nextSibDomNode, parentDom);
+    updatePointers(newVNode);
   }
 }
 
-export function placeDomNodeAroundSibDomsifNeeded(
+export function appendNodeToDocument(
   domToPlace: UIElement | DocumentFragment,
-  nextSibDomNode: UIElement | (UIElement | Text)[],
+  nextSibDomNode: UIElement,
   parentDom: Node
 ) {
   let shouldAppend: boolean = true;
   let insertBefore: Node;
   if (nextSibDomNode) {
-    if (Array.isArray(nextSibDomNode)) {
-      const ndom = getClosestDomElementFromFragmentChildren(nextSibDomNode);
-      if (ndom) {
-        shouldAppend = false;
-        insertBefore = ndom;
-      }
-    } else {
-      shouldAppend = false;
-      insertBefore = nextSibDomNode;
-    }
+    shouldAppend = false;
+    insertBefore = nextSibDomNode;
   }
   if (!shouldAppend && insertBefore) {
     parentDom.insertBefore(domToPlace, insertBefore);
@@ -187,68 +190,84 @@ export function placeDomNodeAroundSibDomsifNeeded(
   }
 }
 
-function updatePointers(newVNode: VNode, parentDom: Node) {
-  const dom = newVNode._docFrag || newVNode._dom;
-  const nextSib = dom.nextSibling;
-  const prevSib = dom.previousSibling;
-  __updateInternalVnodes(newVNode, "_parentDom", parentDom, "_renders");
-  __updateInternalVnodes(newVNode, "_parentDom", parentDom, "_renderedBy");
-  updateVNodePropRecursively(
-    newVNode,
-    nextSib as UIElement,
-    "_prevSibDomVnode"
-  );
-  updateVNodePropRecursively(
-    newVNode,
-    prevSib as UIElement,
-    "_nextSibDomVnode"
-  );
+function updatePointers(newVNode: VNode) {
+  const dom = newVNode._dom;
+  /** we get the parent dom from the actual element instead as it could be null (when we are reordering) */
+  if (newVNode._parentDom == null) {
+    updateParentDomPointers(newVNode, dom.parentNode);
+  }
+  const nextSib = dom.nextSibling as UIElement;
+  const prevSib = dom.previousSibling as UIElement;
+
+  if (nextSib != null) {
+    updateAdjacentElementPointers(nextSib._VNode, dom, "_nextSibDomVNode");
+    updateAdjacentElementPointers(newVNode, nextSib, "_prevSibDomVNode");
+  }
+  if (prevSib != null) {
+    updateAdjacentElementPointers(newVNode, prevSib, "_nextSibDomVNode");
+    updateAdjacentElementPointers(prevSib._VNode, dom, "_prevSibDomVNode");
+  }
 }
 
-function updateVNodePropRecursively(
+export function updateAdjacentElementPointers(
   VNode: VNode,
   nextSib: UIElement,
-  propVal: "_prevSibDomVnode" | "_nextSibDomVnode"
+  propVal: "_prevSibDomVNode" | "_nextSibDomVNode"
 ) {
   if (!nextSib) return;
-  const sibVnode = nextSib._VNode;
-  if (!sibVnode) return;
-  __updateInternalVnodes(sibVnode, propVal, VNode, "_renders");
-  __updateInternalVnodes(sibVnode, propVal, VNode, "_renderedBy");
+  const sibVNode = nextSib._VNode;
+  if (!sibVNode) return;
+
+  updateInternalVNodes(sibVNode, propVal, VNode, "_renders");
+  updateInternalVNodes(sibVNode, propVal, VNode, "_renderedBy");
 }
 
-export function __updateInternalVnodes(
+const replaceOtherProp = {
+  _dom: "_FragmentDomNodeChildren",
+  _FragmentDomNodeChildren: "_dom",
+};
+
+export function updateInternalVNodes(
   VNode: VNode,
   prop: string,
   val: any,
   nextGetter: "_renders" | "_renderedBy"
 ) {
   let next = VNode;
+  const replace = replaceOtherProp[prop];
   if (next) {
-    next[prop] = val;
-  }
-  while ((next = next[nextGetter])) {
-    next[prop] = val;
-  }
-}
-
-type DomNodeLike = UIElement | Text | null;
-export function getClosestDomElementFromFragmentChildren(
-  nextDom: DomNodeLike | DomNodeLike[]
-): DomNodeLike {
-  if (Array.isArray(nextDom)) {
-    for (let i = 0; i < nextDom.length; i++) {
-      const next = nextDom[i];
-      if (Array.isArray(next)) {
-        return getClosestDomElementFromFragmentChildren(next);
-      }
-      if (next != null) return next;
+    const fragParent = VNode._fragmentParent;
+    if (shouldMirrorPropOnFragmentParent(fragParent, prop, val)) {
+      fragParent[prop] = val;
     }
-  } else {
-    return nextDom;
+    if (replace) {
+      next[replace] = null;
+    }
+    next[prop] = val;
+    return updateInternalVNodes(next[nextGetter], prop, val, nextGetter);
   }
 }
+function shouldMirrorPropOnFragmentParent(
+  fragParent: VNode,
+  prop: string,
+  val: any
+): boolean {
+  return (
+    fragParent != null &&
+    (prop === "_nextSibDomVNode" || prop === "_prevSibDomVNode") &&
+    (val == null || isNotACommonChild(val, fragParent))
+  );
+}
 
+function isNotACommonChild(val: VNode, fragParent: VNode) {
+  if (val._fragmentParent === fragParent) {
+    return false;
+  }
+  while ((val = val._fragmentParent)) {
+    if (val._fragmentParent === fragParent) return false;
+  }
+  return true;
+}
 /** dom helper */
 function $(dom: UIElement, key: string, value: any) {
   if (key in dom) {
@@ -257,4 +276,10 @@ function $(dom: UIElement, key: string, value: any) {
     if (value == null) return dom.removeAttribute(key);
     return dom.setAttribute(key, value);
   }
+}
+
+export function updateParentDomPointers(VNode: VNode, dom: Node) {
+  if (dom == null) return;
+
+  updateInternalVNodes(VNode, "_parentDom", dom, "_renderedBy");
 }

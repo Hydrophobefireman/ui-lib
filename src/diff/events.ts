@@ -7,7 +7,7 @@ export function diffEventListeners(
   newEvents: EventListenerDict,
   oldEvents: EventListenerDict
 ) {
-  if (dom instanceof Text || newEvents === oldEvents) return;
+  if (dom == null || dom instanceof Text || newEvents === oldEvents) return;
   if (dom._listeners == null) dom._listeners = {};
   if (newEvents != null) {
     if (dom._listeners == null) {
