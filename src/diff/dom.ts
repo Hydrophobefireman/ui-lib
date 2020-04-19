@@ -160,11 +160,14 @@ export function flushChangesToDomIfNeeded(
 ) {
   const nextSibVNode =
     newVNode._nextSibDomVNode || getFragParentSibDom(newVNode);
-  const nextSibDomNode = getClosestDom(nextSibVNode);
+
+  const nextSibDomNode = /*#__NOINLINE__*/ getClosestDom(nextSibVNode);
   const domToPlace = newVNode._dom;
   if (!domToPlace) return;
   if (needsAppending) {
+    /*#__NOINLINE__*/
     appendNodeToDocument(domToPlace, nextSibDomNode, parentDom);
+    /*#__NOINLINE__*/
     updatePointers(newVNode);
   }
 }
@@ -176,7 +179,7 @@ export function appendNodeToDocument(
 ) {
   let shouldAppend: boolean = true;
   let insertBefore: Node;
-  if (nextSibDomNode) {
+  if (nextSibDomNode && nextSibDomNode !== domToPlace) {
     shouldAppend = false;
     insertBefore = nextSibDomNode;
   }
@@ -258,7 +261,7 @@ function shouldMirrorPropOnFragmentParent(
   return (
     fragParent != null &&
     (prop === "_nextSibDomVNode" || prop === "_prevSibDomVNode") &&
-    (val == null || isNotACommonChild(val, fragParent))
+    (val == null || /*#__NOINLINE__*/ isNotACommonChild(val, fragParent))
   );
 }
 

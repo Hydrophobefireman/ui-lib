@@ -91,9 +91,10 @@ export interface Component<P = {}, S = {}> {
 }
 
 export type Props<P> = Readonly<
-  P & { children?: ComponentChildren } & JSXInternal.DOMEvents<EventTarget> &
+  { children?: ComponentChildren } & JSXInternal.DOMEvents<EventTarget> &
     JSXInternal.HTMLAttributes &
-    Record<string, any>
+    Record<string, any> &
+    P
 >;
 export type ComponentChild =
   | VNode<any>

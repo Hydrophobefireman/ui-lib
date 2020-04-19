@@ -21,6 +21,7 @@ export function render(VNode: VNode, parentDom: VNodeHost) {
   const normalizedVNode = createElement(Fragment, null, VNode);
 
   if (parentDom.hasChildNodes() && !parentDom._hosts) {
+    /*#__NOINLINE__*/
     clearDOM(parentDom);
   }
   //   /** We have some content in the parent dom.. attempt diffing  */

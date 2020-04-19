@@ -10,7 +10,7 @@ import {
 
 import { EMPTY_OBJ, flattenArray, isListener } from "./util";
 
-export function createElement<P>(
+export function createElement<P = {}>(
   type: ComponentType<P> | string,
   props?: createElementPropType<P> | null,
   ...children: ComponentChildren[]
@@ -25,7 +25,8 @@ export function createElement<P>(
 
   const events: EventListenerDict = typeof type === "string" ? {} : null;
   props = getPropsWithoutSpecialKeysAndInitializeEventsDict(props, events);
-  if (children.length || (children = [props.children])) {
+  // children provided as the extra args are used
+  if (children.length && !props.children) {
     (props as any).children = flattenArray(children);
   }
   return getVNode<P>(type, props, events, key, ref);

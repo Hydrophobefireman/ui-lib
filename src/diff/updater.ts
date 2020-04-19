@@ -34,23 +34,23 @@ export function unmountVNodeAndDestroyDom(
   }
 
   const dom = VNode._dom;
+  /*#__NOINLINE__*/
   _processNodeCleanup(dom, VNode, onlyClearPointers);
 }
-
-/* #__NOINLINE__ */
 function _processNodeCleanup(
   dom: UIElement,
   VNode: VNode,
   onlyClearPointers: boolean
 ) {
   if (!onlyClearPointers) {
+    /*#__NOINLINE__*/
     diffEventListeners(dom, null, VNode.events);
-
+    /*#__NOINLINE__*/
     clearDomNodePointers(dom);
-
+    /*#__NOINLINE__*/
     removeNode(dom);
   }
-
+  
   clearVNodePointers(VNode, onlyClearPointers);
 }
 const DOM_POINTERS = { _VNode: 1, _listeners: 1, onclick: 1 };

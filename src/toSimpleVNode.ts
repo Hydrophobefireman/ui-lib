@@ -18,9 +18,11 @@ export function toSimpleVNode(
     oldVNode = oldVNode || EMPTY_OBJ;
     if (isClassComponent(type)) {
       /** class component, call lifecycle methods */
+      /*#__NOINLINE__*/
       return renderClassComponent(VNode, oldVNode, forceUpdate, meta);
     } else {
       /** Hooks - TODO */
+      /*#__NOINLINE__*/
       return renderFunctionalComponent(VNode, meta);
     }
   } else {
@@ -41,7 +43,6 @@ function renderFunctionalComponent(VNode: VNode, meta?: DiffMeta) {
     c = new Component(VNode.props);
 
     VNode._component = c;
-
     c.render = getRenderer;
     c.constructor = fn;
     c.props = VNode.props;
