@@ -1,19 +1,23 @@
 import { VNode, UIElement } from "../types";
-import { EMPTY_OBJ, EMPTY_ARR } from "../util";
+import { EMPTY_OBJ } from "../util";
 import { diffEventListeners } from "./events";
 import { scheduleLifeCycleCallbacks } from "../lifeCycleCallbacks";
 import { Fragment } from "../create_element";
+import { copyPropsOverEntireTree } from "./dom";
 
-export function unmountVNodeAndDestroyDom(VNode: VNode): void {
+export function unmountVNodeAndDestroyDom(
+  VNode: VNode,
+  onlyClearPointers?: boolean
+): void {
   /** short circuit */
   if (VNode == null || VNode === EMPTY_OBJ) return;
-
+  unmountVNodeAndDestroyDom(VNode._renders, onlyClearPointers);
   const component = VNode._component;
-  if (component) {
+  if (!onlyClearPointers && component) {
     /** maybe disable setState for this component? */
     component.setState = Fragment;
     /** todo check for side effects */
-
+    component._VNode = null;
     scheduleLifeCycleCallbacks({
       name: "componentWillUnmount",
       bind: component,
@@ -25,72 +29,37 @@ export function unmountVNodeAndDestroyDom(VNode: VNode): void {
   if (childArray) {
     while (childArray.length) {
       child = childArray.pop();
-      unmountVNodeAndDestroyDom(child);
+      unmountVNodeAndDestroyDom(child, onlyClearPointers);
     }
   }
-
-  const fragChildren = VNode._FragmentDomNodeChildren;
-  unmountFragChildren(fragChildren);
-
-  unmountNextRenderedVNode(VNode);
 
   const dom = VNode._dom;
-  _processNodeCleanup(dom, VNode);
-}
-
-function unmountFragChildren(fragChildren: VNode["_FragmentDomNodeChildren"]) {
-  if (fragChildren) {
-    let fragChild: UIElement | UIElement[];
-    while (fragChildren.length) {
-      fragChild = fragChildren.pop() as UIElement;
-      if (fragChild != null) {
-        if (Array.isArray(fragChild)) {
-          unmountFragChildren(fragChild);
-        } else {
-          unmountVNodeAndDestroyDom(fragChild._VNode);
-        }
-      }
-    }
-  }
-}
-function unmountNextRenderedVNode(VNode: VNode): void {
-  if (!VNode) return;
-  let nextVNode = VNode;
-  while ((nextVNode = nextVNode._renders)) {
-    unmountVNodeAndDestroyDom(nextVNode);
-  }
+  _processNodeCleanup(dom, VNode, onlyClearPointers);
 }
 
 /* #__NOINLINE__ */
-function _processNodeCleanup(dom: UIElement, VNode: VNode) {
-  diffEventListeners(dom, null, VNode.events);
+function _processNodeCleanup(
+  dom: UIElement,
+  VNode: VNode,
+  onlyClearPointers: boolean
+) {
+  if (!onlyClearPointers) {
+    diffEventListeners(dom, null, VNode.events);
 
-  clearDomNodePointers(dom);
+    clearDomNodePointers(dom);
 
-  removeNode(dom);
-
-  clearSibDomPointers(VNode);
-  clearVNodePointers(VNode);
-}
-
-function clearSibDomPointers(VNode: VNode) {
-  let nextVNode: VNode = VNode;
-
-  while ((nextVNode = nextVNode._renders)) {
-    const prevSibDomVNode = nextVNode._prevSibDomVNode;
-    const nextSibDomVNode = nextVNode._nextSibDomVNode;
-
-    prevSibDomVNode && (prevSibDomVNode._nextSibDomVNode = null);
-    nextSibDomVNode && (nextSibDomVNode._prevSibDomVNode = null);
+    removeNode(dom);
   }
-}
 
-const DOM_POINTERS = { _VNode: 1, _listeners: 1 };
+  clearVNodePointers(VNode, onlyClearPointers);
+}
+const DOM_POINTERS = { _VNode: 1, _listeners: 1, onclick: 1 };
 export function clearDomNodePointers(dom: UIElement) {
   _clearPointers(DOM_POINTERS, dom);
 }
 
-const VNode_POINTERS = {
+const VNode_POINTERS: {} = {
+  events: 1,
   _FragmentDomNodeChildren: 1,
   _children: 1,
   _component: 1,
@@ -101,18 +70,15 @@ const VNode_POINTERS = {
   _renderedBy: 1,
   _renders: 1,
   _fragmentParent: 1,
-};
+  _parentDom: 1,
+} as { [key in keyof VNode<any>]: 1 | null };
 
-export function clearVNodePointers(VNode: VNode) {
-  if (VNode != null) {
-    const fp = VNode._fragmentParent;
-    if (fp != null) {
-      if (fp._nextSibDomVNode === VNode) {
-        fp._nextSibDomVNode = null;
-      } else if (fp._prevSibDomVNode === VNode) {
-        fp._prevSibDomVNode = null;
-      }
-    }
+export function clearVNodePointers(VNode: VNode, skipUpdate: boolean) {
+  if (!skipUpdate && VNode != null) {
+    const next = VNode._nextSibDomVNode;
+    copyPropsOverEntireTree(next, "_prevSibDomVNode", null);
+    const prev = VNode._prevSibDomVNode;
+    copyPropsOverEntireTree(prev, "_nextSibDomVNode", null);
   }
   _clearPointers(VNode_POINTERS, VNode);
 }

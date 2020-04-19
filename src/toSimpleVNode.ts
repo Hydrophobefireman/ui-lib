@@ -3,7 +3,7 @@ import { Component } from "./component";
 import { scheduleLifeCycleCallbacks } from "./lifeCycleCallbacks";
 import { convertToVNodeIfNeeded, Fragment } from "./create_element";
 import { EMPTY_OBJ, assign } from "./util";
-
+import config from "./config";
 export const isFn = (vnType: any) =>
   typeof vnType === "function" && vnType !== Fragment;
 
@@ -49,6 +49,7 @@ function renderFunctionalComponent(VNode: VNode, meta?: DiffMeta) {
     c = VNode._component;
   }
   /**TODO - implement hooks */
+  config.beforeHookRender(c);
   nextVNode = convertToVNodeIfNeeded(c.render(VNode.props));
   c._depth = ++meta.depth;
 
@@ -74,6 +75,7 @@ function setNextRenderedVNodePointers(next: VNode, VNode: VNode) {
 function getRenderer(props: Props<any>) {
   return this.constructor(props);
 }
+
 function renderClassComponent(
   VNode: VNode,
   oldVNode: VNode,
@@ -160,9 +162,8 @@ function updateStateFromStaticLifeCycleMethods(
   cls: typeof Component,
   VNode: VNode
 ): void {
-  const state = component.state || {};
-  // component.state = state;
-  const nextState = assign({}, component._nextState || state);
+  const state = component.state || EMPTY_OBJ;
+  const nextState = assign({}, state, component._nextState || EMPTY_OBJ);
   const ns = _runGetDerivedStateFromProps(cls, VNode.props, nextState);
   if (ns) {
     assign(nextState, ns);

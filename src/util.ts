@@ -1,6 +1,6 @@
 import { clearDomNodePointers } from "./diff/updater";
 import { UIElement, VNode } from "./types";
-import { updateInternalVNodes } from "./diff/dom";
+import { copyPropsOverEntireTree } from "./diff/dom";
 import { Fragment } from "./create_element";
 
 export const EMPTY_OBJ: any = {};
@@ -69,8 +69,6 @@ export function clearDOM(dom: Element, clearPointers?: boolean) {
 
 const propPSD = "_prevSibDomVNode";
 const propNSD = "_nextSibDomVNode";
-const renders = "_renders";
-const renderedBy = "_renderedBy";
 /**
  * copy random dom data that stays static during the diff
  * @param target target VNode - most likely newVNode of diff function
@@ -78,27 +76,34 @@ const renderedBy = "_renderedBy";
  */
 export function copyVNodePointers(newVNode: VNode, oldVNode: VNode) {
   if (oldVNode === EMPTY_OBJ || newVNode == null || oldVNode == null) return;
+
+  copyPropsOverEntireTree(
+    newVNode,
+    "_fragmentParent",
+    oldVNode._fragmentParent
+  );
+
   const _prevSibDomVNode = oldVNode._prevSibDomVNode;
 
   const shouldUpdatePrevSibVNodeProps =
     newVNode._prevSibDomVNode == null && _prevSibDomVNode != null;
 
   if (shouldUpdatePrevSibVNodeProps) {
-    updateInternalVNodes(newVNode, propPSD, _prevSibDomVNode, renders);
-    updateInternalVNodes(newVNode, propPSD, _prevSibDomVNode, renderedBy);
+    copyPropsOverEntireTree(newVNode, propPSD, _prevSibDomVNode);
+    copyPropsOverEntireTree(_prevSibDomVNode, propNSD, newVNode);
   }
 
   const _nextSibDomVNode =
     oldVNode.type !== Fragment
       ? oldVNode._nextSibDomVNode
-      : getSibVNodeFromFragmentChildren(oldVNode["_children"]);
+      : getSibVNodeFromFragmentChildren(oldVNode._children);
 
   const shouldUpdateNextSibVNodeProps =
     newVNode._nextSibDomVNode == null && _nextSibDomVNode != null;
 
   if (shouldUpdateNextSibVNodeProps) {
-    updateInternalVNodes(newVNode, propNSD, _nextSibDomVNode, renders);
-    updateInternalVNodes(newVNode, propNSD, _nextSibDomVNode, renderedBy);
+    copyPropsOverEntireTree(newVNode, propNSD, _nextSibDomVNode);
+    copyPropsOverEntireTree(_nextSibDomVNode, propPSD, newVNode);
   }
 }
 
@@ -111,7 +116,7 @@ export function isValidVNode(V: VNode) {
   return true;
 }
 
-export function getClosestDom(VNode: VNode): UIElement {
+ export function getClosestDom(VNode: VNode): UIElement {
   if (!VNode) return;
   const dom = VNode._dom;
   if (dom) return dom;
@@ -138,7 +143,6 @@ export function getSibVNodeFromFragmentChildren(children: VNode["_children"]) {
   let length = children.length;
   while (length) {
     const child = children[length--];
-    let next: VNode;
     if (child) {
       if (child._dom) {
         return child._nextSibDomVNode;

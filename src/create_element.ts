@@ -22,7 +22,8 @@ export function createElement<P>(
   }
   const ref = props.ref;
   const key = props.key;
-  const events: EventListenerDict = {};
+
+  const events: EventListenerDict = typeof type === "string" ? {} : null;
   props = getPropsWithoutSpecialKeysAndInitializeEventsDict(props, events);
   if (children.length || (children = [props.children])) {
     (props as any).children = flattenArray(children);
@@ -60,19 +61,18 @@ function getVNode<P>(
   return VNode;
 }
 
-export function Fragment<T>(props: Props<T>): VNode<T> {
-  return props.children;
-}
+export const Fragment: any = function Fragment(): void {};
 const skipProps = { key: 1, ref: 1 };
 function getPropsWithoutSpecialKeysAndInitializeEventsDict<P>(
   props: createElementPropType<P>,
   events: {}
 ) {
   const obj = {};
+  const shouldAddEvents = events != null;
   for (const i in props) {
     if (skipProps[i] == null) {
       obj[i] = props[i];
-      if (isListener(i)) {
+      if (shouldAddEvents && isListener(i)) {
         events[i.substr(2).toLowerCase()] = props[i];
       }
     }
@@ -90,7 +90,6 @@ export function convertToVNodeIfNeeded(VNode: ComponentChild | VNode): VNode {
   if (Array.isArray(VNode)) {
     return createElement(Fragment, null, VNode);
   }
-
   if ((VNode as VNode)._dom != null) {
     const vn = getVNode(
       (VNode as VNode).type,
@@ -99,7 +98,6 @@ export function convertToVNodeIfNeeded(VNode: ComponentChild | VNode): VNode {
       (VNode as VNode).key,
       null
     );
-    vn._dom = (VNode as VNode)._dom;
     return vn;
   }
   return VNode as VNode;

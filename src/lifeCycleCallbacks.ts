@@ -1,4 +1,6 @@
 import { Component } from "./component";
+import { HAS_PROMISE } from "./config";
+
 type ProcessOptions = {
   name: Component["_lastLifeCycleMethod"];
   bind: Component;
@@ -28,7 +30,6 @@ export function scheduleLifeCycleCallbacks(options: ProcessOptions): any {
   else __executeCallback(options);
 }
 
-const HAS_PROMISE = typeof Promise !== "undefined";
 function __executeCallback(cbObj: ProcessOptions) {
   const args = cbObj.args;
   const component = cbObj.bind;

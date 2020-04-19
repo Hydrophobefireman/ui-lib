@@ -9,7 +9,7 @@ import {
   updateParentDomPointers,
 } from "./dom";
 import { toSimpleVNode, isFn } from "../toSimpleVNode";
-import { processUpdatesQueue } from "../lifeCycleCallbacks";
+// import { processUpdatesQueue } from "../lifeCycleCallbacks";
 
 /**
  *
@@ -56,7 +56,7 @@ export function diff(
     oldType = oldVNode.type;
   }
   /**strict equality,  leave diffing */
-  if (newVNode === oldVNode && !isComplex) {
+  if (newVNode === oldVNode) {
     return newVNodeISNULL ? null : newVNode._dom;
   }
 
@@ -101,7 +101,6 @@ export function diff(
     diffChildren(newVNode, null, newVNode._dom, meta);
   }
   flushChangesToDomIfNeeded(newVNode, parentDom, needsAppending);
-  processUpdatesQueue();
-
+  unmountVNodeAndDestroyDom(oldVNode, true);
   return newVNode._dom;
 }

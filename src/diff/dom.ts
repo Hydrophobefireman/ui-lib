@@ -17,10 +17,7 @@ export function diffDomNode(newVNode: VNode, oldVNode: VNode) {
   dom._VNode = newVNode;
 
   diffAttributes(dom, newVNode, oldVNode === EMPTY_OBJ ? null : oldVNode);
-
-  updateInternalVNodes(newVNode, "_dom", dom, "_renders");
-  updateInternalVNodes(newVNode, "_dom", dom, "_renderedBy");
-
+  copyPropsOverEntireTree(newVNode, "_dom", dom);
   setComponent_base(newVNode, dom);
 }
 
@@ -218,10 +215,16 @@ export function updateAdjacentElementPointers(
   const sibVNode = nextSib._VNode;
   if (!sibVNode) return;
 
-  updateInternalVNodes(sibVNode, propVal, VNode, "_renders");
-  updateInternalVNodes(sibVNode, propVal, VNode, "_renderedBy");
+  copyPropsOverEntireTree(sibVNode, propVal, VNode);
 }
-
+export function copyPropsOverEntireTree(
+  VNode: VNode,
+  propVal: string,
+  val: any
+) {
+  updateInternalVNodes(VNode, propVal, val, "_renders");
+  updateInternalVNodes(VNode, propVal, val, "_renderedBy");
+}
 const replaceOtherProp = {
   _dom: "_FragmentDomNodeChildren",
   _FragmentDomNodeChildren: "_dom",
@@ -238,7 +241,7 @@ export function updateInternalVNodes(
   if (next) {
     const fragParent = VNode._fragmentParent;
     if (shouldMirrorPropOnFragmentParent(fragParent, prop, val)) {
-      fragParent[prop] = val;
+      updateInternalVNodes(fragParent, prop, val, "_renderedBy");
     }
     if (replace) {
       next[replace] = null;
@@ -260,11 +263,10 @@ function shouldMirrorPropOnFragmentParent(
 }
 
 function isNotACommonChild(val: VNode, fragParent: VNode) {
-  if (val._fragmentParent === fragParent) {
-    return false;
-  }
-  while ((val = val._fragmentParent)) {
-    if (val._fragmentParent === fragParent) return false;
+  let next = val;
+  while (next) {
+    if (next === fragParent) return false;
+    next = next._fragmentParent;
   }
   return true;
 }

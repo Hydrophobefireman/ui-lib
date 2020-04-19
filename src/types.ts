@@ -112,4 +112,9 @@ export interface UIElement extends HTMLElement {
   data?: string | number;
 }
 
+export interface VNodeHost extends UIElement {
+  _hosts?: VNode;
+}
 export type DiffMeta = { depth: number };
+
+export type HookInternal = { currentComponent: Component };

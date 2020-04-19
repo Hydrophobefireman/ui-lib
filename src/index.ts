@@ -1,5 +1,6 @@
 export { createElement, createElement as h, Fragment } from "./create_element";
-export { render, hydrate } from "./render";
+
+export { render } from "./render";
 export { Component, Component as default } from "./component";
 export { default as config } from "./config";
 export { default as AsyncComponent } from "./pkg/AsyncComponent/AsyncComponent";

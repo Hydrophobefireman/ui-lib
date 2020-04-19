@@ -9,14 +9,22 @@ import {
 import { assign } from "./util";
 import config from "./config";
 import { diff } from "./diff/index";
-import { processMountsQueue } from "./lifeCycleCallbacks";
+import { processMountsQueue, processUpdatesQueue } from "./lifeCycleCallbacks";
+
 const RENDER_QUEUE: Component[] = [];
+
+/** The pseudo-abstract component class */
 export class Component<P = {}, S = {}> implements Component_Interface<P, S> {
+  // our hook data store
+  private __hooksData?: { args: []; pendingEffects: any[] }; //TODO
+
   constructor(props?: P) {
     this.state = {} as any;
     this.props = props as Props<P>;
   }
+  // tracks component nesting
   _depth?: number;
+  // props passed to the component
   props: Props<P>;
   state: S;
   _oldState?: S;
@@ -36,9 +44,9 @@ export class Component<P = {}, S = {}> implements Component_Interface<P, S> {
       assign(this._nextState, nextState);
     }
     this.state = this._nextState;
-    this._nextState = null;
     enqueueRender(this);
   }
+
   forceUpdate(callback?: (() => void) | false): void {
     const shouldForce = callback !== false;
     this.base = diff(
@@ -50,11 +58,14 @@ export class Component<P = {}, S = {}> implements Component_Interface<P, S> {
     ) as UIElement;
     typeof callback === "function" && callback();
     processMountsQueue();
+    processUpdatesQueue();
   }
+  // current virtual dom
   _VNode?: VNode<P>;
   // user shall implement these
   componentWillMount?(): void;
   componentDidMount?(): void;
+
   componentWillUnmount?(): void;
   shouldComponentUpdate?(
     nextProps: Readonly<P>,
@@ -71,6 +82,7 @@ export class Component<P = {}, S = {}> implements Component_Interface<P, S> {
     state: Readonly<object>
   ): object | null;
   componentDidCatch?(error: any): void;
+  // debug purposes
   _lastLifeCycleMethod?:
     | "componentWillMount"
     | "componentDidMount"
