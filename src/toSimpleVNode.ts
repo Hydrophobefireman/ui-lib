@@ -49,7 +49,7 @@ function renderFunctionalComponent(VNode: VNode, meta?: DiffMeta) {
     c = VNode._component;
   }
   /**TODO - implement hooks */
-  config.beforeHookRender(c);
+  // config.beforeHookRender(c);
   nextVNode = convertToVNodeIfNeeded(c.render(VNode.props));
   c._depth = ++meta.depth;
 
