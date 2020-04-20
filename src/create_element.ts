@@ -106,7 +106,7 @@ export function convertToVNodeIfNeeded(VNode: ComponentChild | VNode): VNode {
 
 export function flattenVNodeChildren<P>(VNode: VNode<P>): VNode[] {
   return flattenArray<any>(
-    VNode.props.children,
+    [VNode.props.children],
     convertToVNodeIfNeeded
   ) as VNode[];
 }
