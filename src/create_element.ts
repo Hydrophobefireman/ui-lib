@@ -26,9 +26,14 @@ export function createElement<P = {}>(
   const events: EventListenerDict = typeof type === "string" ? {} : null;
   props = getPropsWithoutSpecialKeysAndInitializeEventsDict(props, events);
   // children provided as the extra args are used
-  if (children.length && !props.children) {
-    (props as any).children = flattenArray(children);
+  let _children: any[];
+  if (children.length && props.children == null) {
+    _children = flattenArray(children);
   }
+  if (props.children != null) {
+    _children = flattenArray([props.children]);
+  }
+  (props as any).children = _children;
   return getVNode<P>(type, props, events, key, ref);
 }
 
