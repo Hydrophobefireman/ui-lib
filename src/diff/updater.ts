@@ -84,7 +84,7 @@ export function clearVNodePointers(VNode: VNode, skipRemove?: boolean) {
     const prev = VNode._prevSibDomVNode;
     if (prev != null) {
       const prevDom = prev._dom;
-      const newNextSib = prevDom && (prevDom.previousSibling as UIElement);
+      const newNextSib = prevDom && (prevDom.nextSibling as UIElement);
       copyPropsOverEntireTree(
         prev,
         "_nextSibDomVNode",
