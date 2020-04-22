@@ -3,6 +3,7 @@ import { EMPTY_OBJ } from "../util";
 import { diffEventListeners } from "./events";
 import { scheduleLifeCycleCallbacks } from "../lifeCycleCallbacks";
 import { Fragment, PlaceHolder } from "../create_element";
+import { copyPropsOverEntireTree } from "./dom";
 
 export function unmountVNodeAndDestroyDom(
   VNode: VNode,
@@ -35,10 +36,10 @@ export function unmountVNodeAndDestroyDom(
   /*#__NOINLINE__*/
   _processNodeCleanup(VNode, skipRemove);
 }
-function _processNodeCleanup(VNode: VNode, skip?: boolean) {
+function _processNodeCleanup(VNode: VNode, skipRemove?: boolean) {
   const isPlaceholder = VNode.type === PlaceHolder;
   const dom = VNode._dom;
-  if (!skip && dom != null) {
+  if (!skipRemove && dom != null) {
     /*#__NOINLINE__*/
     !isPlaceholder && diffEventListeners(dom, null, VNode.events);
     /*#__NOINLINE__*/
@@ -47,7 +48,7 @@ function _processNodeCleanup(VNode: VNode, skip?: boolean) {
     removeNode(dom);
   }
 
-  clearVNodePointers(VNode);
+  clearVNodePointers(VNode, skipRemove);
 }
 const DOM_POINTERS = { _VNode: 1, _listeners: 1, onclick: 1 };
 export function clearDomNodePointers(dom: UIElement) {
@@ -68,8 +69,14 @@ const VNode_POINTERS: {} = {
   _parentDom: 1,
 } as { [key in keyof VNode<any>]: 1 | null };
 
-export function clearVNodePointers(VNode: VNode) {
-  _clearPointers(VNode_POINTERS, VNode);
+export function clearVNodePointers(VNode: VNode, skipRemove?: boolean) {
+  if (!skipRemove && VNode != null) {
+    const next = VNode._nextSibDomVNode;
+    copyPropsOverEntireTree(next, "_prevSibDomVNode", null);
+    const prev = VNode._prevSibDomVNode;
+    copyPropsOverEntireTree(prev, "_nextSibDomVNode", null);
+    _clearPointers(VNode_POINTERS, VNode);
+  }
 }
 
 function _clearPointers(pointersObj: object, el: any) {
