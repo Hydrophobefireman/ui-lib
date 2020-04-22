@@ -71,11 +71,28 @@ const VNode_POINTERS: {} = {
 
 export function clearVNodePointers(VNode: VNode, skipRemove?: boolean) {
   if (!skipRemove && VNode != null) {
-    const next = VNode._nextSibDomVNode;
-    copyPropsOverEntireTree(next, "_prevSibDomVNode", null);
+    var next = VNode._nextSibDomVNode;
+    if (next != null) {
+      const nextDom = next._dom;
+      const newPrevSib = nextDom && (nextDom.previousSibling as UIElement);
+      copyPropsOverEntireTree(
+        next,
+        "_prevSibDomVNode",
+        newPrevSib && newPrevSib._VNode
+      );
+    }
     const prev = VNode._prevSibDomVNode;
-    copyPropsOverEntireTree(prev, "_nextSibDomVNode", null);
-    _clearPointers(VNode_POINTERS, VNode);
+    if (prev != null) {
+      const prevDom = prev._dom;
+      const newNextSib = prevDom && (prevDom.previousSibling as UIElement);
+      copyPropsOverEntireTree(
+        prev,
+        "_nextSibDomVNode",
+        newNextSib && newNextSib._VNode
+      );
+
+      _clearPointers(VNode_POINTERS, VNode);
+    }
   }
 }
 
