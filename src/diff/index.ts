@@ -1,23 +1,9 @@
-import { VNode, ComponentType, DiffMeta, UIElement } from "../types";
-import {
-  EMPTY_OBJ,
-  copyVNodePointers,
-  isValidVNode,
-  getSibVNodeFromFragmentChildren,
-} from "../util";
+import { VNode, ComponentType, DiffMeta } from "../types";
+import { EMPTY_OBJ, copyVNodePointers, isValidVNode } from "../util";
 import { unmountVNodeAndDestroyDom } from "./updater";
-import {
-  Fragment,
-  flattenVNodeChildren,
-  createElement,
-  PlaceHolder,
-} from "../create_element";
+import { Fragment, flattenVNodeChildren, PlaceHolder } from "../create_element";
 import { diffChildren } from "./children";
-import {
-  diffDomNodes,
-  updateParentDomPointers,
-  copyPropsOverEntireTree,
-} from "./dom";
+import { diffDomNodes, updateParentDomPointers } from "./dom";
 import { toSimpleVNode, isFn } from "../toSimpleVNode";
 // import { processUpdatesQueue } from "../lifeCycleCallbacks";
 

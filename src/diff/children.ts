@@ -1,11 +1,6 @@
 import { VNode, UIElement, DiffMeta } from "../types";
 import { Fragment } from "../create_element";
-import {
-  EMPTY_ARR,
-  EMPTY_OBJ,
-  getClosestDom,
-  getSibVNodeFromFragmentChildren,
-} from "../util";
+import { EMPTY_ARR, EMPTY_OBJ, getClosestDom } from "../util";
 import { diff } from "./index";
 import { updateInternalVNodes } from "./dom";
 export function diffChildren(
@@ -37,14 +32,7 @@ function diffEachChild(
     const oldChild: VNode = oldChildren[i] || EMPTY_OBJ;
 
     if (oldChild._nextSibDomVNode == null) {
-      let sibDom: UIElement | null = getNextSibDom(
-        oldChildren,
-        i + i,
-        oldChildrenLen
-      );
-      const _nextSibDomVNode = sibDom
-        ? sibDom._VNode
-        : isFragment
+      const _nextSibDomVNode = isFragment
         ? newParentVNode._nextSibDomVNode
         : null;
       if (_nextSibDomVNode != null) {
@@ -79,6 +67,13 @@ function updateFragmentDomPointers(
   x: VNode,
   index: number
 ) {
+  if (x != null && x._nextSibDomVNode != null)
+    updateInternalVNodes(
+      newParentVNode,
+      "_nextSibDomVNode",
+      x._nextSibDomVNode,
+      "_renderedBy"
+    );
   const domChild = x && ((x._dom || x._FragmentDomNodeChildren) as any);
   let arr = newParentVNode._FragmentDomNodeChildren;
   if (arr == null) {

@@ -196,30 +196,31 @@ export function appendNodeToDocument(
     parentDom.appendChild(domToPlace);
   }
 }
-function updatePointers(newVNode) {
+function updatePointers(newVNode: VNode) {
   const dom = newVNode._dom;
 
   if (newVNode._parentDom == null) {
     updateParentDomPointers(newVNode, dom.parentNode);
   }
 
-  const nextSib = dom.nextSibling as UIElement;
-  const prevSib = dom.previousSibling as UIElement;
-
-  if (newVNode._nextSibDomVNode == null) {
+  let sn = newVNode._nextSibDomVNode;
+  if (sn == null) {
+    const nextSib = dom.nextSibling as UIElement;
     if (nextSib != null) {
-      const sn = nextSib._VNode;
-      copyPropsOverEntireTree(sn, "_prevSibDomVNode", newVNode);
-      copyPropsOverEntireTree(newVNode, "_nextSibDomVNode", sn);
+      sn = nextSib._VNode;
     }
   }
-  if (newVNode._prevSibDomVNode == null) {
+  copyPropsOverEntireTree(sn, "_prevSibDomVNode", newVNode);
+  copyPropsOverEntireTree(newVNode, "_nextSibDomVNode", sn);
+  let pn = newVNode._prevSibDomVNode;
+  if (pn == null) {
+    const prevSib = dom.previousSibling as UIElement;
     if (prevSib != null) {
-      const pn = prevSib._VNode;
-      copyPropsOverEntireTree(pn, "_nextSibDomVNode", newVNode);
-      copyPropsOverEntireTree(newVNode, "_prevSibDomVNode", pn);
+      pn = prevSib._VNode;
     }
   }
+  copyPropsOverEntireTree(pn, "_nextSibDomVNode", newVNode);
+  copyPropsOverEntireTree(newVNode, "_prevSibDomVNode", pn);
 }
 
 export function copyPropsOverEntireTree(

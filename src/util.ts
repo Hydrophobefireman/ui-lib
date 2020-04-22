@@ -1,7 +1,6 @@
 import { clearDomNodePointers } from "./diff/updater";
 import { UIElement, VNode } from "./types";
 import { copyPropsOverEntireTree } from "./diff/dom";
-import { Fragment } from "./create_element";
 
 export const EMPTY_OBJ: any = {};
 export const EMPTY_ARR: any[] = [];
@@ -87,10 +86,7 @@ export function copyVNodePointers(newVNode: VNode, oldVNode: VNode) {
     copyPropsOverEntireTree(_prevSibDomVNode, propNSD, newVNode);
   }
 
-  const _nextSibDomVNode =
-    oldVNode.type !== Fragment
-      ? oldVNode._nextSibDomVNode
-      : getSibVNodeFromFragmentChildren(oldVNode._children);
+  const _nextSibDomVNode = oldVNode._nextSibDomVNode;
 
   const shouldUpdateNextSibVNodeProps =
     newVNode._nextSibDomVNode == null && _nextSibDomVNode != null;
@@ -130,26 +126,4 @@ function _getDom(fDom: VNode["_FragmentDomNodeChildren"]): UIElement {
     }
     if (e) return e as UIElement;
   }
-}
-
-export function getSibVNodeFromFragmentChildren(children: VNode["_children"]) {
-  if (children == null) return;
-  let length = children.length;
-  while (length) {
-    const child = children[length--];
-    if (child) {
-      if (child._dom) {
-        return child._nextSibDomVNode;
-      } else if (child._FragmentDomNodeChildren) {
-        const fin = getFinalVnode(child) || (EMPTY_OBJ as VNode);
-        return getSibVNodeFromFragmentChildren(fin._children);
-      }
-    }
-  }
-}
-
-function getFinalVnode(VNode: VNode): VNode {
-  let next: VNode = VNode;
-  if (!next) return null;
-  return next._renders ? getFinalVnode(next._renders) : next;
 }
