@@ -8,8 +8,9 @@ import {
   ComponentChild,
 } from "./types";
 
-import { EMPTY_OBJ, flattenArray, isListener } from "./util";
+import { EMPTY_OBJ, flattenArray, isListener, EMPTY_ARR } from "./util";
 
+export const PlaceHolder: any = Object.freeze({});
 export function createElement<P = {}>(
   type: ComponentType<P> | string,
   props?: createElementPropType<P> | null,
@@ -26,7 +27,8 @@ export function createElement<P = {}>(
   const events: EventListenerDict = typeof type === "string" ? {} : null;
   props = getPropsWithoutSpecialKeysAndInitializeEventsDict(props, events);
   // children provided as the extra args are used
-  let _children: any[];
+  // mark props.children as empty_arr so we know the no child was passed
+  let _children: any[] = EMPTY_ARR;
   if (children.length && props.children == null) {
     _children = flattenArray(children);
   }
@@ -59,7 +61,7 @@ function getVNode<P>(
     _prevSibDomVNode: null,
     _FragmentDomNodeChildren: null,
     _parentDom: null,
-    _fragmentParent: null,
+    // _fragmentParent: null,
     _depth: 0,
     __self: null,
   };
@@ -88,7 +90,7 @@ function getPropsWithoutSpecialKeysAndInitializeEventsDict<P>(
 
 export function convertToVNodeIfNeeded(VNode: ComponentChild | VNode): VNode {
   if (VNode == null || typeof VNode === "boolean") {
-    return null;
+    return createElement(PlaceHolder);
   }
   if (typeof VNode === "string" || typeof VNode === "number") {
     return getVNode(null, String(VNode) as any);
@@ -110,8 +112,10 @@ export function convertToVNodeIfNeeded(VNode: ComponentChild | VNode): VNode {
 }
 
 export function flattenVNodeChildren<P>(VNode: VNode<P>): VNode[] {
-  return flattenArray<any>(
-    [VNode.props.children],
-    convertToVNodeIfNeeded
-  ) as VNode[];
+  const c = VNode.props.children;
+  if (c === EMPTY_ARR) {
+    (VNode.props as any).children = void 0;
+    return [];
+  }
+  return flattenArray<any>([c], convertToVNodeIfNeeded) as VNode[];
 }

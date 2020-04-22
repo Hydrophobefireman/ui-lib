@@ -3,7 +3,6 @@ import { Component } from "./component";
 import { scheduleLifeCycleCallbacks } from "./lifeCycleCallbacks";
 import { convertToVNodeIfNeeded, Fragment } from "./create_element";
 import { EMPTY_OBJ, assign } from "./util";
-import config from "./config";
 export const isFn = (vnType: any) =>
   typeof vnType === "function" && vnType !== Fragment;
 
@@ -61,7 +60,6 @@ function renderFunctionalComponent(VNode: VNode, meta?: DiffMeta) {
 const COPY_PROPS = {
   _nextSibDomVNode: 1,
   _prevSibDomVNode: 1,
-  _fragmentParent: 1,
 };
 function setNextRenderedVNodePointers(next: VNode, VNode: VNode) {
   VNode._renders = next;

@@ -77,12 +77,6 @@ const propNSD = "_nextSibDomVNode";
 export function copyVNodePointers(newVNode: VNode, oldVNode: VNode) {
   if (oldVNode === EMPTY_OBJ || newVNode == null || oldVNode == null) return;
 
-  copyPropsOverEntireTree(
-    newVNode,
-    "_fragmentParent",
-    oldVNode._fragmentParent
-  );
-
   const _prevSibDomVNode = oldVNode._prevSibDomVNode;
 
   const shouldUpdatePrevSibVNodeProps =
@@ -116,7 +110,7 @@ export function isValidVNode(V: VNode) {
   return true;
 }
 
- export function getClosestDom(VNode: VNode): UIElement {
+export function getClosestDom(VNode: VNode): UIElement {
   if (!VNode) return;
   const dom = VNode._dom;
   if (dom) return dom;

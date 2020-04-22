@@ -1,9 +1,15 @@
 import { VNode, UIElement, Props } from "../types";
 import { EMPTY_OBJ, isListener, getClosestDom } from "../util";
 import { diffEventListeners } from "./events";
+import { PlaceHolder } from "../create_element";
 
-export function diffDomNode(newVNode: VNode, oldVNode: VNode) {
+export function diffDomNodes(
+  newVNode: VNode,
+  oldVNode: VNode,
+  parentDom: Node
+) {
   oldVNode = oldVNode || EMPTY_OBJ;
+  const shouldAppend = oldVNode === EMPTY_OBJ;
   const newType = newVNode.type;
   const oldType = oldVNode.type;
   let dom: UIElement;
@@ -16,9 +22,12 @@ export function diffDomNode(newVNode: VNode, oldVNode: VNode) {
   }
   dom._VNode = newVNode;
 
-  diffAttributes(dom, newVNode, oldVNode === EMPTY_OBJ ? null : oldVNode);
+  diffAttributes(dom, newVNode, shouldAppend ? null : oldVNode);
   copyPropsOverEntireTree(newVNode, "_dom", dom);
   setComponent_base(newVNode, dom);
+  if (shouldAppend) {
+    flushChangesToDomIfNeeded(newVNode, parentDom, true);
+  }
 }
 
 function setComponent_base(VNode: VNode, dom: UIElement) {
@@ -35,7 +44,10 @@ function createDomFromVNode(newVNode: VNode): UIElement {
   if (typeof newVNode.props === "string") {
     return (document.createTextNode("") as unknown) as UIElement;
   } else {
-    return document.createElement(newVNode.type as string) as UIElement;
+    const type = newVNode.type;
+    if (type === PlaceHolder)
+      return (document.createComment(" ") as any) as UIElement;
+    return document.createElement(type as string) as UIElement;
   }
 }
 
@@ -44,6 +56,7 @@ function diffAttributes(
   newVNode: VNode,
   oldVNode: VNode | null
 ) {
+  if (newVNode.type === PlaceHolder) return;
   oldVNode = oldVNode || EMPTY_OBJ;
   const isTextNode = typeof newVNode.props === "string";
   if (isTextNode) {
@@ -148,18 +161,12 @@ function __diffTextNodes(dom: UIElement, newVal: string, oldVal: string) {
   return newVal === oldVal || (dom.nodeValue = newVal);
 }
 
-function getFragParentSibDom(VNode: VNode) {
-  const fp = VNode._fragmentParent;
-  return fp && fp._nextSibDomVNode;
-}
-
 export function flushChangesToDomIfNeeded(
   newVNode: VNode,
   parentDom: Node,
   needsAppending: boolean
 ) {
-  const nextSibVNode =
-    newVNode._nextSibDomVNode || getFragParentSibDom(newVNode);
+  const nextSibVNode = newVNode._nextSibDomVNode;
 
   const nextSibDomNode = /*#__NOINLINE__*/ getClosestDom(nextSibVNode);
   const domToPlace = newVNode._dom;
@@ -189,37 +196,32 @@ export function appendNodeToDocument(
     parentDom.appendChild(domToPlace);
   }
 }
-
-function updatePointers(newVNode: VNode) {
+function updatePointers(newVNode) {
   const dom = newVNode._dom;
-  /** we get the parent dom from the actual element instead as it could be null (when we are reordering) */
+
   if (newVNode._parentDom == null) {
     updateParentDomPointers(newVNode, dom.parentNode);
   }
+
   const nextSib = dom.nextSibling as UIElement;
   const prevSib = dom.previousSibling as UIElement;
 
-  if (nextSib != null) {
-    updateAdjacentElementPointers(nextSib._VNode, dom, "_nextSibDomVNode");
-    updateAdjacentElementPointers(newVNode, nextSib, "_prevSibDomVNode");
+  if (newVNode._nextSibDomVNode == null) {
+    if (nextSib != null) {
+      const sn = nextSib._VNode;
+      copyPropsOverEntireTree(sn, "_prevSibDomVNode", newVNode);
+      copyPropsOverEntireTree(newVNode, "_nextSibDomVNode", sn);
+    }
   }
-  if (prevSib != null) {
-    updateAdjacentElementPointers(newVNode, prevSib, "_nextSibDomVNode");
-    updateAdjacentElementPointers(prevSib._VNode, dom, "_prevSibDomVNode");
+  if (newVNode._prevSibDomVNode == null) {
+    if (prevSib != null) {
+      const pn = prevSib._VNode;
+      copyPropsOverEntireTree(pn, "_nextSibDomVNode", newVNode);
+      copyPropsOverEntireTree(newVNode, "_prevSibDomVNode", pn);
+    }
   }
 }
 
-export function updateAdjacentElementPointers(
-  VNode: VNode,
-  nextSib: UIElement,
-  propVal: "_prevSibDomVNode" | "_nextSibDomVNode"
-) {
-  if (!nextSib) return;
-  const sibVNode = nextSib._VNode;
-  if (!sibVNode) return;
-
-  copyPropsOverEntireTree(sibVNode, propVal, VNode);
-}
 export function copyPropsOverEntireTree(
   VNode: VNode,
   propVal: string,
@@ -240,12 +242,9 @@ export function updateInternalVNodes(
   nextGetter: "_renders" | "_renderedBy"
 ) {
   let next = VNode;
-  const replace = replaceOtherProp[prop];
   if (next) {
-    const fragParent = VNode._fragmentParent;
-    if (shouldMirrorPropOnFragmentParent(fragParent, prop, val)) {
-      updateInternalVNodes(fragParent, prop, val, "_renderedBy");
-    }
+    const replace = replaceOtherProp[prop];
+
     if (replace) {
       next[replace] = null;
     }
@@ -253,26 +252,7 @@ export function updateInternalVNodes(
     return updateInternalVNodes(next[nextGetter], prop, val, nextGetter);
   }
 }
-function shouldMirrorPropOnFragmentParent(
-  fragParent: VNode,
-  prop: string,
-  val: any
-): boolean {
-  return (
-    fragParent != null &&
-    (prop === "_nextSibDomVNode" || prop === "_prevSibDomVNode") &&
-    (val == null || /*#__NOINLINE__*/ isNotACommonChild(val, fragParent))
-  );
-}
 
-function isNotACommonChild(val: VNode, fragParent: VNode) {
-  let next = val;
-  while (next) {
-    if (next === fragParent) return false;
-    next = next._fragmentParent;
-  }
-  return true;
-}
 /** dom helper */
 function $(dom: UIElement, key: string, value: any) {
   if (key in dom) {

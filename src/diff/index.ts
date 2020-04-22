@@ -1,12 +1,22 @@
-import { VNode, ComponentType, DiffMeta } from "../types";
-import { EMPTY_OBJ, copyVNodePointers, isValidVNode } from "../util";
+import { VNode, ComponentType, DiffMeta, UIElement } from "../types";
+import {
+  EMPTY_OBJ,
+  copyVNodePointers,
+  isValidVNode,
+  getSibVNodeFromFragmentChildren,
+} from "../util";
 import { unmountVNodeAndDestroyDom } from "./updater";
-import { Fragment, flattenVNodeChildren } from "../create_element";
+import {
+  Fragment,
+  flattenVNodeChildren,
+  createElement,
+  PlaceHolder,
+} from "../create_element";
 import { diffChildren } from "./children";
 import {
-  diffDomNode,
-  flushChangesToDomIfNeeded,
+  diffDomNodes,
   updateParentDomPointers,
+  copyPropsOverEntireTree,
 } from "./dom";
 import { toSimpleVNode, isFn } from "../toSimpleVNode";
 // import { processUpdatesQueue } from "../lifeCycleCallbacks";
@@ -25,82 +35,76 @@ export function diff(
   parentDom: Node,
   force: boolean,
   meta: DiffMeta
-): Element | Text {
+): Element | Text | void {
   if (typeof newVNode === "boolean") newVNode = null;
 
-  const newVNodeISNULL = newVNode == null;
   const oldVNodeISNULL = oldVNode == null;
-
-  let oldType: string | ComponentType;
-  let newType: string | ComponentType;
-  let isComplex: boolean;
-  /** SCU returned False */
-  if (newVNode === EMPTY_OBJ) return;
-  copyVNodePointers(newVNode, oldVNode);
-  if (newVNodeISNULL || oldVNodeISNULL || newVNode.type !== oldVNode.type) {
-    unmountVNodeAndDestroyDom(oldVNode);
-
+  if (oldVNodeISNULL) {
     oldVNode = EMPTY_OBJ;
-    if (newVNodeISNULL) return null;
   }
-
-  if (!newVNodeISNULL) {
-    newType = newVNode.type;
-    isComplex = isFn(newType);
-    /**Prevention against json injection */
-    if (!isValidVNode(newVNode)) {
-      return null;
-    }
+  if (newVNode == null) {
+    unmountVNodeAndDestroyDom(oldVNode);
+    return;
   }
-  if (!oldVNodeISNULL) {
-    oldType = oldVNode.type;
+  if (newVNode === EMPTY_OBJ) return null;
+  if (!isValidVNode(newVNode)) {
+    return null;
   }
-  /**strict equality,  leave diffing */
-  if (newVNode === oldVNode) {
-    return newVNodeISNULL ? null : newVNode._dom;
+  /** SCU returned False */
+  if (oldVNode === newVNode) {
+    return newVNode._dom;
   }
+  copyVNodePointers(newVNode, oldVNode);
+  let oldType: string | ComponentType = oldVNode.type;
+  let newType: string | ComponentType = newVNode.type;
+  let isComplex = isFn(newType);
 
   if (newType === oldType && isComplex) {
-    /** preserve component state and instance */
     newVNode._component = oldVNode._component;
   }
-
+  // if (newVNode._nextSibDomVNode == null) {
+  //   const oldDom = oldVNode._dom;
+  //   const oldFragDom = oldVNode._FragmentDomNodeChildren;
+  //   let ns: VNode;
+  //   if (oldDom) {
+  //     const nextOldSib = oldDom.nextSibling as UIElement;
+  //     ns = nextOldSib && nextOldSib._VNode;
+  //   } else if (oldFragDom) {
+  //     ns = getSibVNodeFromFragmentChildren(oldVNode._children);
+  //   }
+  //   copyPropsOverEntireTree(newVNode, "_nextSibDomVNode", ns);
+  // }
+  if (newType !== oldType) {
+    unmountVNodeAndDestroyDom(oldVNode);
+    oldVNode = EMPTY_OBJ;
+  }
   const tmp = newVNode;
-  /** normalize VNode.props.children */
-  newVNode._children = flattenVNodeChildren(newVNode);
-  /** if we have a function/class Component, get the next rendered VNode */
-  newVNode = toSimpleVNode(newVNode, oldVNode, force, meta);
-
+  if (typeof newVNode.props !== "string" && newType !== PlaceHolder) {
+    /** normalize VNode.props.children */
+    newVNode._children = flattenVNodeChildren(newVNode);
+    /** if we have a function/class Component, get the next rendered VNode */
+    newVNode = toSimpleVNode(newVNode, oldVNode, force, meta);
+  }
   if (isFn(oldVNode.type)) {
     oldVNode = oldVNode._renders;
   }
-
-  if (newVNode == null || newVNode !== tmp) {
-    /** toSimpleVNode gave us a null, unmount the vnode or it gave us a function.
-     * - simplify our vnode again  */
-
+  if (newVNode !== tmp) {
     return diff(newVNode, oldVNode, parentDom, force, meta);
   }
-  /** If we reached here, our component is either a Fragment or a simple dom node */
   oldType = oldVNode.type;
   newType = newVNode.type;
   updateParentDomPointers(newVNode, parentDom);
+
   if (newType === Fragment) {
-    diffChildren(newVNode, oldVNode, parentDom, meta);
-    return;
+    return diffChildren(newVNode, oldVNode, parentDom, meta);
   }
-  let needsAppending: boolean = true;
+  const maybeUnmount = oldVNode;
 
-  if (oldType === newType) {
-    diffDomNode(newVNode, oldVNode);
-    diffChildren(newVNode, oldVNode, newVNode._dom, meta);
-    needsAppending = false;
-  } else {
-    diffDomNode(newVNode, null);
-
-    diffChildren(newVNode, null, newVNode._dom, meta);
+  if (oldType !== newType) {
+    oldVNode = null;
   }
-  flushChangesToDomIfNeeded(newVNode, parentDom, needsAppending);
-  unmountVNodeAndDestroyDom(oldVNode, true);
+  diffDomNodes(newVNode, oldVNode, parentDom);
+  diffChildren(newVNode, oldVNode, newVNode._dom, meta);
+  unmountVNodeAndDestroyDom(maybeUnmount, true);
   return newVNode._dom;
 }

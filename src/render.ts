@@ -20,7 +20,7 @@ import { clearDOM } from "./util";
 export function render(VNode: VNode, parentDom: VNodeHost) {
   const normalizedVNode = createElement(Fragment, null, VNode);
 
-  if (parentDom.hasChildNodes() && !parentDom._hosts) {
+  if (parentDom.hasChildNodes()) {
     /*#__NOINLINE__*/
     clearDOM(parentDom);
   }
@@ -33,10 +33,10 @@ export function render(VNode: VNode, parentDom: VNodeHost) {
   // }
   // const oldVNode = parentDom._hosts;
   // clearDOM(parentDom);
-  diff(normalizedVNode, parentDom._hosts, parentDom, false, { depth: 0 });
+  diff(normalizedVNode, null, parentDom, false, { depth: 0 });
   processMountsQueue();
   processUpdatesQueue();
-  parentDom._hosts = VNode;
+  // parentDom._hosts = VNode;
 }
 
 /**@todo fix hydrate */

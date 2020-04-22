@@ -36,7 +36,7 @@ export interface VNode<P = {}> {
   // parentDom node -> to call append child on if we can not reorder
   _parentDom: Node;
   //  the fragment parent VNode this VNode is a child of
-  _fragmentParent: VNode;
+  // _fragmentParent: VNode;
 }
 
 export type EventListenerDict = JSXInternal.DOMEvents<EventTarget>;

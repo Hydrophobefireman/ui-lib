@@ -35,22 +35,19 @@ function diffEachChild(
   for (let i = 0; i < larger; i++) {
     const newChild: VNode = newChildren[i];
     const oldChild: VNode = oldChildren[i] || EMPTY_OBJ;
-    const addPointers = isFragment && newChild != null;
-    const oldDom: UIElement | Text = getClosestDom(oldChild) as UIElement;
 
-    if (oldDom == null && newChild != null) {
+    if (oldChild._nextSibDomVNode == null) {
       let sibDom: UIElement | null = getNextSibDom(
         oldChildren,
         i + i,
         oldChildrenLen
       );
-      const _nextSibDomVNode =
-        (sibDom
-          ? sibDom._VNode
-          : newParentVNode.type === Fragment &&
-            getSibVNodeFromFragmentChildren(newParentVNode._children)) ||
-        void 0;
-      if (_nextSibDomVNode !== void 0) {
+      const _nextSibDomVNode = sibDom
+        ? sibDom._VNode
+        : isFragment
+        ? newParentVNode._nextSibDomVNode
+        : null;
+      if (_nextSibDomVNode != null) {
         updateInternalVNodes(
           newChild,
           "_nextSibDomVNode",
@@ -59,8 +56,6 @@ function diffEachChild(
         );
       }
     }
-
-    addPointers && (newChild._fragmentParent = newParentVNode);
     diff(newChild, oldChild, parentDom, null, meta);
     isFragment && updateFragmentDomPointers(newParentVNode, newChild, i);
   }
