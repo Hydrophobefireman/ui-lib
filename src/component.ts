@@ -44,6 +44,7 @@ export class Component<P = {}, S = {}> implements Component_Interface<P, S> {
       assign(this._nextState, nextState);
     }
     this.state = this._nextState;
+    // this._nextState = null;
     enqueueRender(this);
   }
 
