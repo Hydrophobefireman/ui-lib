@@ -50,6 +50,11 @@ function diffEachChild(
     diff(newChild, oldChild, parentDom, null, meta);
     isFragment && updateFragmentDomPointers(newParentVNode, newChild, i);
   }
+  if (isFragment && newChildrenLen) {
+    const c = newParentVNode._children;
+    const t = c[newChildrenLen - 1]._nextSibDomVNode;
+    updateInternalVNodes(newParentVNode, "_nextSibDomVNode", t, "_renderedBy");
+  }
 }
 
 function updateFragmentDomPointers(
@@ -57,7 +62,7 @@ function updateFragmentDomPointers(
   x: VNode,
   index: number
 ) {
-  if (x != null && x._nextSibDomVNode != null)
+  if (x != null)
     updateInternalVNodes(
       newParentVNode,
       "_nextSibDomVNode",

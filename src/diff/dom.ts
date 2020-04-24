@@ -1,7 +1,7 @@
 import { VNode, UIElement, Props } from "../types";
 import { EMPTY_OBJ, isListener, getClosestDom } from "../util";
 import { diffEventListeners } from "./events";
-import { PlaceHolder } from "../create_element";
+import { PlaceHolder, Fragment } from "../create_element";
 
 export function diffDomNodes(
   newVNode: VNode,
@@ -45,9 +45,12 @@ function createDomFromVNode(newVNode: VNode): UIElement {
     return (document.createTextNode("") as unknown) as UIElement;
   } else {
     const type = newVNode.type;
-    if (type === PlaceHolder)
+    if (type === PlaceHolder) {
       return (document.createComment("") as any) as UIElement;
-    return document.createElement(type as string) as UIElement;
+    }
+    const dom = document.createElement(type as string) as UIElement;
+    dom.onclick = Fragment;
+    return dom;
   }
 }
 

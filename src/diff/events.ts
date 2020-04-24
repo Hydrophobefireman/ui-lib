@@ -8,12 +8,10 @@ export function diffEventListeners(
   oldEvents: EventListenerDict
 ) {
   if (dom == null || dom instanceof Text || newEvents === oldEvents) return;
-  if (dom._listeners == null) dom._listeners = EMPTY_OBJ;
-  if (newEvents != null) {
-    if (dom._listeners == EMPTY_OBJ) {
-      dom.onclick = Fragment;
-    }
-  } else {
+  if (dom._listeners == null) {
+    dom._listeners = {};
+  }
+  if (newEvents == null) {
     newEvents = EMPTY_OBJ;
   }
   if (oldEvents == null) {

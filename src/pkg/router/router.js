@@ -32,11 +32,11 @@ export const RouterSubscription = {
 };
 
 export function loadURL(url) {
-  window.history.pushState(EMPTY_OBJ, document.title, url);
+  window.history.pushState(0, 0, url);
   RouterSubscription.emit(url, { type: "load", native: false });
 }
 export function redirect(url) {
-  window.history.replaceState(EMPTY_OBJ, document.title, url);
+  window.history.replaceState(0, 0, url);
   RouterSubscription.emit(url, { type: "redirect", native: false });
 }
 class Router extends Component {
