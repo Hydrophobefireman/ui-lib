@@ -28,7 +28,7 @@ export function createElement<P = {}>(
   props = getPropsWithoutSpecialKeysAndInitializeEventsDict(props, events);
   // children provided as the extra args are used
   // mark props.children as empty_arr so we know the no child was passed
-  let _children: any[] = EMPTY_ARR;
+  let _children: any[];
   if (children.length && props.children == null) {
     _children = flattenArray(children);
   }
@@ -113,8 +113,7 @@ export function convertToVNodeIfNeeded(VNode: ComponentChild | VNode): VNode {
 
 export function flattenVNodeChildren<P>(VNode: VNode<P>): VNode[] {
   const c = VNode.props.children;
-  if (c === EMPTY_ARR) {
-    (VNode.props as any).children = void 0;
+  if (c == null) {
     return [];
   }
   return flattenArray<any>([c], convertToVNodeIfNeeded) as VNode[];
