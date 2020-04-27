@@ -66,8 +66,6 @@ export function diff(
   }
   const tmp = newVNode;
   if (typeof newVNode.props !== "string" && newType !== PlaceHolder) {
-    /** normalize VNode.props.children */
-    newVNode._children = flattenVNodeChildren(newVNode);
     /** if we have a function/class Component, get the next rendered VNode */
     newVNode = toSimpleVNode(newVNode, oldVNode, force, meta);
   }
@@ -77,20 +75,23 @@ export function diff(
   if (newVNode !== tmp) {
     return diff(newVNode, oldVNode, parentDom, force, meta);
   }
+  /** normalize VNode.props.children */
+  newVNode._children = flattenVNodeChildren(newVNode);
+
   oldType = oldVNode.type;
   newType = newVNode.type;
   updateParentDomPointers(newVNode, parentDom);
 
-  if (newType === Fragment) {
-    return diffChildren(newVNode, oldVNode, parentDom, meta);
-  }
   const maybeUnmount = oldVNode;
-
-  if (oldType !== newType) {
-    oldVNode = null;
+  if (newType === Fragment) {
+    diffChildren(newVNode, oldVNode, parentDom, meta);
+  } else {
+    if (oldType !== newType) {
+      oldVNode = null;
+    }
+    diffDomNodes(newVNode, oldVNode, parentDom);
+    diffChildren(newVNode, oldVNode, newVNode._dom, meta);
   }
-  diffDomNodes(newVNode, oldVNode, parentDom);
-  diffChildren(newVNode, oldVNode, newVNode._dom, meta);
   unmountVNodeAndDestroyDom(maybeUnmount, true);
   return newVNode._dom;
 }

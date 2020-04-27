@@ -78,19 +78,17 @@ function diffAttributes(
   diffEventListeners(dom, newVNode.events, oldVNode.events);
 }
 const UNSAFE_ATTRS = { key: 1, ref: 1, children: 1 };
-function isUnsafeAttr(attr: string): boolean {
-  return attr in UNSAFE_ATTRS;
-}
 
+const attrsToFetchFromDOM = { value: 1, checked: 1 };
 function __diffNewAttributes(
   dom: UIElement,
   prev: Props<any>,
   next: Props<any>
 ) {
   for (let attr in next) {
-    if (isListener(attr) || isUnsafeAttr(attr)) continue;
+    if (isListener(attr) || attr in UNSAFE_ATTRS) continue;
     let newValue = next[attr];
-    let oldValue = prev[attr];
+    let oldValue = attrsToFetchFromDOM[attr] ? dom[attr] : prev[attr];
     if (newValue === oldValue) continue;
     attr = attr === "class" ? "className" : attr;
     if (attr === "className") {
@@ -228,7 +226,7 @@ function updatePointers(newVNode: VNode) {
 
 export function copyPropsOverEntireTree(
   VNode: VNode,
-  propVal: string,
+  propVal: keyof VNode,
   val: any
 ) {
   updateInternalVNodes(VNode, propVal, val, "_renders");
@@ -241,19 +239,18 @@ const replaceOtherProp = {
 
 export function updateInternalVNodes(
   VNode: VNode,
-  prop: string,
+  prop: keyof VNode,
   val: any,
   nextGetter: "_renders" | "_renderedBy"
 ) {
   let next = VNode;
-  if (next) {
-    const replace = replaceOtherProp[prop];
-
+  const replace = replaceOtherProp[prop];
+  while (next) {
     if (replace) {
       next[replace] = null;
     }
     next[prop] = val;
-    return updateInternalVNodes(next[nextGetter], prop, val, nextGetter);
+    next = next[nextGetter];
   }
 }
 

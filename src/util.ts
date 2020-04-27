@@ -1,4 +1,3 @@
-import { clearDomNodePointers } from "./diff/updater";
 import { UIElement, VNode } from "./types";
 import { copyPropsOverEntireTree } from "./diff/dom";
 
@@ -56,12 +55,9 @@ export const assign = ("assign" in Object
       return target;
     }) as ObjectConstructor["assign"];
 
-export function clearDOM(dom: Element, clearPointers?: boolean) {
+export function clearDOM(dom: Element) {
   let c: ChildNode;
   while ((c = dom.firstChild)) {
-    if (clearPointers) {
-      clearDomNodePointers(c as UIElement);
-    }
     dom.removeChild(c);
   }
 }

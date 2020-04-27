@@ -38,14 +38,18 @@ export function unmountVNodeAndDestroyDom(
 }
 function _processNodeCleanup(VNode: VNode, skipRemove?: boolean) {
   const isPlaceholder = VNode.type === PlaceHolder;
-  const dom = VNode._dom;
-  if (!skipRemove && dom != null) {
-    /*#__NOINLINE__*/
-    !isPlaceholder && diffEventListeners(dom, null, VNode.events);
-    /*#__NOINLINE__*/
-    clearDomNodePointers(dom);
-    /*#__NOINLINE__*/
-    removeNode(dom);
+
+  if (!skipRemove && typeof VNode.type !== "function") {
+    const dom = VNode._dom;
+    if (dom != null) {
+      /*#__NOINLINE__*/
+      !isPlaceholder && diffEventListeners(dom, null, VNode.events);
+      /*#__NOINLINE__*/
+      clearDomNodePointers(dom);
+      /*#__NOINLINE__*/
+
+      removeNode(dom);
+    }
   }
 
   clearVNodePointers(VNode, skipRemove);
@@ -70,7 +74,8 @@ const VNode_POINTERS: {} = {
 } as { [key in keyof VNode<any>]: 1 | null };
 
 export function clearVNodePointers(VNode: VNode, skipRemove?: boolean) {
-  if (!skipRemove && VNode != null) {
+  if (VNode == null) return;
+  if (!skipRemove) {
     var next = VNode._nextSibDomVNode;
     if (next != null) {
       const nextDom = next._dom;
@@ -90,10 +95,9 @@ export function clearVNodePointers(VNode: VNode, skipRemove?: boolean) {
         "_nextSibDomVNode",
         newNextSib && newNextSib._VNode
       );
-
-      _clearPointers(VNode_POINTERS, VNode);
     }
   }
+  _clearPointers(VNode_POINTERS, VNode);
 }
 
 function _clearPointers(pointersObj: object, el: any) {
