@@ -82,7 +82,6 @@ export function diff(
   newType = newVNode.type;
   updateParentDomPointers(newVNode, parentDom);
 
-  const maybeUnmount = oldVNode;
   if (newType === Fragment) {
     diffChildren(newVNode, oldVNode, parentDom, meta);
   } else {
@@ -92,6 +91,6 @@ export function diff(
     diffDomNodes(newVNode, oldVNode, parentDom);
     diffChildren(newVNode, oldVNode, newVNode._dom, meta);
   }
-  unmountVNodeAndDestroyDom(maybeUnmount, true);
+
   return newVNode._dom;
 }

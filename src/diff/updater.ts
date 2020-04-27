@@ -97,6 +97,7 @@ export function clearVNodePointers(VNode: VNode, skipRemove?: boolean) {
       );
     }
   }
+
   _clearPointers(VNode_POINTERS, VNode);
 }
 
