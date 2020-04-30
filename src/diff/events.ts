@@ -18,7 +18,7 @@ export function diffEventListeners(
     oldEvents = EMPTY_OBJ;
   }
   for (const event in oldEvents) {
-    if (!(event in newEvents)) {
+    if (newEvents[event] == null) {
       delete dom._listeners[event];
       dom.removeEventListener(event, eventListenerProxy);
     }
@@ -26,7 +26,7 @@ export function diffEventListeners(
   for (const event in newEvents) {
     const listener = newEvents[event];
     const oldListener = oldEvents[event];
-    if (oldListener !== listener) {
+    if (listener != null && oldListener !== listener) {
       if (oldListener == null) dom.addEventListener(event, eventListenerProxy);
       dom._listeners[event] = listener;
     }

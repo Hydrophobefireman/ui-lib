@@ -118,7 +118,7 @@ function diffStyle(
     st.cssText = "";
   } else {
     for (const styleProp in oldValue as object) {
-      if (!(styleProp in newValue)) {
+      if (newValue[styleProp] == null) {
         st[styleProp] = "";
       }
     }
@@ -153,7 +153,8 @@ function __removeOldAttributes(
   next: Props<any>
 ) {
   for (const i in prev) {
-    if (!(i in next)) {
+    if (isListener(i) || i in UNSAFE_ATTRS) continue;
+    if (next[i] == null) {
       $(dom, i, null);
     }
   }
