@@ -35,9 +35,12 @@ export class Component<P = {}, S = {}> implements Component_Interface<P, S> {
   }
   setState<K extends keyof S>(nextState: setStateArgType<P, S, K>): void {
     this._oldState = assign({}, this.state);
+
     this._nextState = assign({}, this.state);
+
     if (typeof nextState === "function") {
       const next = nextState(this._nextState, this.props);
+
       if (next == null) return;
       assign(this._nextState, next);
     } else {

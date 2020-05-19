@@ -26,9 +26,10 @@
         Router,
         AsyncComponent,
         A,
-        absolutePath,
+        createRoutePath,
         RouterSubscription,
-        render
+        render,
+        Path,
       } from "../../ui/index.js";
       const f = Fragment;
       class UL extends Component {
@@ -36,7 +37,7 @@
           const c = h(
             "ul",
             null,
-            show ? todos.map(x => h("li", null, x.text)) : null
+            show ? todos.map((x) => h("li", null, x.text)) : null
           );
           return c;
         }
@@ -46,9 +47,9 @@
           super(p);
           this.state = { todos: [], navigateTo: "page1", text: "", show: true };
 
-          this.setText = e => {
+          this.setText = (e) => {
             this.setState({
-              text: e.target.value
+              text: e.target.value,
             });
           };
 
@@ -58,17 +59,17 @@
               return;
             }
             todos = todos.concat({
-              text
+              text,
             });
             this.setState({
               todos,
-              text: ""
+              text: "",
             });
           };
         }
         componentWillMount() {
           console.log("willMount");
-          RouterSubscription.subscribe(e =>
+          RouterSubscription.subscribe((e) =>
             this.setState({ navigateTo: e !== base ? base : "page1" })
           );
         }
@@ -85,7 +86,7 @@
               h(
                 "button",
                 {
-                  onClick: () => this.setState(p => ({ show: !p.show }))
+                  onClick: () => this.setState((p) => ({ show: !p.show })),
                 },
                 "Todo List is",
                 this.state.show ? " Shown" : " Hidden"
@@ -95,16 +96,16 @@
               "form",
               {
                 onSubmit: this.addTodo,
-                action: "javascript:"
+                action: "javascript:",
               },
               h("input", {
                 value: text,
-                onInput: this.setText
+                onInput: this.setText,
               }),
               h(
                 "button",
                 {
-                  type: "submit"
+                  type: "submit",
                 },
                 "Add"
               )
@@ -113,20 +114,18 @@
             h(
               Router,
               { fallbackComponent: () => h("div", null, "Not Found") },
-              h(
-                function() {
+              h(Path, {
+                match: createRoutePath(base + "page1(/?)"),
+                component: function () {
                   return h("div", null, h(A, { href: "page2" }, "go to page2"));
                 },
-                { path: absolutePath(base + "page1(/?)") }
-              ),
-              h(
-                function() {
+              }),
+              h(Path, {
+                match: createRoutePath(base + "page2(/?)"),
+                component: function () {
                   return h("div", null, h(A, { href: "page1" }, "go to page1"));
                 },
-                {
-                  path: absolutePath(base + "page2(/?)")
-                }
-              )
+              })
             ),
             h(A, { href: navigateTo }, "Navigate To:", navigateTo)
           );
@@ -136,12 +135,12 @@
       render(
         h(AsyncComponent, {
           fallbackComponent: () => h("div", null, "Loading"),
-          componentPromise: async function() {
+          componentPromise: async function () {
             console.log("Load Start");
-            await new Promise(r => setTimeout(r, 500));
+            await new Promise((r) => setTimeout(r, 500));
             console.log("Load End");
             return Foo;
-          }
+          },
         }),
         document.getElementById("app")
       );
