@@ -172,7 +172,7 @@ function onLinkClick(e: MouseEvent) {
     e.stopPropagation();
   }
   e.preventDefault();
-  const el = new URL((e.target as HTMLAnchorElement).href);
+  const el = new URL((e.target as HTMLAnchorElement).href, location.href);
   const href = el.pathname + el.search + el.hash;
   loadURL(href);
 }

@@ -49,7 +49,7 @@ function createDomFromVNode(newVNode: VNode): UIElement {
       return (document.createComment("") as any) as UIElement;
     }
     const dom = document.createElement(type as string) as UIElement;
-    dom.onclick = Fragment;
+    // dom.onclick = Fragment;
     return dom;
   }
 }
