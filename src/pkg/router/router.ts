@@ -84,6 +84,24 @@ export class Router extends Component {
   static get searchParams(): URLSearchParams {
     return new URLSearchParams(Router.qs);
   }
+  static _getParams(
+    pathParams: RoutePath["params"],
+    test: RegExpExecArray
+  ): {} {
+    const params = {};
+    for (const i in pathParams) {
+      params[pathParams[i]] = test[i];
+    }
+    return params;
+  }
+
+  static getCurrentParams(regexPath: RoutePath) {
+    regexPath = createRoutePath(regexPath);
+    const pathParams = regexPath.params;
+    const test = regexPath.regex.exec(Router.path);
+    return Router._getParams(pathParams, test);
+  }
+
   componentDidMount() {
     RouterSubscription.subscribe(this._routeChangeHandler);
     window.addEventListener("popstate", Router.__emitter);
@@ -111,13 +129,12 @@ export class Router extends Component {
       const test = pathinfo.regex.exec(renderPath);
       if (test) {
         const childProps = x.props as PathProps;
-
-        const params = {};
-        for (const i in pathinfo.params) {
-          params[pathinfo.params[i]] = test[i];
-        }
+        const params = Router._getParams(pathinfo.params, test);
         (child as VNode[]).push(
-          createRouterChild(childProps.component, assign({}, x.props, params))
+          createRouterChild(
+            childProps.component,
+            assign({}, x.props, { params })
+          )
         );
       }
     });
