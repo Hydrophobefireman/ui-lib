@@ -126,7 +126,8 @@ export class Router extends Component {
   }
 }
 
-deprecateGetter(Router, "getPath");
+deprecateGetter(Router, "getPath", "path");
+deprecateGetter(Router, "getQs", "qs");
 
 function _absolutePath(route: string) {
   return RegExp(`^${route}(/?)$`);
