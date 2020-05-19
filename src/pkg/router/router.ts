@@ -1,13 +1,22 @@
 import { Component } from "../../component";
 import { createElement, Fragment } from "../../create_element";
 import { deprecateFunction, deprecateGetter } from "../../$ui_tools";
-import { VNode, Props } from "../../types";
+import { VNode, Props, ComponentType } from "../../types";
+import { assign } from "../../util";
+import { createElementIfNeeded } from "../common";
 
 const pathFixRegex = /\/+$/;
 
 function fixPath(path: string): string {
   if (path.length === 1) return path;
   return path.replace(pathFixRegex, "");
+}
+
+function createRouterChild(
+  component: VNode | ComponentType,
+  props: Props<any>
+) {
+  return createElementIfNeeded(component, props);
 }
 
 const _routerSubscriptions: Array<(
@@ -108,7 +117,7 @@ export class Router extends Component {
           params[pathinfo.params[i]] = test[i];
         }
         (child as VNode[]).push(
-          createElement(childProps.component, { ...x.props, params })
+          createRouterChild(childProps.component, assign({}, x.props, params))
         );
       }
     });
@@ -186,6 +195,4 @@ export function A(props: any) {
   return createElement("a", props);
 }
 
-export function Path(props: Props<{ match: RoutePath; component: any }>) {
-  return;
-}
+export const Path = {};

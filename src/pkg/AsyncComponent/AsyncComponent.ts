@@ -1,6 +1,7 @@
 import { Component } from "../../component";
-import { createElement } from "../../create_element";
+
 import { ComponentType, VNode, Props } from "../../types";
+import { createElementIfNeeded } from "../common";
 // import { deprecationWarning } from "../../$ui_tools";
 
 export class AsyncComponent extends Component {
@@ -28,9 +29,10 @@ export class AsyncComponent extends Component {
 
     prom()
       .then((component: ComponentType | VNode) => {
-        if (!(component as VNode).__self) {
-          component = createElement(component as ComponentType);
-        }
+        component = createElementIfNeeded(component);
+        // if (!(component as VNode).__self) {
+        //  component = createElement(component as ComponentType);
+        // }
         this.setState({ render: component, inProgress: false });
       })
       .catch((x: Error) => this.setState({ error: true, inProgress: false }));
@@ -45,10 +47,4 @@ export class AsyncComponent extends Component {
       return createElementIfNeeded(props.errorComponent) || "An Error Occured";
     return state.render;
   }
-}
-
-function createElementIfNeeded(x: any): VNode {
-  if (x == null) return x;
-  if ((x as VNode).__self) return x;
-  return createElement(x);
 }
