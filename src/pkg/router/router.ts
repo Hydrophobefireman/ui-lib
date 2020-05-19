@@ -1,9 +1,14 @@
-import { Component, createElement, Fragment } from "@hydrophobefireman/ui-lib";
-
+import { Component } from "../../component";
+import { createElement, Fragment } from "../../create_element";
 import { deprecateFunction, deprecateGetter } from "../../$ui_tools";
 import { VNode, Props } from "../../types";
 
 const pathFixRegex = /\/+$/;
+
+function fixPath(path: string): string {
+  if (path.length === 1) return path;
+  return path.replace(pathFixRegex, "");
+}
 
 const _routerSubscriptions: Array<(
   e: PopStateEvent | null,
@@ -87,7 +92,7 @@ export class Router extends Component {
     );
   }
   _routeChangeHandler(_e: PopStateEvent | string): void {
-    const renderPath = Router.path.replace(pathFixRegex, "");
+    const renderPath = fixPath(Router.path);
     const children = this.props.children as VNode[];
 
     let child: VNode[] | VNode = [];
@@ -121,7 +126,7 @@ export class Router extends Component {
   }
 }
 
-deprecateGetter(Router, "getPath", "path");
+deprecateGetter(Router, "getPath");
 
 function _absolutePath(route: string) {
   return RegExp(`^${route}(/?)$`);
@@ -132,7 +137,7 @@ interface RoutePath {
 }
 export function createRoutePath(pathString: string | RoutePath): RoutePath {
   if ((pathString as RoutePath).regex != null) return pathString as RoutePath;
-  pathString = (pathString as string).replace(pathFixRegex, "");
+  pathString = fixPath(pathString as string);
   const params: { [index: number]: string } = {};
   let i = 0;
   const pathRegex = pathString
@@ -180,4 +185,6 @@ export function A(props: any) {
   return createElement("a", props);
 }
 
-export const Path: any = {};
+export function Path(props: Props<{ match: RoutePath; component: any }>) {
+  return;
+}
