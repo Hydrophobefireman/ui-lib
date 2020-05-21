@@ -46,7 +46,7 @@ function createDomFromVNode(newVNode: VNode): UIElement {
   } else {
     const type = newVNode.type;
     if (type === PlaceHolder) {
-      return (document.createComment("") as any) as UIElement;
+      return (document.createComment("$") as any) as UIElement;
     }
     const dom = document.createElement(type as string) as UIElement;
     // dom.onclick = Fragment;

@@ -173,7 +173,7 @@ export function createRoutePath(pathString: string | RoutePath): RoutePath {
       if (partialPath[0] === ":") {
         // param matcher
         params[++i] = partialPath.substr(1); // matches will start at 1
-        return "(\\S*?)"; //match all non whitespace lazily
+        return "([^?\\/]+)"; //match all non whitespace lazily
       }
       return partialPath;
     })
@@ -187,7 +187,7 @@ export const absolutePath = deprecateFunction(
   "absolutePath",
   "createRoutePath"
 );
-
+  
 function onLinkClick(e: MouseEvent) {
   if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) {
     return;
