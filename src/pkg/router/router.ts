@@ -90,7 +90,7 @@ export class Router extends Component {
   ): {} {
     const params = {};
     for (const i in pathParams) {
-      params[pathParams[i]] = test[i];
+      params[pathParams[i]] = decodeURIComponent(test[i]);
     }
     return params;
   }
@@ -187,7 +187,7 @@ export const absolutePath = deprecateFunction(
   "absolutePath",
   "createRoutePath"
 );
-  
+
 function onLinkClick(e: MouseEvent) {
   if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) {
     return;
