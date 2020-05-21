@@ -2,6 +2,7 @@ import { Component } from "../../component";
 
 import { ComponentType, VNode, Props } from "../../types";
 import { createElementIfNeeded } from "../common";
+import { flattenArray } from "../../util";
 // import { deprecationWarning } from "../../$ui_tools";
 
 export class AsyncComponent extends Component {
@@ -29,10 +30,6 @@ export class AsyncComponent extends Component {
 
     prom()
       .then((component: ComponentType | VNode) => {
-        component = createElementIfNeeded(component);
-        // if (!(component as VNode).__self) {
-        //  component = createElement(component as ComponentType);
-        // }
         this.setState({ render: component, inProgress: false });
       })
       .catch((x: Error) => this.setState({ error: true, inProgress: false }));
@@ -45,6 +42,25 @@ export class AsyncComponent extends Component {
       );
     if (state.error)
       return createElementIfNeeded(props.errorComponent) || "An Error Occured";
-    return state.render;
+    return createElementIfNeeded(
+      state.render,
+      _objectWithoutKeys(props, [
+        "fallback",
+        "fallbackComponent",
+        "promise",
+        "componentPromise",
+      ])
+    );
   }
+}
+
+function _objectWithoutKeys<T = {}>(obj: T, propArr: (keyof T)[]) {
+  propArr = (flattenArray([propArr] as (keyof T)[][]) as any) as (keyof T)[];
+  const ret = {} as T;
+  for (const i in obj) {
+    if (propArr.indexOf(i) === -1) {
+      ret[i] = obj[i];
+    }
+  }
+  return ret;
 }

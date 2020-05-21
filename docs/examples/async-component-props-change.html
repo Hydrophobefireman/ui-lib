@@ -35,7 +35,10 @@
         _gen() {
           return () =>
             new Promise((resolve) =>
-              setTimeout(() => resolve(Math.random()), 1000)
+              setTimeout(
+                () => resolve((p) => h("div", p, new Date().toString())),
+                1000
+              )
             );
         }
         render() {
@@ -46,6 +49,7 @@
             h(asnc, {
               promise: this.state.promise,
               fallbackComponent: "Loading...",
+              random: Math.random(),
             }),
             h(
               "div",
