@@ -26,14 +26,22 @@ export class Component<P = {}, S = {}> implements Component_Interface<P, S> {
   _depth?: number;
   // props passed to the component
   props: Props<P>;
+  // the component state
   state: S;
+  // store old state to pass in `componentDidUpdate`
   _oldState?: S;
+  // before applying to `Component.state`, pass the next state for `componentWillUpdate`
   _nextState?: S;
+  // the DOM this component points to, returns null for a fragment as a top level child
   base?: UIElement | null;
+
   render(props?: Props<P>, state?: Readonly<S>): ComponentChild {
     return null;
   }
+
   setState<K extends keyof S>(nextState: setStateArgType<P, S, K>): void {
+    //clone states
+
     this._oldState = assign({}, this.state);
 
     this._nextState = assign({}, this.state);

@@ -1,5 +1,5 @@
 import { UIElement, EventListenerDict } from "../types";
-import { Fragment } from "../create_element";
+
 import { EMPTY_OBJ } from "../util";
 
 export function diffEventListeners(

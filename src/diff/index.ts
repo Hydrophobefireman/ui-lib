@@ -48,19 +48,9 @@ export function diff(
   if (newType === oldType && isComplex) {
     newVNode._component = oldVNode._component;
   }
-  // if (newVNode._nextSibDomVNode == null) {
-  //   const oldDom = oldVNode._dom;
-  //   const oldFragDom = oldVNode._FragmentDomNodeChildren;
-  //   let ns: VNode;
-  //   if (oldDom) {
-  //     const nextOldSib = oldDom.nextSibling as UIElement;
-  //     ns = nextOldSib && nextOldSib._VNode;
-  //   } else if (oldFragDom) {
-  //     ns = getSibVNodeFromFragmentChildren(oldVNode._children);
-  //   }
-  //   copyPropsOverEntireTree(newVNode, "_nextSibDomVNode", ns);
-  // }
+
   if (newType !== oldType) {
+    // type differs, either different dom nodes or different function/class components
     unmountVNodeAndDestroyDom(oldVNode);
     oldVNode = EMPTY_OBJ;
   }
@@ -70,9 +60,11 @@ export function diff(
     newVNode = toSimpleVNode(newVNode, oldVNode, force, meta);
   }
   if (isFn(oldVNode.type)) {
+    // also get the next rendered VNode from the old VNode
     oldVNode = oldVNode._renders;
   }
   if (newVNode !== tmp) {
+    // we received a new VNode from calling Component.render, start a new diff
     return diff(newVNode, oldVNode, parentDom, force, meta);
   }
   /** normalize VNode.props.children */
@@ -80,6 +72,7 @@ export function diff(
 
   oldType = oldVNode.type;
   newType = newVNode.type;
+
   updateParentDomPointers(newVNode, parentDom);
 
   if (newType === Fragment) {

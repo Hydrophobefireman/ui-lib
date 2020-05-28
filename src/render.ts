@@ -1,19 +1,7 @@
-import {
-  createElement,
-  Fragment,
-  // flattenVNodeChildren,
-} from "./create_element";
-import {
-  VNode,
-  // UIElement,
-  // ComponentChild,
-  // ComponentChildren,
-  // Props,
-  VNodeHost,
-} from "./types";
+import { createElement, Fragment } from "./create_element";
+import { VNode, VNodeHost } from "./types";
 
 import { diff } from "./diff/index";
-// import config from "./config";
 import { processMountsQueue, processUpdatesQueue } from "./lifeCycleCallbacks";
 import { clearDOM } from "./util";
 
@@ -21,6 +9,8 @@ export function render(VNode: VNode, parentDom: VNodeHost) {
   const normalizedVNode = createElement(Fragment, null, VNode);
 
   if (parentDom.hasChildNodes()) {
+    // hydrate is unstable right now, just clear the dom and start afresh
+
     /*#__NOINLINE__*/
     clearDOM(parentDom);
   }
@@ -33,9 +23,11 @@ export function render(VNode: VNode, parentDom: VNodeHost) {
   // }
   // const oldVNode = parentDom._hosts;
   // clearDOM(parentDom);
+
   diff(normalizedVNode, null, parentDom, false, { depth: 0 });
   processMountsQueue();
   processUpdatesQueue();
+
   // parentDom._hosts = VNode;
 }
 
