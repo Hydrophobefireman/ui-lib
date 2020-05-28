@@ -8,9 +8,10 @@ import {
   ComponentChild,
 } from "./types";
 
-import { EMPTY_OBJ, flattenArray, isListener, EMPTY_ARR } from "./util";
+import { EMPTY_OBJ, flattenArray, isListener } from "./util";
 
-export const PlaceHolder: any = Object.freeze({});
+export const PlaceHolder: any = {};
+
 export function createElement<P = {}>(
   type: ComponentType<P> | string,
   props?: createElementPropType<P> | null,

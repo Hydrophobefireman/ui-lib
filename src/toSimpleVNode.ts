@@ -119,6 +119,7 @@ function renderClassComponent(
 
     component._depth = ++meta.depth;
   }
+
   component._VNode = VNode;
 
   const oldState = component._oldState;
@@ -133,13 +134,14 @@ function renderClassComponent(
   const nextVNode = convertToVNodeIfNeeded(
     component.render(component.props, component.state)
   );
+
+  setNextRenderedVNodePointers(nextVNode, VNode);
+
   scheduleLifeCycleCallbacks({
     bind: component,
     name: nextLifeCycle,
     args: nextLifeCycle === "componentDidUpdate" ? [oldProps, oldState] : [],
   });
-
-  setNextRenderedVNodePointers(nextVNode, VNode);
 
   return nextVNode;
 }

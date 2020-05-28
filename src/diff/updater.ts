@@ -16,6 +16,7 @@ export function unmountVNodeAndDestroyDom(
   if (!skipRemove && component != null) {
     /** maybe disable setState for this component? */
     component.setState = Fragment;
+    component.forceUpdate = Fragment;
     /** todo check for side effects */
     component._VNode = null;
     scheduleLifeCycleCallbacks({

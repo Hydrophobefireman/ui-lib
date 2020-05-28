@@ -52,6 +52,7 @@ export class Component<P = {}, S = {}> implements Component_Interface<P, S> {
   }
 
   forceUpdate(callback?: (() => void) | false): void {
+    if (this._VNode == null) return;
     const shouldForce = callback !== false;
     this.base = diff(
       this._VNode,
