@@ -99,7 +99,7 @@ export class Router extends Component {
     regexPath = createRoutePath(regexPath);
     const pathParams = regexPath.params;
     const test = regexPath.regex.exec(Router.path);
-    return Router._getParams(pathParams, test);
+    return test ? Router._getParams(pathParams, test) : {};
   }
 
   componentDidMount() {
