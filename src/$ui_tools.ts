@@ -21,14 +21,7 @@ export function deprecateFunction<A, T>(
 export function deprecateGetter(O: any, getterName: string, newName?: string) {
   const _getter = Object.getOwnPropertyDescriptor(O, newName).get.bind(O);
   Object.defineProperty(O, getterName, {
-    get() {
-      deprecationWarning(
-        getterName,
-        " has been deprecated." +
-          (newName ? " Use '" + newName + "' instead" : "")
-      );
-      return _getter();
-    },
+    get: deprecateFunction(_getter, getterName, newName),
   });
 }
 

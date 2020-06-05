@@ -15,13 +15,13 @@ const RENDER_QUEUE: Component[] = [];
 
 /** The pseudo-abstract component class */
 export class Component<P = {}, S = {}> implements Component_Interface<P, S> {
-  // our hook data store
-  private __hooksData?: { args: []; pendingEffects: any[] }; //TODO
-
   constructor(props?: P) {
     this.state = {} as any;
     this.props = props as Props<P>;
   }
+  _pendingEffects?: { [index: number]: { cb: () => any; cleanUp?: () => any } };
+  // our hook data store
+  _hooksData?: { args: any[]; hookState: any }[];
   // tracks component nesting
   _depth?: number;
   // props passed to the component
@@ -41,7 +41,6 @@ export class Component<P = {}, S = {}> implements Component_Interface<P, S> {
 
   setState<K extends keyof S>(nextState: setStateArgType<P, S, K>): void {
     //clone states
-
     this._oldState = assign({}, this.state);
 
     this._nextState = assign({}, this.state);

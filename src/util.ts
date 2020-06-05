@@ -1,5 +1,6 @@
 import { UIElement, VNode } from "./types";
 import { copyPropsOverEntireTree } from "./diff/dom";
+import { Component } from "./component";
 
 export const EMPTY_OBJ: any = {};
 export const EMPTY_ARR: any[] = [];
@@ -121,5 +122,27 @@ function _getDom(fDom: VNode["_FragmentDomNodeChildren"]): UIElement {
       continue;
     }
     if (e) return e as UIElement;
+  }
+}
+
+export function setRef<T>(
+  ref: ((value: T) => void) | { current: T },
+  value: T
+) {
+  if (!ref) return;
+  if (typeof ref == "function") ref(value);
+  else ref.current = value;
+}
+
+export function diffReferences(
+  newVNode: VNode,
+  oldVNode: VNode,
+  domOrComponent: UIElement | Component
+) {
+  const newRef = newVNode.ref;
+  const oldRef = (oldVNode || EMPTY_OBJ).ref;
+  if (newRef && newRef !== oldRef) {
+    setRef(newRef, domOrComponent);
+    oldRef && setRef(oldVNode.ref, null);
   }
 }

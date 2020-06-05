@@ -2,7 +2,7 @@ import { JSXInternal } from "./jsx";
 export interface ExtendedDocFrag extends DocumentFragment {
   _parent?: UIElement;
 }
-export interface VNode<P = {}> {
+export interface VNode<P = {}, R = any> {
   type?: string | ComponentType<P>;
   // json injection prevention
   __self: VNode<P>;
@@ -11,8 +11,8 @@ export interface VNode<P = {}> {
   events: EventListenerDict;
   //
   key: any;
-  //
-  ref: any;
+  // ref
+  ref: ((val: R) => void) | { current: R };
   // dom rendered can be `Element` or `Text`
   _dom: UIElement;
   // normalized props.children
@@ -55,6 +55,10 @@ export type setStateArgType<P, S, K extends keyof S> =
   | (Pick<S, K> | Partial<S> | null);
 
 export interface Component<P = {}, S = {}> {
+  // our hook data store
+  _pendingEffects?: { [index: number]: { cb: () => any; cleanUp?: () => any } };
+  // our hook data store
+  _hooksData?: { args: any[]; hookState: any }[];
   props: Props<P>;
   state: S;
   _nextState?: S;

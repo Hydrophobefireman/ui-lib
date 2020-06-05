@@ -1,5 +1,5 @@
 import { VNode, UIElement } from "../types";
-import { EMPTY_OBJ } from "../util";
+import { EMPTY_OBJ, setRef } from "../util";
 import { diffEventListeners } from "./events";
 import { scheduleLifeCycleCallbacks } from "../lifeCycleCallbacks";
 import { Fragment, PlaceHolder } from "../create_element";
@@ -11,6 +11,7 @@ export function unmountVNodeAndDestroyDom(
 ): void {
   /** short circuit */
   if (VNode == null || VNode === EMPTY_OBJ) return;
+  setRef(VNode.ref, null);
   unmountVNodeAndDestroyDom(VNode._renders, skipRemove);
   const component = VNode._component;
   if (!skipRemove && component != null) {

@@ -1,0 +1,48 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      const updater = (x) => x + 1;
+      import * as UI from "../ui/index.js";
+      import {
+        h,
+        render,
+        useState,
+        Fragment,
+        useEffect,
+        Component,
+        createRef,
+        useRef,
+      } from "../ui/index.js";
+      window.UI = window.a = UI;
+      class O extends Component {
+        render() {
+          return h("span", null, "ref2");
+        }
+      }
+      function App() {
+        const [state, setState] = useState(true);
+
+        const $ref1 = useRef();
+        const $ref2 = useRef();
+
+        useEffect(() => {
+          console.log($ref1, $ref2);
+        }, [$ref1.current, $ref2.current]);
+        return h(
+          "div",
+          { onClick: () => setState(!state) },
+
+          h("span", { ref: $ref1 }, "Ref1"),
+          state && h(O, { ref: $ref2 })
+        );
+      }
+
+      render(h(App), document.getElementById("app"));
+    </script>
+  </body>
+</html>

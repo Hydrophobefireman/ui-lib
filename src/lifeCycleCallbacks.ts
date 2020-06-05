@@ -1,5 +1,5 @@
 import { Component } from "./component";
-import { HAS_PROMISE } from "./config";
+import { HAS_PROMISE, plugins } from "./config";
 
 type ProcessOptions = {
   name: Component["_lastLifeCycleMethod"];
@@ -37,10 +37,10 @@ function __executeCallback(cbObj: ProcessOptions) {
   component._lastLifeCycleMethod = fName;
   const func = component[fName];
   const hasCatch = !!component.componentDidCatch;
-
+  if (!func) return;
   if (HAS_PROMISE) {
     Promise.resolve()
-      .then(() => func && func.apply(component, args))
+      .then(() => func.apply(component, args))
       .catch((error) => {
         if (hasCatch) return component.componentDidCatch(error);
         throw error;

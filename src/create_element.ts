@@ -152,3 +152,7 @@ export function flattenVNodeChildren<P>(VNode: VNode<P>): VNode[] {
   }
   return flattenArray<unknown>([c], convertToVNodeIfNeeded) as VNode[];
 }
+
+export function createRef<T>() {
+  return { current: null } as { current: T };
+}

@@ -1,0 +1,78 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      const updater = (x) => x + 1;
+      import * as UI from "../ui/index.js";
+      import { h, render, useState, Fragment, useEffect } from "../ui/index.js";
+      window.UI = window.a = UI;
+      function Button() {
+        const [count, setCount] = useState(0);
+        const [time, updateTime] = useState(new Date());
+        return h(
+          Fragment,
+          null,
+          h(
+            "button",
+            { onClick: () => setCount(updater) },
+            "Clicked ",
+            count,
+            " times"
+          ),
+          h(
+            "button",
+            { onClick: () => updateTime(new Date()) },
+            "Time: ",
+            time.toString()
+          )
+        );
+      }
+      function Hide() {
+        return h("div", null, "Hello");
+      }
+      function Ok() {
+        const [show, set] = useState(true);
+        return h(
+          "div",
+          null,
+          show && h(Effects),
+          h(
+            "div",
+            null,
+            h("button", { onClick: () => set((x) => !x) }, "Toggle")
+          )
+        );
+      }
+      function Effects() {
+        const [time, setTime] = useState(new Date());
+        useEffect(() => {
+          let _;
+          _ = setInterval(
+            () => console.log("timer") || setTime(new Date()),
+            1000
+          );
+          console.log("new effect", _);
+          return () => {
+            console.log("clear", _);
+            clearInterval(_);
+          };
+        }, []);
+        return h("div", null, +time);
+      }
+      const App = function () {
+        return h(
+          Fragment,
+          null,
+          h("div", null, h(Button)),
+          h("div", null, h(Button)),
+          h(Ok)
+        );
+      };
+      render(h(App), document.getElementById("app"));
+    </script>
+  </body>
+</html>

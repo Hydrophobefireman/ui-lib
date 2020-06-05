@@ -1,10 +1,17 @@
-import { VNode, ComponentType, DiffMeta } from "../types";
-import { EMPTY_OBJ, copyVNodePointers, isValidVNode } from "../util";
+import { VNode, ComponentType, DiffMeta, UIElement } from "../types";
+import {
+  EMPTY_OBJ,
+  copyVNodePointers,
+  isValidVNode,
+  setRef,
+  diffReferences,
+} from "../util";
 import { unmountVNodeAndDestroyDom } from "./updater";
 import { Fragment, flattenVNodeChildren, PlaceHolder } from "../create_element";
 import { diffChildren } from "./children";
 import { diffDomNodes, updateParentDomPointers } from "./dom";
 import { toSimpleVNode, isFn } from "../toSimpleVNode";
+import { plugins } from "../config";
 // import { processUpdatesQueue } from "../lifeCycleCallbacks";
 
 /**
@@ -74,7 +81,7 @@ export function diff(
   newType = newVNode.type;
 
   updateParentDomPointers(newVNode, parentDom);
-
+  let dom: UIElement;
   if (newType === Fragment) {
     diffChildren(newVNode, oldVNode, parentDom, meta);
   } else {
@@ -82,8 +89,11 @@ export function diff(
       oldVNode = null;
     }
     diffDomNodes(newVNode, oldVNode, parentDom);
-    diffChildren(newVNode, oldVNode, newVNode._dom, meta);
+    dom = newVNode._dom;
+    diffChildren(newVNode, oldVNode, dom, meta);
   }
+  plugins.diffed(newVNode);
 
-  return newVNode._dom;
+  diffReferences(newVNode, oldVNode, dom);
+  return dom;
 }

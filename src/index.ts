@@ -1,4 +1,9 @@
-export { createElement, createElement as h, Fragment } from "./create_element";
+export {
+  createElement,
+  createElement as h,
+  Fragment,
+  createRef,
+} from "./create_element";
 
 export { render } from "./render";
 
@@ -18,3 +23,5 @@ export {
   createRoutePath,
   Path,
 } from "./pkg/router/router";
+
+export * from "./hooks/index";
