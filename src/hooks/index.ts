@@ -1,3 +1,5 @@
+export { useCallback } from "./implementation/useCallback";
+
 export { useRef } from "./implementation/useRef";
 
 export { useMemo } from "./implementation/useMemo";
