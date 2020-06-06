@@ -20,12 +20,12 @@ export function useReducer<T = any>(
     hookData,
     currentHookIndex,
     () => ({
-      args: reducer,
       hookState: setup
         ? setup(initialValue)
         : consumeCallable(void 0, initialValue),
     })
   );
+  currentHook.args = reducer;
 
   return [
     currentHook.hookState as T,

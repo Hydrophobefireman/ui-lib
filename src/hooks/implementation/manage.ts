@@ -14,7 +14,7 @@ export function runCleanup(effect: Component["_pendingEffects"][0]) {
     effect.cleanUp = null;
   }
 }
-function effectCbHandler(effect: Component["_pendingEffects"][0]) {
+export function effectCbHandler(effect: Component["_pendingEffects"][0]) {
   runCleanup(effect);
   let ret = effect.cb;
   if (ret && typeof (ret = ret()) === "function") {

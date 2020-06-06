@@ -21,7 +21,7 @@ export class Component<P = {}, S = {}> implements Component_Interface<P, S> {
   }
   _pendingEffects?: { [index: number]: { cb: () => any; cleanUp?: () => any } };
   // our hook data store
-  _hooksData?: { args: any[]; hookState: any }[];
+  _hooksData?: { args: any; hookState: any }[];
   // tracks component nesting
   _depth?: number;
   // props passed to the component
