@@ -38,16 +38,17 @@ function __executeCallback(cbObj: ProcessOptions) {
   const func = component[fName];
   const hasCatch = !!component.componentDidCatch;
   if (!func) return;
+  const cb = () => func.apply(component, args);
   if (HAS_PROMISE) {
     Promise.resolve()
-      .then(() => func.apply(component, args))
+      .then(cb)
       .catch((error) => {
         if (hasCatch) return component.componentDidCatch(error);
         throw error;
       });
   } else {
     try {
-      func.apply(component, args);
+      cb();
     } catch (e) {
       if (hasCatch) return component.componentDidCatch(e);
       throw e;

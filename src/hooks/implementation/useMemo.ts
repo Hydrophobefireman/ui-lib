@@ -18,6 +18,7 @@ export function useMemo<T>(memoFunc: () => T, dependencies: any[]) {
   if (!argsChanged(currentHook.args, dependencies))
     return currentHook.hookState;
 
+  hookData[hookIndex] = null;
   currentHook = getCurrentHookValueOrSetDefault(hookData, hookIndex, () => ({
     args: dependencies,
     hookState: memoFunc(),
