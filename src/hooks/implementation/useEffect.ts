@@ -20,7 +20,7 @@ function unmount() {
   (this as Component)._pendingEffects = null;
 }
 
-export function useEffect(callback: () => void, dependencies: any[]) {
+export function useEffect(callback: () => void, dependencies: any[]): void {
   const hookArgs = {
     hookState: callback,
   };

@@ -7,7 +7,7 @@ export function useReducer<T = any>(
   reducer: Reducer<T>,
   initialValue: T | (() => T),
   setup?: <T>(a: T) => any
-): [T, (action?: string | T) => void] {
+): [T, (action?: any) => void] {
   const state = getHookStateAtCurrentRender();
 
   const candidate = state[0];
@@ -29,7 +29,7 @@ export function useReducer<T = any>(
 
   return [
     currentHook.hookState as T,
-    (action?: string) => {
+    (action?: any) => {
       const next = ((currentHook.args as unknown) as Reducer<T>)(
         currentHook.hookState,
         action

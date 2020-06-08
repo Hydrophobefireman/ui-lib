@@ -5,7 +5,7 @@ import {
 } from "./util";
 import { getHookStateAtCurrentRender } from "./manage";
 
-export function useMemo<T>(memoFunc: () => T, dependencies: any[]) {
+export function useMemo<T>(memoFunc: () => T, dependencies: any[]): T {
   const state = getHookStateAtCurrentRender();
 
   const candidate = state[0];
@@ -24,6 +24,6 @@ export function useMemo<T>(memoFunc: () => T, dependencies: any[]) {
   }));
 
   currentHook.args = dependencies;
-  
+
   return currentHook.hookState;
 }
