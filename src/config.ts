@@ -1,29 +1,43 @@
 import { Fragment } from "./create_element";
 
 type anyFunc<T> = (...args: T[]) => T;
-type configType = {
-  deferImplementation<T>(fn: anyFunc<T>): Promise<T>;
-  scheduleRender(cb: anyFunc<any>): any;
-  eagerlyHydrate: boolean;
-};
 
 export const HAS_PROMISE = typeof Promise !== "undefined";
-const HAS_RAF = typeof requestAnimationFrame !== "undefined";
-const DEFAULT_FUNC = setTimeout;
 
-const defaultRenderDeferrer = HAS_PROMISE
+export const HAS_RAF = typeof requestAnimationFrame !== "undefined";
+
+const defer = HAS_PROMISE
   ? Promise.prototype.then.bind(Promise.resolve())
-  : DEFAULT_FUNC;
+  : setTimeout;
 
-const config: configType = {
-  deferImplementation: defaultRenderDeferrer,
-  scheduleRender: HAS_RAF ? reqAnimFrame : defaultRenderDeferrer,
+const config = {
+  scheduleRender: HAS_RAF ? reqAnimFrame : defer,
   eagerlyHydrate: true,
+  RAF_TIMEOUT: 100,
 };
 
+/**
+ * This ensures that we begin our render work  even if we don't get an animation frame for 100ms
+ * this could happen in cases like we're in an inactive tab
+ * but we need to render the component and it's children
+ * as we might delay some side effects
+ * however if the user wishes to have the rendering stop until the tab is active
+ * they can set `config.scheduleRender` to `requestAnimationFrame`
+ */
 function reqAnimFrame(cb: FrameRequestCallback) {
-  return requestAnimationFrame(cb);
+  let raf: number;
+  const done = () => {
+    clearTimeout(timeout);
+    cancelAnimationFrame(raf);
+    setTimeout(cb);
+  };
+  const timeout = setTimeout(done, config.RAF_TIMEOUT);
+
+  if (typeof requestAnimationFrame == "function") {
+    raf = requestAnimationFrame(done);
+  }
 }
+
 export default config;
 
 export const plugins = {
