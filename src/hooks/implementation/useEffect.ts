@@ -1,29 +1,28 @@
 import {
-  rafPendingCallbacks,
   getHookStateAtCurrentRender,
-  runCleanup,
-  effectCbHandler,
+  runEffectCleanup,
+  runHookEffectAndAssignCleanup,
+  $push,
 } from "./manage";
+
 import {
   argsChanged,
   getCurrentHookValueOrSetDefault,
   HookDefault,
 } from "./util";
+
 import { Component } from "../../component";
 import { EMPTY_OBJ } from "../../util";
 
 function unmount() {
   const pending = (this as Component)._pendingEffects;
   for (const effect in pending || EMPTY_OBJ) {
-    runCleanup(pending[effect]);
+    runEffectCleanup(pending[effect]);
   }
   (this as Component)._pendingEffects = null;
 }
 
 export function useEffect(callback: () => void, dependencies: any[]): void {
-  const hookArgs = {
-    hookState: callback,
-  };
   const state = getHookStateAtCurrentRender();
 
   const candidate = state[0];
@@ -35,25 +34,37 @@ export function useEffect(callback: () => void, dependencies: any[]): void {
 
   if (!argsChanged(currentHook.args, dependencies)) return;
 
-  currentHook = getCurrentHookValueOrSetDefault(
-    hookData,
-    hookIndex,
-    () => hookArgs
-  );
+  currentHook = getCurrentHookValueOrSetDefault(hookData, hookIndex, () => ({
+    hookState: callback,
+  }));
   currentHook.args = dependencies;
 
   const pending = (candidate._pendingEffects = candidate._pendingEffects || {});
 
-  const old = pending[hookIndex] || ({} as typeof pending[0]);
+  const oldEffect = pending[hookIndex];
+  // TODO
+  // in case we have an unused effect (callback not called yet)
+  // attempt to defer the old effect as well, maybe wrap them together in a separate effect
+  // as in this case we could end up blocking the render iff -
+  // - previous callback hasn't been called yet
+  // - previous callback is an expensive function
+  // the cleanup does not matter as we will call it right before we call the new effect
+  // however it is important that we call the effect right here for now as in the rare event
+  // where the callback hasn't been called, we could end up with no cleanup either
+  // another approach could be to leave the uncalled function and it's cleanup and start with
+  // what we have as the new effect.
 
-  effectCbHandler(old);
+  const cleanUp = oldEffect
+    ? ((runHookEffectAndAssignCleanup(oldEffect) as any) as false) ||
+      oldEffect.cleanUp
+    : null;
 
   pending[hookIndex] = {
     cb: callback,
-    cleanUp: old.cleanUp,
+    cleanUp,
   };
 
-  rafPendingCallbacks.push(candidate);
+  $push(pending);
 
   candidate.componentWillUnmount = unmount;
 }

@@ -1,35 +1,42 @@
 import { Component } from "../../component";
 import config, { addPluginCallback } from "../../config";
 
+type PendingEffects = Component["_pendingEffects"];
+
 let hookIndex = 0;
 
 let hookCandidate: Component = null;
 
-export const rafPendingCallbacks: Component[] = [];
+export const rafPendingCallbacks: PendingEffects[] = [];
 
-export function runCleanup(effect: Component["_pendingEffects"][0]) {
+export function runEffectCleanup(effect: PendingEffects[0]) {
+  // only called if the effect itself returns a function
   const cl = effect.cleanUp;
   if (typeof cl === "function") {
     cl();
     effect.cleanUp = null;
   }
 }
-export function effectCbHandler(effect: Component["_pendingEffects"][0]) {
-  runCleanup(effect);
+
+export function runHookEffectAndAssignCleanup(effect: PendingEffects[0]) {
   let ret = effect.cb;
   if (ret && typeof (ret = ret()) === "function") {
     effect.cleanUp = ret;
   }
+  // make sure we can't run this effect again
   effect.cb = null;
 }
-
+export function effectCbHandler(effect: PendingEffects[0]) {
+  // we run this cleanup first to ensure any older effect has been successfully completed
+  // an effect will be completed when both it's callback and it's cleanup (if provided have been finished)
+  runEffectCleanup(effect);
+  runHookEffectAndAssignCleanup(effect);
+}
 function scheduleEffects() {
   rafPendingCallbacks.forEach((x) => {
-    const pending = x._pendingEffects;
-    for (const i in pending) {
-      const value = pending[i];
+    for (const i in x) {
+      const value = x[i];
       effectCbHandler(value);
-      value.cleanUp;
     }
   });
   rafPendingCallbacks.length = 0;
@@ -50,6 +57,10 @@ function prepForNextHookCandidate(c: Component) {
 export function getHookStateAtCurrentRender(): [Component, number] {
   return [hookCandidate, hookIndex++];
 }
-
+// todo manage sideEffects
 addPluginCallback("hookSetup", prepForNextHookCandidate);
 addPluginCallback("diffed", setEffectiveCallbacks);
+
+export function $push(x: PendingEffects) {
+  rafPendingCallbacks.indexOf(x) === -1 && rafPendingCallbacks.push(x);
+}

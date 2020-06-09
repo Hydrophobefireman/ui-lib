@@ -4,22 +4,28 @@ import { EMPTY_ARR, EMPTY_OBJ } from "../util";
 import { diff } from "./index";
 import { updateInternalVNodes } from "./dom";
 
+type VNodeChildren = VNode["_children"];
+
 export function diffChildren(
   newVNode: VNode,
   oldVNode: VNode,
   parentDom: Node,
   meta: DiffMeta
 ) {
-  const newChildren: (VNode | null)[] = newVNode._children || EMPTY_ARR;
-  const oldChildren: (VNode | null)[] =
+  if (newVNode.type === PlaceHolder) return;
+
+  const newChildren: VNodeChildren = newVNode._children || EMPTY_ARR;
+
+  const oldChildren: VNodeChildren =
     (oldVNode || EMPTY_OBJ)._children || EMPTY_ARR;
+
   return diffEachChild(newVNode, newChildren, oldChildren, parentDom, meta);
 }
 
 function diffEachChild(
   newParentVNode: VNode,
-  newChildren: (VNode | null)[],
-  oldChildren: (VNode | null)[],
+  newChildren: VNodeChildren,
+  oldChildren: VNodeChildren,
   parentDom: Node,
   meta: DiffMeta
 ) {
@@ -32,6 +38,7 @@ function diffEachChild(
     const newChild: VNode =
       newChildren[i] ||
       (i < newChildrenLen ? createElement(PlaceHolder) : null);
+
     const oldChild: VNode = oldChildren[i] || EMPTY_OBJ;
 
     if (oldChild._nextSibDomVNode == null) {

@@ -1,7 +1,7 @@
 import { VNode, Props, FunctionComponent, DiffMeta } from "./types";
 import { Component } from "./component";
 import { scheduleLifeCycleCallbacks } from "./lifeCycleCallbacks";
-import { convertToVNodeIfNeeded, Fragment } from "./create_element";
+import { coerceToVNode, Fragment } from "./create_element";
 import { EMPTY_OBJ, assign, diffReferences } from "./util";
 import { plugins } from "./config";
 
@@ -87,7 +87,7 @@ function renderClassComponent(
   component._nextState = null;
   component.props = VNode.props;
 
-  const nextVNode = convertToVNodeIfNeeded(
+  const nextVNode = coerceToVNode(
     component.render(component.props, component.state)
   );
 
@@ -125,7 +125,7 @@ function renderFunctionalComponent(VNode: VNode, meta?: DiffMeta) {
   c._VNode = VNode;
 
   plugins.hookSetup(c);
-  nextVNode = convertToVNodeIfNeeded(c.render(VNode.props));
+  nextVNode = coerceToVNode(c.render(VNode.props));
   // remove reference of this component
   plugins.hookSetup(null);
   setNextRenderedVNodePointers(nextVNode, VNode);

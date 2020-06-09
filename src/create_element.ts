@@ -106,6 +106,7 @@ function getPropsWithoutSpecialKeysAndInitializeEventsDict<P>(
   props: createElementPropType<P>,
   events: {}
 ) {
+  // we initialize the events dict right here to avoid looping over the props again
   const obj = {};
   const shouldAddEvents = events != null;
   for (const i in props) {
@@ -119,7 +120,7 @@ function getPropsWithoutSpecialKeysAndInitializeEventsDict<P>(
   return obj as Props<P>;
 }
 
-export function convertToVNodeIfNeeded(VNode: ComponentChild | VNode): VNode {
+export function coerceToVNode(VNode: ComponentChild | VNode): VNode {
   // don't render anything to the dom, just leave a comment
   if (VNode == null || typeof VNode === "boolean") {
     return createElement(PlaceHolder);
@@ -147,10 +148,14 @@ export function convertToVNodeIfNeeded(VNode: ComponentChild | VNode): VNode {
 /** return a flat array of children and normalize them*/
 export function flattenVNodeChildren<P>(VNode: VNode<P>): VNode[] {
   const c = VNode.props.children;
+  // even if we are creating an empty fragment
+  // we will still render a null child (`c`)
+  // as it will serve as a memory for where the fragment's
+  // future children should be
   if (c == null && VNode.type !== Fragment) {
     return [];
   }
-  return flattenArray<unknown>([c], convertToVNodeIfNeeded) as VNode[];
+  return flattenArray<unknown>([c], coerceToVNode) as VNode[];
 }
 
 export function createRef<T>() {

@@ -53,7 +53,7 @@ export class Component<P = {}, S = {}> implements Component_Interface<P, S> {
     } else {
       assign(this._nextState, nextState);
     }
-    this.state = this._nextState;
+    // this.state = this._nextState;
     // this._nextState = null;
     enqueueRender(this);
   }

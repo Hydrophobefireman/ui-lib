@@ -145,6 +145,9 @@ function diffStyle(
 ) {
   oldValue = oldValue || "";
 
+  // incase someone sets their style to null
+  // fastest way to remove previous props
+  newValue = newValue || "";
   const st = dom.style;
 
   if (typeof newValue === "string") {
@@ -173,6 +176,7 @@ function diffStyle(
     }
   }
 }
+const trim = (k: string) => k.trim();
 
 function diffClass(
   dom: UIElement,
@@ -182,11 +186,11 @@ function diffClass(
   const isArray = Array.isArray;
 
   if (isArray(newValue)) {
-    newValue = newValue.join(" ").trim();
+    newValue = trim(newValue.join(" "));
   }
 
   if (isArray(oldValue)) {
-    oldValue = oldValue.join(" ").trim();
+    oldValue = trim(oldValue.join(" "));
   }
 
   if (newValue === oldValue) return;
