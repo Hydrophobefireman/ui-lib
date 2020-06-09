@@ -63,7 +63,7 @@ export function useEffect(callback: () => void, dependencies: any[]): void {
     cb: callback,
     cleanUp,
   };
-
+  // only push effect if we haven't already added it to the queue
   $push(pending);
 
   candidate.componentWillUnmount = unmount;
