@@ -32,16 +32,19 @@ export function useEffect(callback: () => void, dependencies: any[]): void {
 
   let currentHook = hookData[hookIndex] || <HookDefault>{};
 
-  if (!argsChanged(currentHook.args, dependencies)) return;
-
+  const pending = (candidate._pendingEffects = candidate._pendingEffects || {});
+  const oldEffect = pending[hookIndex];
+  if (!argsChanged(currentHook.args, dependencies)) {
+    // mark the effect as resolved
+    // no cleanup will be performed (except on unmount)
+    if (oldEffect) oldEffect.resolved = true;
+    return;
+  }
   currentHook = getCurrentHookValueOrSetDefault(hookData, hookIndex, () => ({
     hookState: callback,
   }));
   currentHook.args = dependencies;
 
-  const pending = (candidate._pendingEffects = candidate._pendingEffects || {});
-
-  const oldEffect = pending[hookIndex];
   // TODO
   // in case we have an unused effect (callback not called yet)
   // attempt to defer the old effect as well, maybe wrap them together in a separate effect

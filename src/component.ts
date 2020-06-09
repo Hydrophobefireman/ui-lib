@@ -19,7 +19,9 @@ export class Component<P = {}, S = {}> implements Component_Interface<P, S> {
     this.state = {} as any;
     this.props = props as Props<P>;
   }
-  _pendingEffects?: { [index: number]: { cb: () => any; cleanUp?: () => any } };
+  _pendingEffects?: {
+    [index: number]: { cb: () => any; cleanUp?: () => any; resolved?: boolean };
+  };
   // our hook data store
   _hooksData?: { args: any; hookState: any }[];
   // tracks component nesting

@@ -29,7 +29,9 @@ export function runHookEffectAndAssignCleanup(effect: PendingEffects[0]) {
 export function effectCbHandler(effect: PendingEffects[0]) {
   // we run this cleanup first to ensure any older effect has been successfully completed
   // an effect will be completed when both it's callback and it's cleanup (if provided have been finished)
-  runEffectCleanup(effect);
+  // only run cleanup on unresolved effects
+  // i.e effects that have their dependency arrays updated
+  effect.resolved || runEffectCleanup(effect);
   runHookEffectAndAssignCleanup(effect);
 }
 function scheduleEffects() {
