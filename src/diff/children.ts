@@ -9,7 +9,7 @@ type VNodeChildren = VNode["_children"];
 export function diffChildren(
   newVNode: VNode,
   oldVNode: VNode,
-  parentDom: Node,
+  parentDom: HTMLElement,
   meta: DiffMeta
 ) {
   if (newVNode.type === PlaceHolder) return;
@@ -26,7 +26,7 @@ function diffEachChild(
   newParentVNode: VNode,
   newChildren: VNodeChildren,
   oldChildren: VNodeChildren,
-  parentDom: Node,
+  parentDom: HTMLElement,
   meta: DiffMeta
 ) {
   const isFragment = newParentVNode.type === Fragment;

@@ -1,8 +1,8 @@
 import { createElement, Fragment } from "./create_element";
-import { VNode, VNodeHost } from "./types";
+import { VNode, VNodeHost, DOMOps } from "./types";
 
 import { diff } from "./diff/index";
-import { processMountsQueue, processUpdatesQueue } from "./lifeCycleCallbacks";
+import { onDiff } from "./lifeCycleCallbacks";
 import { clearDOM } from "./util";
 
 export function render(VNode: VNode, parentDom: VNodeHost) {
@@ -23,10 +23,13 @@ export function render(VNode: VNode, parentDom: VNodeHost) {
   // }
   // const oldVNode = parentDom._hosts;
   // clearDOM(parentDom);
+  const batchQueue: DOMOps[] = [];
+  diff(normalizedVNode, null, parentDom, false, {
+    depth: 0,
+    batch: batchQueue,
+  });
 
-  diff(normalizedVNode, null, parentDom, false, { depth: 0 });
-  processMountsQueue();
-  processUpdatesQueue();
+  onDiff(batchQueue);
 
   // parentDom._hosts = VNode;
 }

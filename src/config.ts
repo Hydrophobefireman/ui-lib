@@ -24,18 +24,16 @@ const config = {
  * however if the user wishes to have the rendering stop until the tab is active
  * they can set `config.scheduleRender` to `requestAnimationFrame`
  */
-function reqAnimFrame(cb: FrameRequestCallback) {
+function reqAnimFrame(cb: () => void) {
   let raf: number;
+  let timeout: NodeJS.Timeout;
   const done = () => {
     clearTimeout(timeout);
     cancelAnimationFrame(raf);
-    setTimeout(cb);
+    cb();
   };
-  const timeout = setTimeout(done, config.RAF_TIMEOUT);
-
-  if (typeof requestAnimationFrame == "function") {
-    raf = requestAnimationFrame(done);
-  }
+  timeout = setTimeout(done, config.RAF_TIMEOUT);
+  raf = requestAnimationFrame(done);
 }
 
 export default config;

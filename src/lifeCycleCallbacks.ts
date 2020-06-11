@@ -1,5 +1,7 @@
 import { Component } from "./component";
 import { HAS_PROMISE, plugins } from "./config";
+import { DOMOps } from "./types";
+import { commitDOMOps } from "./diff/dom";
 
 type ProcessOptions = {
   name: Component["_lastLifeCycleMethod"];
@@ -10,12 +12,12 @@ const mountCallbackQueue: ProcessOptions[] = [];
 const updateCallbackQueue: ProcessOptions[] = [];
 
 export function processMountsQueue(): void {
-  processQueue(mountCallbackQueue);
+  processLifeCycleQueue(mountCallbackQueue);
 }
 export function processUpdatesQueue(): void {
-  processQueue(updateCallbackQueue);
+  processLifeCycleQueue(updateCallbackQueue);
 }
-function processQueue(obj: ProcessOptions[]): void {
+function processLifeCycleQueue(obj: ProcessOptions[]): void {
   let cbObj: ProcessOptions;
   while ((cbObj = obj.pop())) {
     __executeCallback(cbObj);
@@ -54,4 +56,11 @@ function __executeCallback(cbObj: ProcessOptions) {
       throw e;
     }
   }
+}
+
+export function onDiff(queue: DOMOps[]) {
+  commitDOMOps(queue);
+  plugins.diffed();
+  processMountsQueue();
+  processUpdatesQueue();
 }

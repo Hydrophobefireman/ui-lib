@@ -1,4 +1,4 @@
-import { VNode, UIElement } from "../types";
+import { VNode, UIElement, DiffMeta } from "../types";
 import { EMPTY_OBJ, setRef } from "../util";
 import { diffEventListeners } from "./events";
 import { scheduleLifeCycleCallbacks } from "../lifeCycleCallbacks";
@@ -7,12 +7,13 @@ import { copyPropsOverEntireTree } from "./dom";
 
 export function unmountVNodeAndDestroyDom(
   VNode: VNode,
-  skipRemove?: boolean
+  skipRemove: boolean,
+  meta: DiffMeta
 ): void {
   /** short circuit */
   if (VNode == null || VNode === EMPTY_OBJ) return;
   setRef(VNode.ref, null);
-  unmountVNodeAndDestroyDom(VNode._renders, skipRemove);
+  unmountVNodeAndDestroyDom(VNode._renders, skipRemove, meta);
   const component = VNode._component;
   if (!skipRemove && component != null) {
     /** maybe disable setState for this component? */
@@ -31,14 +32,18 @@ export function unmountVNodeAndDestroyDom(
   if (childArray) {
     while (childArray.length) {
       child = childArray.pop();
-      unmountVNodeAndDestroyDom(child, skipRemove);
+      unmountVNodeAndDestroyDom(child, skipRemove, meta);
     }
   }
 
   /*#__NOINLINE__*/
-  _processNodeCleanup(VNode, skipRemove);
+  _processNodeCleanup(VNode, skipRemove, meta);
 }
-function _processNodeCleanup(VNode: VNode, skipRemove?: boolean) {
+function _processNodeCleanup(
+  VNode: VNode,
+  skipRemove: boolean,
+  meta: DiffMeta
+) {
   const isPlaceholder = VNode.type === PlaceHolder;
 
   if (!skipRemove && typeof VNode.type !== "function") {
@@ -50,7 +55,7 @@ function _processNodeCleanup(VNode: VNode, skipRemove?: boolean) {
       clearDomNodePointers(dom);
       /*#__NOINLINE__*/
 
-      removeNode(dom);
+      meta.batch.push({ node: dom, action: "removeChild" });
     }
   }
 
@@ -107,13 +112,5 @@ function _clearPointers(pointersObj: object, el: any) {
   if (el == null) return;
   for (const i in pointersObj) {
     el[i] = null;
-  }
-}
-
-function removeNode(dom: UIElement) {
-  if (dom == null) return;
-  const p = dom.parentNode;
-  if (p) {
-    p.removeChild(dom);
   }
 }

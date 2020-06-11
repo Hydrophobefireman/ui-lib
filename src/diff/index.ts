@@ -25,7 +25,7 @@ import { plugins } from "../config";
 export function diff(
   newVNode: VNode,
   oldVNode: VNode,
-  parentDom: Node,
+  parentDom: HTMLElement,
   force: boolean,
   meta: DiffMeta
 ): Element | Text | void {
@@ -36,7 +36,7 @@ export function diff(
     oldVNode = EMPTY_OBJ;
   }
   if (newVNode == null) {
-    unmountVNodeAndDestroyDom(oldVNode);
+    unmountVNodeAndDestroyDom(oldVNode, false, meta);
     return;
   }
   if (newVNode === EMPTY_OBJ) return null;
@@ -58,7 +58,7 @@ export function diff(
 
   if (newType !== oldType) {
     // type differs, either different dom nodes or different function/class components
-    unmountVNodeAndDestroyDom(oldVNode);
+    unmountVNodeAndDestroyDom(oldVNode, false, meta);
     oldVNode = EMPTY_OBJ;
   }
   const tmp = newVNode;
@@ -88,11 +88,10 @@ export function diff(
     if (oldType !== newType) {
       oldVNode = null;
     }
-    diffDomNodes(newVNode, oldVNode, parentDom);
+    diffDomNodes(newVNode, oldVNode, parentDom, meta);
     dom = newVNode._dom;
     diffChildren(newVNode, oldVNode, dom, meta);
   }
-  plugins.diffed(newVNode);
 
   diffReferences(newVNode, oldVNode, dom);
   return dom;
