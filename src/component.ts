@@ -5,11 +5,16 @@ import {
   setStateArgType,
   UIElement,
   VNode,
+  DOMOps,
 } from "./types";
 import { assign } from "./util";
 import config from "./config";
 import { diff } from "./diff/index";
-import { processMountsQueue, processUpdatesQueue } from "./lifeCycleCallbacks";
+import {
+  processMountsQueue,
+  processUpdatesQueue,
+  onDiff,
+} from "./lifeCycleCallbacks";
 
 const RENDER_QUEUE: Component[] = [];
 
@@ -62,17 +67,17 @@ export class Component<P = {}, S = {}> implements Component_Interface<P, S> {
 
   forceUpdate(callback?: (() => void) | false): void {
     if (this._VNode == null) return;
+    const batchQueue: DOMOps[] = [];
     const shouldForce = callback !== false;
     this.base = diff(
       this._VNode,
       assign({}, this._VNode),
       this._VNode._parentDom,
       shouldForce,
-      { depth: this._depth }
+      { depth: this._depth, batch: batchQueue }
     ) as UIElement;
     typeof callback === "function" && callback();
-    processMountsQueue();
-    processUpdatesQueue();
+    onDiff(batchQueue);
   }
   // current virtual dom
   _VNode?: VNode<P>;

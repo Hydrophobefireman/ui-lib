@@ -34,7 +34,7 @@ export interface VNode<P = {}, R = any> {
   // passes the depth arg to the component
   _depth: number;
   // parentDom node -> to call append child on if we can not reorder
-  _parentDom: Node;
+  _parentDom: HTMLElement;
   //  the fragment parent VNode this VNode is a child of
   // _fragmentParent: VNode;
 }
@@ -120,6 +120,21 @@ export interface UIElement extends HTMLElement {
 export interface VNodeHost extends UIElement {
   _hosts?: VNode;
 }
-export type DiffMeta = { depth: number };
+export type DiffMeta = { depth: number; batch: DOMOps[] };
 
 export type HookInternal = { currentComponent: Component };
+
+export interface DOMOps {
+  node: UIElement;
+  action:
+    | "appendChild"
+    | "removeChild"
+    | "insertBefore"
+    | "setProp"
+    | "style"
+    | "removeAttribute";
+  refDom?: HTMLElement;
+  VNode?: VNode;
+  attr?: string;
+  value?: any;
+}
