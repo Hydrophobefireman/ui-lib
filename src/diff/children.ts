@@ -43,11 +43,6 @@ function diffEachChild(
 
     copyVNodePointers(newChild, oldChild);
 
-    if (oldChild === ((EMPTY_ARR as unknown) as VNode)) {
-      const next = i + 1;
-      oldChild = oldChildren[next];
-    }
-
     if (newChild && newChild._nextSibDomVNode == null) {
       const _nextSibDomVNode = isFragment
         ? newParentVNode._nextSibDomVNode
