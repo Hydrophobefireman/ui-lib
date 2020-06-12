@@ -4,14 +4,12 @@ type anyFunc<T> = (...args: T[]) => T;
 
 export const HAS_PROMISE = typeof Promise !== "undefined";
 
-export const HAS_RAF = typeof requestAnimationFrame !== "undefined";
-
 const defer = HAS_PROMISE
   ? Promise.prototype.then.bind(Promise.resolve())
-  : setTimeout;
+  : setTimeout.bind(window);
 
 const config = {
-  scheduleRender: HAS_RAF ? reqAnimFrame : defer,
+  scheduleRender: defer,
   eagerlyHydrate: true,
   RAF_TIMEOUT: 100,
 };
@@ -24,17 +22,6 @@ const config = {
  * however if the user wishes to have the rendering stop until the tab is active
  * they can set `config.scheduleRender` to `requestAnimationFrame`
  */
-function reqAnimFrame(cb: () => void) {
-  let raf: number;
-  let timeout: NodeJS.Timeout;
-  const done = () => {
-    clearTimeout(timeout);
-    cancelAnimationFrame(raf);
-    cb();
-  };
-  timeout = setTimeout(done, config.RAF_TIMEOUT);
-  raf = requestAnimationFrame(done);
-}
 
 export default config;
 

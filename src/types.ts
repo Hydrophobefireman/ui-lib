@@ -127,12 +127,12 @@ export type HookInternal = { currentComponent: Component };
 export interface DOMOps {
   node: UIElement;
   action:
-    | "appendChild"
-    | "removeChild"
-    | "insertBefore"
-    | "setProp"
-    | "style"
-    | "removeAttribute";
+    | 0 //appendChild
+    | 1 //removeChild
+    | 2 //insertBefore
+    | 3 // setAttribute (or property)
+    | 4 // removeAttribute
+    | 5; //style
   refDom?: HTMLElement;
   VNode?: VNode;
   attr?: string;

@@ -1,6 +1,6 @@
 import { VNode, DiffMeta } from "../types";
 import { Fragment, createElement, PlaceHolder } from "../create_element";
-import { EMPTY_ARR, EMPTY_OBJ } from "../util";
+import { EMPTY_ARR, EMPTY_OBJ, copyVNodePointers } from "../util";
 import { diff } from "./index";
 import { updateInternalVNodes } from "./dom";
 
@@ -38,10 +38,17 @@ function diffEachChild(
     const newChild: VNode =
       newChildren[i] ||
       (i < newChildrenLen ? createElement(PlaceHolder) : null);
+    const unkeyedOldChild = oldChildren[i];
+    let oldChild: VNode = unkeyedOldChild || EMPTY_OBJ;
 
-    const oldChild: VNode = oldChildren[i] || EMPTY_OBJ;
+    copyVNodePointers(newChild, oldChild);
 
-    if (oldChild._nextSibDomVNode == null) {
+    if (oldChild === ((EMPTY_ARR as unknown) as VNode)) {
+      const next = i + 1;
+      oldChild = oldChildren[next];
+    }
+
+    if (newChild && newChild._nextSibDomVNode == null) {
       const _nextSibDomVNode = isFragment
         ? newParentVNode._nextSibDomVNode
         : null;
@@ -54,6 +61,7 @@ function diffEachChild(
         );
       }
     }
+
     diff(newChild, oldChild, parentDom, null, meta);
     isFragment &&
       newChild != null &&
@@ -90,3 +98,20 @@ function updateFragmentDomPointers(
   }
   arr[index] = domChild;
 }
+
+// function findKeyedNode(
+//   child: VNode,
+//   oldChildren: VNode[],
+//   oldChildrenLen: number
+// ) {
+//   if (child == null) return;
+//   const key = child.key;
+//   for (let i = 0; i < oldChildrenLen; i++) {
+//     const oldChild = oldChildren[i];
+//     if (oldChild.key == key && oldChild.type === child.type) {
+//       oldChildren[i] = (EMPTY_ARR as unknown) as VNode;
+//       return oldChild;
+//     }
+//   }
+//   // return null;
+// }

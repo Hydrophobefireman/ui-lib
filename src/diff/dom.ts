@@ -2,6 +2,13 @@ import { VNode, UIElement, Props, DiffMeta, DOMOps } from "../types";
 import { EMPTY_OBJ, isListener, getClosestDom } from "../util";
 import { diffEventListeners } from "./events";
 import { PlaceHolder } from "../create_element";
+import {
+  MODE_SET_STYLE,
+  MODE_SET_ATTRIBUTE,
+  MODE_REMOVE_ATTRIBUTE,
+  MODE_INSERT_BEFORE,
+  MODE_APPEND_CHILD,
+} from "../commit";
 export function diffDomNodes(
   newVNode: VNode,
   oldVNode: VNode,
@@ -37,7 +44,7 @@ export function diffDomNodes(
   setComponent_base(newVNode, dom);
 
   if (shouldAppend) {
-    batchAppendChild(newVNode, parentDom, true, meta);
+    batchAppendChild(newVNode, parentDom, meta);
   }
 }
 
@@ -46,7 +53,6 @@ function setComponent_base(VNode: VNode, dom: UIElement) {
 
   if (VNode._component != null) {
     /** set the base value of the first component we find while travelling up the tree */
-
     VNode._component.base = dom;
   } else {
     setComponent_base(VNode._renderedBy, dom);
@@ -134,12 +140,17 @@ function __diffNewAttributes(
     } else if (attr === "style") {
       meta.batch.push({
         node: dom,
-        action: "style",
+        action: MODE_SET_STYLE,
         value: { newValue, oldValue },
       });
       continue;
     }
-    meta.batch.push({ node: dom, action: "setProp", attr, value: newValue });
+    meta.batch.push({
+      node: dom,
+      action: MODE_SET_ATTRIBUTE,
+      attr,
+      value: newValue,
+    });
   }
 }
 
@@ -202,7 +213,7 @@ function diffClass(
   if (newValue === oldValue) return;
   meta.batch.push({
     node: dom,
-    action: "setProp",
+    action: MODE_SET_ATTRIBUTE,
     attr: "className",
     value: newValue,
   });
@@ -218,7 +229,7 @@ function __removeOldAttributes(
     if (isListener(i) || i in UNSAFE_ATTRS) continue;
 
     if (next[i] == null) {
-      meta.batch.push({ node: dom, action: "removeAttribute", attr: i });
+      meta.batch.push({ node: dom, action: MODE_REMOVE_ATTRIBUTE, attr: i });
     }
   }
 }
@@ -230,51 +241,46 @@ function __diffTextNodes(dom: UIElement, newVal: string, oldVal: string) {
 export function batchAppendChild(
   newVNode: VNode,
   parentDom: HTMLElement,
-  needsAppending: boolean,
+
   meta: DiffMeta
 ) {
-  const nextSibVNode = newVNode._nextSibDomVNode;
-
-  const nextSibDomNode = /*#__NOINLINE__*/ getClosestDom(nextSibVNode);
-
   const domToPlace = newVNode._dom;
-
   if (!domToPlace) return;
 
-  if (needsAppending) {
-    /*#__NOINLINE__*/
+  const nextSibVNode = newVNode._nextSibDomVNode;
 
-    let shouldAppend: boolean = true;
+  const nextSibDomNode = getClosestDom(nextSibVNode);
 
-    let insertBefore: HTMLElement;
+  let shouldAppend: boolean = true;
 
-    if (nextSibDomNode && nextSibDomNode !== domToPlace) {
-      shouldAppend = false;
+  let insertBefore: HTMLElement;
 
-      insertBefore = nextSibDomNode;
-    }
+  if (nextSibDomNode && nextSibDomNode !== domToPlace) {
+    shouldAppend = false;
 
-    if (!shouldAppend && insertBefore) {
-      meta.batch.push({
-        node: domToPlace,
-        action: "insertBefore",
-        refDom: insertBefore,
-        value: parentDom,
-        VNode: newVNode,
-      });
-    } else {
-      meta.batch.push({
-        node: domToPlace,
-        action: "appendChild",
-        refDom: parentDom,
-        VNode: newVNode,
-      });
-    }
-    // updatePointers(newVNode);
+    insertBefore = nextSibDomNode;
   }
+
+  if (!shouldAppend && insertBefore) {
+    meta.batch.push({
+      node: domToPlace,
+      action: MODE_INSERT_BEFORE,
+      refDom: insertBefore,
+      value: parentDom,
+      VNode: newVNode,
+    });
+  } else {
+    meta.batch.push({
+      node: domToPlace,
+      action: MODE_APPEND_CHILD,
+      refDom: parentDom,
+      VNode: newVNode,
+    });
+  }
+  // updatePointers(newVNode);
 }
 
-function updatePointers(newVNode: VNode) {
+export function updatePointers(newVNode: VNode) {
   const dom = newVNode._dom;
 
   if (newVNode._parentDom == null) {
@@ -348,7 +354,7 @@ export function updateInternalVNodes(
 
 const ariaType = /^aria[\-A-Z]/;
 /** dom helper */
-function $(dom: HTMLElement, key: string, value: any) {
+export function $(dom: HTMLElement, key: string, value: any) {
   const shouldRemove =
     value == null || (value === false && !ariaType.test(key));
   if (key in dom) {
@@ -363,47 +369,4 @@ export function updateParentDomPointers(VNode: VNode, dom: Node) {
   if (dom == null) return;
 
   updateInternalVNodes(VNode, "_parentDom", dom, "_renderedBy");
-}
-
-export function commitDOMOps(queue: DOMOps[]) {
-  const queueLen = queue.length;
-  for (let i = 0; i < queueLen; i++) {
-    const op = queue[i];
-    const dom = op.node;
-    const action = op.action;
-    const refDom = op.refDom;
-    const value = op.value;
-    const VNode = op.VNode;
-    switch (action) {
-      case "appendChild":
-        refDom[action](dom);
-        updatePointers(VNode);
-        break;
-      case "insertBefore":
-        (value as Node).insertBefore(dom, refDom);
-        updatePointers(VNode);
-        break;
-      case "removeAttribute":
-      case "setProp":
-        // in case of removeAttribute, `op.attr===undefined`
-        $(dom, op.attr, value);
-        break;
-      case "style":
-        diffStyle(dom as UIElement, value.newValue, value.oldValue);
-        break;
-      case "removeChild":
-        removeNode(dom);
-      default:
-        break;
-    }
-  }
-  queue.length = 0;
-}
-
-function removeNode(dom: UIElement) {
-  if (dom == null) return;
-  const p = dom.parentNode;
-  if (p) {
-    p.removeChild(dom);
-  }
 }

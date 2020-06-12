@@ -30,9 +30,12 @@ export function useEffect(callback: () => void, dependencies: any[]): void {
 
   const hookData = candidate._hooksData;
 
-  let currentHook = hookData[hookIndex] || <HookDefault>{};
+  const tmp = <any>{};
 
-  const pending = (candidate._pendingEffects = candidate._pendingEffects || {});
+  let currentHook: HookDefault = hookData[hookIndex] || tmp;
+
+  const pending: Component["_pendingEffects"] = (candidate._pendingEffects =
+    candidate._pendingEffects || tmp);
   const oldEffect = pending[hookIndex];
   if (!argsChanged(currentHook.args, dependencies)) {
     // mark the effect as resolved
@@ -40,9 +43,7 @@ export function useEffect(callback: () => void, dependencies: any[]): void {
     if (oldEffect) oldEffect.resolved = true;
     return;
   }
-  currentHook = getCurrentHookValueOrSetDefault(hookData, hookIndex, () => ({
-    hookState: callback,
-  }));
+  currentHook = getCurrentHookValueOrSetDefault(hookData, hookIndex, tmp);
   currentHook.args = dependencies;
 
   // TODO

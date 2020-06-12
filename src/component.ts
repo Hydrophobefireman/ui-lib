@@ -50,7 +50,7 @@ export class Component<P = {}, S = {}> implements Component_Interface<P, S> {
     //clone states
     this._oldState = assign({}, this.state);
 
-    this._nextState = assign({}, this.state);
+    this._nextState = assign({}, this._nextState || this.state);
 
     if (typeof nextState === "function") {
       const next = nextState(this._nextState, this.props);
@@ -60,8 +60,6 @@ export class Component<P = {}, S = {}> implements Component_Interface<P, S> {
     } else {
       assign(this._nextState, nextState);
     }
-    // this.state = this._nextState;
-    // this._nextState = null;
     enqueueRender(this);
   }
 
@@ -69,7 +67,7 @@ export class Component<P = {}, S = {}> implements Component_Interface<P, S> {
     if (this._VNode == null) return;
     const batchQueue: DOMOps[] = [];
     const shouldForce = callback !== false;
-    this.base = diff(
+    diff(
       this._VNode,
       assign({}, this._VNode),
       this._VNode._parentDom,

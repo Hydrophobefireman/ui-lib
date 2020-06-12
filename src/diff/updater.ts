@@ -4,6 +4,7 @@ import { diffEventListeners } from "./events";
 import { scheduleLifeCycleCallbacks } from "../lifeCycleCallbacks";
 import { Fragment, PlaceHolder } from "../create_element";
 import { copyPropsOverEntireTree } from "./dom";
+import { MODE_REMOVE_CHILD } from "../commit";
 
 export function unmountVNodeAndDestroyDom(
   VNode: VNode,
@@ -55,7 +56,7 @@ function _processNodeCleanup(
       clearDomNodePointers(dom);
       /*#__NOINLINE__*/
 
-      meta.batch.push({ node: dom, action: "removeChild" });
+      meta.batch.push({ node: dom, action: MODE_REMOVE_CHILD });
     }
   }
 

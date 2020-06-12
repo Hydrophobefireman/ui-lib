@@ -1,7 +1,7 @@
 import { Component } from "./component";
 import { HAS_PROMISE, plugins } from "./config";
 import { DOMOps } from "./types";
-import { commitDOMOps } from "./diff/dom";
+import { commitDOMOps } from "./commit";
 
 type ProcessOptions = {
   name: Component["_lastLifeCycleMethod"];

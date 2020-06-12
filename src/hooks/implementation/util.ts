@@ -13,11 +13,11 @@ type Coerce = Component["_hooksData"][0];
 export function getCurrentHookValueOrSetDefault(
   hookData: Component["_hooksData"],
   currentHookIndex: number,
-  defaultValues: () => HookDefault
+  defaultValues: HookDefault | (() => HookDefault)
 ) {
   return (
     hookData[currentHookIndex] ||
-    (hookData[currentHookIndex] = <Coerce>defaultValues())
+    (hookData[currentHookIndex] = <Coerce>consumeCallable(0, defaultValues))
   );
 }
 

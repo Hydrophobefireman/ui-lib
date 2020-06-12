@@ -1,4 +1,5 @@
-import { Component, render, h } from "../../ui/index.js";
+import { Component, render, h, config } from "../../ui/index.js";
+config.scheduleRender = requestAnimationFrame.bind(window);
 function _defineProperty(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
@@ -16,7 +17,6 @@ function _defineProperty(obj, key, value) {
 /** @jsx h */
 const COUNT = 200;
 const LOOPS = 6;
-
 class Main extends Component {
   constructor(...args) {
     super(...args);

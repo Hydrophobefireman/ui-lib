@@ -1,17 +1,11 @@
 import { VNode, ComponentType, DiffMeta, UIElement } from "../types";
-import {
-  EMPTY_OBJ,
-  copyVNodePointers,
-  isValidVNode,
-  setRef,
-  diffReferences,
-} from "../util";
+import { EMPTY_OBJ, isValidVNode, diffReferences } from "../util";
 import { unmountVNodeAndDestroyDom } from "./updater";
 import { Fragment, flattenVNodeChildren, PlaceHolder } from "../create_element";
 import { diffChildren } from "./children";
 import { diffDomNodes, updateParentDomPointers } from "./dom";
 import { toSimpleVNode, isFn } from "../toSimpleVNode";
-import { plugins } from "../config";
+
 // import { processUpdatesQueue } from "../lifeCycleCallbacks";
 
 /**
@@ -31,23 +25,20 @@ export function diff(
 ): Element | Text | void {
   if (typeof newVNode === "boolean") newVNode = null;
 
-  const oldVNodeISNULL = oldVNode == null;
-  if (oldVNodeISNULL) {
-    oldVNode = EMPTY_OBJ;
-  }
   if (newVNode == null) {
     unmountVNodeAndDestroyDom(oldVNode, false, meta);
     return;
   }
+  /** SCU returned False */
   if (newVNode === EMPTY_OBJ) return null;
+
   if (!isValidVNode(newVNode)) {
     return null;
   }
-  /** SCU returned False */
   if (oldVNode === newVNode) {
     return newVNode._dom;
   }
-  copyVNodePointers(newVNode, oldVNode);
+  oldVNode = oldVNode || EMPTY_OBJ;
   let oldType: string | ComponentType = oldVNode.type;
   let newType: string | ComponentType = newVNode.type;
   let isComplex = isFn(newType);
@@ -81,6 +72,7 @@ export function diff(
   newType = newVNode.type;
 
   updateParentDomPointers(newVNode, parentDom);
+
   let dom: UIElement;
   if (newType === Fragment) {
     diffChildren(newVNode, oldVNode, parentDom, meta);
@@ -91,8 +83,7 @@ export function diff(
     diffDomNodes(newVNode, oldVNode, parentDom, meta);
     dom = newVNode._dom;
     diffChildren(newVNode, oldVNode, dom, meta);
+    diffReferences(newVNode, oldVNode, dom);
   }
-
-  diffReferences(newVNode, oldVNode, dom);
   return dom;
 }

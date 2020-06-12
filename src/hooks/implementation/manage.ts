@@ -7,6 +7,21 @@ let hookIndex = 0;
 
 let hookCandidate: Component = null;
 
+function reqAnimFrame(cb: () => void) {
+  let raf: number;
+  let timeout: NodeJS.Timeout;
+  const done = () => {
+    clearTimeout(timeout);
+    cancelAnimationFrame(raf);
+    cb();
+  };
+  timeout = setTimeout(done, config.RAF_TIMEOUT);
+  raf = requestAnimationFrame(done);
+}
+const nextFrame: Window["requestAnimationFrame"] = window.requestAnimationFrame
+  ? reqAnimFrame
+  : config.scheduleRender;
+
 export const rafPendingCallbacks: PendingEffects[] = [];
 
 export function runEffectCleanup(effect: PendingEffects[0]) {
@@ -45,7 +60,7 @@ function scheduleEffects() {
 }
 
 function setEffectiveCallbacks() {
-  config.scheduleRender(scheduleEffects);
+  nextFrame(scheduleEffects);
 }
 
 function prepForNextHookCandidate(c: Component) {
