@@ -1,26 +1,11 @@
 import { Component } from "../../component";
-import config, { addPluginCallback } from "../../config";
+import { addPluginCallback, HAS_RAF, reqAnimFrame, defer } from "../../config";
 
 type PendingEffects = Component["_pendingEffects"];
 
 let hookIndex = 0;
 
 let hookCandidate: Component = null;
-
-function reqAnimFrame(cb: () => void) {
-  let raf: number;
-  let timeout: NodeJS.Timeout;
-  const done = () => {
-    clearTimeout(timeout);
-    cancelAnimationFrame(raf);
-    cb();
-  };
-  timeout = setTimeout(done, config.RAF_TIMEOUT);
-  raf = requestAnimationFrame(done);
-}
-const nextFrame: Window["requestAnimationFrame"] = window.requestAnimationFrame
-  ? reqAnimFrame
-  : config.scheduleRender;
 
 export const rafPendingCallbacks: PendingEffects[] = [];
 
@@ -59,8 +44,9 @@ function scheduleEffects() {
   rafPendingCallbacks.length = 0;
 }
 
+const effectScheduler = HAS_RAF ? reqAnimFrame : defer;
 function setEffectiveCallbacks() {
-  nextFrame(scheduleEffects);
+  effectScheduler(scheduleEffects);
 }
 
 function prepForNextHookCandidate(c: Component) {

@@ -12,7 +12,7 @@ import {
 } from "./util";
 
 import { Component } from "../../component";
-import { EMPTY_OBJ } from "../../util";
+import { EMPTY_OBJ } from "../../constants";
 
 function unmount() {
   const pending = (this as Component)._pendingEffects;
