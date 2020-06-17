@@ -2,8 +2,9 @@ import { VNode, Props, FunctionComponent, DiffMeta } from "./types";
 import { Component } from "./component";
 import { scheduleLifeCycleCallbacks } from "./lifeCycleCallbacks";
 import { coerceToVNode, Fragment } from "./create_element";
-import { EMPTY_OBJ, assign, diffReferences } from "./util";
+import { EMPTY_OBJ, assign } from "./util";
 import { plugins } from "./config";
+import { diffReferences } from "./ref";
 
 export const isFn = (vnType: any) =>
   typeof vnType === "function" && vnType !== Fragment;

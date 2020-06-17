@@ -1,22 +1,18 @@
 import { VNode, UIElement, DiffMeta } from "../types";
-import { EMPTY_OBJ, setRef } from "../util";
-import { diffEventListeners } from "./events";
+import { EMPTY_OBJ } from "../util";
 import { scheduleLifeCycleCallbacks } from "../lifeCycleCallbacks";
-import { Fragment, PlaceHolder } from "../create_element";
+import { Fragment } from "../create_element";
 import { copyPropsOverEntireTree } from "./dom";
 import { MODE_REMOVE_CHILD } from "../commit";
+import { setRef } from "../ref";
 
-export function unmountVNodeAndDestroyDom(
-  VNode: VNode,
-  skipRemove: boolean,
-  meta: DiffMeta
-): void {
+export function unmountVNodeAndDestroyDom(VNode: VNode, meta: DiffMeta): void {
   /** short circuit */
   if (VNode == null || VNode === EMPTY_OBJ) return;
   setRef(VNode.ref, null);
-  unmountVNodeAndDestroyDom(VNode._renders, skipRemove, meta);
+  unmountVNodeAndDestroyDom(VNode._renders, meta);
   const component = VNode._component;
-  if (!skipRemove && component != null) {
+  if (component != null) {
     /** maybe disable setState for this component? */
     component.setState = Fragment;
     component.forceUpdate = Fragment;
@@ -33,25 +29,17 @@ export function unmountVNodeAndDestroyDom(
   if (childArray) {
     while (childArray.length) {
       child = childArray.pop();
-      unmountVNodeAndDestroyDom(child, skipRemove, meta);
+      unmountVNodeAndDestroyDom(child, meta);
     }
   }
 
   /*#__NOINLINE__*/
-  _processNodeCleanup(VNode, skipRemove, meta);
+  _processNodeCleanup(VNode, meta);
 }
-function _processNodeCleanup(
-  VNode: VNode,
-  skipRemove: boolean,
-  meta: DiffMeta
-) {
-  const isPlaceholder = VNode.type === PlaceHolder;
-
-  if (!skipRemove && typeof VNode.type !== "function") {
+function _processNodeCleanup(VNode: VNode, meta: DiffMeta) {
+  if (typeof VNode.type !== "function") {
     const dom = VNode._dom;
     if (dom != null) {
-      /*#__NOINLINE__*/
-      !isPlaceholder && diffEventListeners(dom, null, VNode.events);
       /*#__NOINLINE__*/
       clearDomNodePointers(dom);
       /*#__NOINLINE__*/
@@ -60,7 +48,7 @@ function _processNodeCleanup(
     }
   }
 
-  clearVNodePointers(VNode, skipRemove);
+  clearVNodePointers(VNode);
 }
 const DOM_POINTERS = { _VNode: 1, _listeners: 1, onclick: 1 };
 export function clearDomNodePointers(dom: UIElement) {
@@ -81,29 +69,28 @@ const VNode_POINTERS: {} = {
   _parentDom: 1,
 } as { [key in keyof VNode<any>]: 1 | null };
 
-export function clearVNodePointers(VNode: VNode, skipRemove?: boolean) {
+export function clearVNodePointers(VNode: VNode) {
   if (VNode == null) return;
-  if (!skipRemove) {
-    var next = VNode._nextSibDomVNode;
-    if (next != null) {
-      const nextDom = next._dom;
-      const newPrevSib = nextDom && (nextDom.previousSibling as UIElement);
-      copyPropsOverEntireTree(
-        next,
-        "_prevSibDomVNode",
-        newPrevSib && newPrevSib._VNode
-      );
-    }
-    const prev = VNode._prevSibDomVNode;
-    if (prev != null) {
-      const prevDom = prev._dom;
-      const newNextSib = prevDom && (prevDom.nextSibling as UIElement);
-      copyPropsOverEntireTree(
-        prev,
-        "_nextSibDomVNode",
-        newNextSib && newNextSib._VNode
-      );
-    }
+
+  let next = VNode._nextSibDomVNode;
+  if (next != null) {
+    const nextDom = next._dom;
+    const newPrevSib = nextDom && (nextDom.previousSibling as UIElement);
+    copyPropsOverEntireTree(
+      next,
+      "_prevSibDomVNode",
+      newPrevSib && newPrevSib._VNode
+    );
+  }
+  const prev = VNode._prevSibDomVNode;
+  if (prev != null) {
+    const prevDom = prev._dom;
+    const newNextSib = prevDom && (prevDom.nextSibling as UIElement);
+    copyPropsOverEntireTree(
+      prev,
+      "_nextSibDomVNode",
+      newNextSib && newNextSib._VNode
+    );
   }
 
   _clearPointers(VNode_POINTERS, VNode);

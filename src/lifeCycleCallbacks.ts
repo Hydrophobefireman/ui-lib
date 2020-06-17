@@ -2,6 +2,7 @@ import { Component } from "./component";
 import { HAS_PROMISE, plugins } from "./config";
 import { DOMOps } from "./types";
 import { commitDOMOps } from "./commit";
+import { defer } from "./config";
 
 type ProcessOptions = {
   name: Component["_lastLifeCycleMethod"];
@@ -11,12 +12,6 @@ type ProcessOptions = {
 const mountCallbackQueue: ProcessOptions[] = [];
 const updateCallbackQueue: ProcessOptions[] = [];
 
-export function processMountsQueue(): void {
-  processLifeCycleQueue(mountCallbackQueue);
-}
-export function processUpdatesQueue(): void {
-  processLifeCycleQueue(updateCallbackQueue);
-}
 function processLifeCycleQueue(obj: ProcessOptions[]): void {
   let cbObj: ProcessOptions;
   while ((cbObj = obj.pop())) {
@@ -42,12 +37,10 @@ function __executeCallback(cbObj: ProcessOptions) {
   if (!func) return;
   const cb = () => func.apply(component, args);
   if (HAS_PROMISE) {
-    Promise.resolve()
-      .then(cb)
-      .catch((error) => {
-        if (hasCatch) return component.componentDidCatch(error);
-        throw error;
-      });
+    defer(cb).catch((error) => {
+      if (hasCatch) return component.componentDidCatch(error);
+      throw error;
+    });
   } else {
     try {
       cb();
@@ -61,6 +54,6 @@ function __executeCallback(cbObj: ProcessOptions) {
 export function onDiff(queue: DOMOps[]) {
   commitDOMOps(queue);
   plugins.diffed();
-  processMountsQueue();
-  processUpdatesQueue();
+  processLifeCycleQueue(mountCallbackQueue);
+  processLifeCycleQueue(updateCallbackQueue);
 }

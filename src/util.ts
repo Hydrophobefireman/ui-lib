@@ -7,33 +7,23 @@ export const EMPTY_ARR: any[] = [];
 
 type flatMap<T> = (e: T | T[]) => T;
 
-function _flat<T>(
-  arr: T[] | T[][],
-  flattenedArray: T[],
-  map: flatMap<T>,
-  removeHoles: boolean
-): T[] {
+function $flat<T>(arr: T[] | T[][], flattenedArray: T[], map: flatMap<T>): T[] {
   if (!arr) return flattenedArray;
   for (let i = 0; i < arr.length; i++) {
     const el = arr[i];
     if (Array.isArray(el)) {
-      _flat(el, flattenedArray, map, removeHoles);
+      $flat(el, flattenedArray, map);
     } else {
-      if (!removeHoles || el != null)
-        flattenedArray.push(map ? map(el) : (el as T));
+      flattenedArray.push(map ? map(el) : (el as T));
     }
   }
   return flattenedArray;
 }
 
 /** flattens array (to `Infinity`) */
-export function flattenArray<T>(
-  array: T[] | T[][],
-  map?: flatMap<T>,
-  removeHoles?: boolean
-): T[] {
+export function flattenArray<T>(array: T[] | T[][], map?: flatMap<T>): T[] {
   const flattened: T[] = [];
-  return _flat(array, flattened, map, removeHoles);
+  return $flat(array, flattened, map);
 }
 
 export function isListener(attr: string): boolean {
@@ -96,7 +86,7 @@ export function copyVNodePointers(newVNode: VNode, oldVNode: VNode) {
 
 /** check if the given vnode is renderable  */
 export function isValidVNode(V: VNode) {
-  if (!V || V.__self !== V) {
+  if (!V || V.constructor !== undefined) {
     console.warn("component not of expected type =>", V);
     return false;
   }
@@ -125,24 +115,3 @@ function _getDom(fDom: VNode["_FragmentDomNodeChildren"]): UIElement {
   }
 }
 
-export function setRef<T>(
-  ref: ((value: T) => void) | { current: T },
-  value: T
-) {
-  if (!ref) return;
-  if (typeof ref == "function") ref(value);
-  else ref.current = value;
-}
-
-export function diffReferences(
-  newVNode: VNode,
-  oldVNode: VNode,
-  domOrComponent: UIElement | Component
-) {
-  const newRef = newVNode.ref;
-  const oldRef = (oldVNode || EMPTY_OBJ).ref;
-  if (newRef && newRef !== oldRef) {
-    setRef(newRef, domOrComponent);
-    oldRef && setRef(oldVNode.ref, null);
-  }
-}

@@ -2,6 +2,7 @@ import { JSXInternal } from "./jsx";
 export interface ExtendedDocFrag extends DocumentFragment {
   _parent?: UIElement;
 }
+export type RenderedDom = UIElement;
 export interface VNode<P = {}, R = any> {
   type?: string | ComponentType<P>;
   // json injection prevention
@@ -112,7 +113,7 @@ export type ComponentChildren = ComponentChild[] | ComponentChild;
 
 export interface UIElement extends HTMLElement {
   // _children?: VNode<any> | null;
-  _listeners?: Record<string, (e: Event) => void>;
+  _events?: Record<string, (e: Event) => void>;
   _VNode: VNode;
   data?: string | number;
 }

@@ -1,10 +1,11 @@
 import { VNode, ComponentType, DiffMeta, UIElement } from "../types";
-import { EMPTY_OBJ, isValidVNode, diffReferences } from "../util";
-import { unmountVNodeAndDestroyDom } from "./updater";
-import { Fragment, flattenVNodeChildren, PlaceHolder } from "../create_element";
+import { EMPTY_OBJ, isValidVNode } from "../util";
+import { unmountVNodeAndDestroyDom } from "./unmount";
+import { Fragment, flattenVNodeChildren, NULL_TYPE } from "../create_element";
 import { diffChildren } from "./children";
 import { diffDomNodes, updateParentDomPointers } from "./dom";
 import { toSimpleVNode, isFn } from "../toSimpleVNode";
+import { diffReferences } from "../ref";
 
 // import { processUpdatesQueue } from "../lifeCycleCallbacks";
 
@@ -26,7 +27,7 @@ export function diff(
   if (typeof newVNode === "boolean") newVNode = null;
 
   if (newVNode == null) {
-    unmountVNodeAndDestroyDom(oldVNode, false, meta);
+    unmountVNodeAndDestroyDom(oldVNode, meta);
     return;
   }
   /** SCU returned False */
@@ -49,11 +50,11 @@ export function diff(
 
   if (newType !== oldType) {
     // type differs, either different dom nodes or different function/class components
-    unmountVNodeAndDestroyDom(oldVNode, false, meta);
+    unmountVNodeAndDestroyDom(oldVNode, meta);
     oldVNode = EMPTY_OBJ;
   }
   const tmp = newVNode;
-  if (typeof newVNode.props !== "string" && newType !== PlaceHolder) {
+  if (typeof newVNode.props !== "string" && newType !== NULL_TYPE) {
     /** if we have a function/class Component, get the next rendered VNode */
     newVNode = toSimpleVNode(newVNode, oldVNode, force, meta);
   }
@@ -78,7 +79,7 @@ export function diff(
     diffChildren(newVNode, oldVNode, parentDom, meta);
   } else {
     if (oldType !== newType) {
-      oldVNode = null;
+      oldVNode = EMPTY_OBJ;
     }
     diffDomNodes(newVNode, oldVNode, parentDom, meta);
     dom = newVNode._dom;

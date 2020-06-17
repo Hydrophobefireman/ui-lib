@@ -1,5 +1,5 @@
 import { Component } from "../../component";
-import config, { addPluginCallback } from "../../config";
+import config, { addPluginCallback, HAS_RAF } from "../../config";
 
 type PendingEffects = Component["_pendingEffects"];
 
@@ -18,9 +18,9 @@ function reqAnimFrame(cb: () => void) {
   timeout = setTimeout(done, config.RAF_TIMEOUT);
   raf = requestAnimationFrame(done);
 }
-const nextFrame: Window["requestAnimationFrame"] = window.requestAnimationFrame
-  ? reqAnimFrame
-  : config.scheduleRender;
+const nextFrame = HAS_RAF
+  ? (reqAnimFrame as Window["requestAnimationFrame"])
+  : (config.scheduleRender as Window["requestAnimationFrame"]);
 
 export const rafPendingCallbacks: PendingEffects[] = [];
 

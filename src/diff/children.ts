@@ -1,5 +1,5 @@
 import { VNode, DiffMeta } from "../types";
-import { Fragment, createElement, PlaceHolder } from "../create_element";
+import { Fragment, createElement, NULL_TYPE } from "../create_element";
 import { EMPTY_ARR, EMPTY_OBJ, copyVNodePointers } from "../util";
 import { diff } from "./index";
 import { updateInternalVNodes } from "./dom";
@@ -12,7 +12,7 @@ export function diffChildren(
   parentDom: HTMLElement,
   meta: DiffMeta
 ) {
-  if (newVNode.type === PlaceHolder) return;
+  if (newVNode.type === NULL_TYPE) return;
 
   const newChildren: VNodeChildren = newVNode._children || EMPTY_ARR;
 
@@ -37,7 +37,7 @@ function diffEachChild(
   for (let i = 0; i < larger; i++) {
     const newChild: VNode =
       newChildren[i] ||
-      (i < newChildrenLen ? createElement(PlaceHolder) : null);
+      (i < newChildrenLen ? createElement(NULL_TYPE) : null);
     const unkeyedOldChild = oldChildren[i];
     let oldChild: VNode = unkeyedOldChild || EMPTY_OBJ;
 
