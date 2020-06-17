@@ -30,7 +30,9 @@ export function addPluginCallback(
 }
 
 const config = {
-  scheduleRender: HAS_RAF ? requestAnimationFrame : defer,
+  scheduleRender: HAS_RAF
+    ? (cb: FrameRequestCallback) => requestAnimationFrame(cb)
+    : defer,
   eagerlyHydrate: true,
   RAF_TIMEOUT: 100,
 };
