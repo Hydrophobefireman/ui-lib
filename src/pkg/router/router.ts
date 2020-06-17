@@ -1,6 +1,7 @@
 import { Component } from "../../component";
 import { createElement, Fragment } from "../../create_element";
-import { VNode, Props, ComponentType } from "../../types/index";
+import { deprecateFunction, deprecateGetter } from "../../$ui_tools";
+import { VNode, Props, ComponentType } from "../../types";
 import { assign } from "../../util";
 import { createElementIfNeeded } from "../common";
 
@@ -145,11 +146,14 @@ export class Router extends Component {
     this.setState({ child });
   }
 
-  render(_: Router["props"], state: Router["state"]) {
+  render(props: Router["props"], state: Router["state"]) {
     const child = state.child;
     return createElement(Fragment, null, child);
   }
 }
+
+deprecateGetter(Router, "getPath", "path");
+deprecateGetter(Router, "getQs", "qs");
 
 function _absolutePath(route: string) {
   return RegExp(`^${route}(/?)$`);
@@ -178,6 +182,12 @@ export function createRoutePath(pathString: string | RoutePath): RoutePath {
   return { regex: _absolutePath(pathRegex), params };
 }
 
+export const absolutePath = deprecateFunction(
+  createRoutePath,
+  "absolutePath",
+  "createRoutePath"
+);
+
 function onLinkClick(e: MouseEvent) {
   if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) {
     return;
@@ -203,3 +213,4 @@ export function A(props: any) {
 }
 
 export const Path = {};
+

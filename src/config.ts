@@ -4,11 +4,26 @@ type anyFunc<T> = (...args: T[]) => T;
 
 export const HAS_PROMISE = typeof Promise !== "undefined";
 
-export const defer: <T>(cb: () => T) => Promise<T> = HAS_PROMISE
+const defer = HAS_PROMISE
   ? Promise.prototype.then.bind(Promise.resolve())
-  : <T>(f: () => T) => setTimeout(f);
+  : setTimeout.bind(window);
 
-export const HAS_RAF = typeof requestAnimationFrame === "function";
+const config = {
+  scheduleRender: defer,
+  eagerlyHydrate: true,
+  RAF_TIMEOUT: 100,
+};
+
+/**
+ * This ensures that we begin our render work  even if we don't get an animation frame for 100ms
+ * this could happen in cases like we're in an inactive tab
+ * but we need to render the component and it's children
+ * as we might delay some side effects
+ * however if the user wishes to have the rendering stop until the tab is active
+ * they can set `config.scheduleRender` to `requestAnimationFrame`
+ */
+
+export default config;
 
 export const plugins = {
   hookSetup: Fragment,
@@ -28,13 +43,3 @@ export function addPluginCallback(
     cb.apply(0, arguments);
   };
 }
-
-const config = {
-  scheduleRender: HAS_RAF
-    ? (cb: FrameRequestCallback) => requestAnimationFrame(cb)
-    : defer,
-  eagerlyHydrate: true,
-  RAF_TIMEOUT: 100,
-};
-
-export default config;

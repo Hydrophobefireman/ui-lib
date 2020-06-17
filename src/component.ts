@@ -1,25 +1,29 @@
 import {
+  Component as Component_Interface,
   ComponentChild,
   Props,
   setStateArgType,
   UIElement,
   VNode,
   DOMOps,
-} from "./types/index";
+} from "./types";
 import { assign } from "./util";
 import config from "./config";
 import { diff } from "./diff/index";
-import { onDiff } from "./lifeCycleCallbacks";
+import {
+  processMountsQueue,
+  processUpdatesQueue,
+  onDiff,
+} from "./lifeCycleCallbacks";
 
 const RENDER_QUEUE: Component[] = [];
 
 /** The pseudo-abstract component class */
-export class Component<P = {}, S = {}> {
+export class Component<P = {}, S = {}> implements Component_Interface<P, S> {
   constructor(props?: P) {
     this.state = {} as any;
     this.props = props as Props<P>;
   }
-
   _pendingEffects?: {
     [index: number]: { cb: () => any; cleanUp?: () => any; resolved?: boolean };
   };
@@ -68,24 +72,18 @@ export class Component<P = {}, S = {}> {
       assign({}, this._VNode),
       this._VNode._parentDom,
       shouldForce,
-      {
-        depth: this._depth,
-        batch: batchQueue,
-      }
+      { depth: this._depth, batch: batchQueue }
     ) as UIElement;
     typeof callback === "function" && callback();
     onDiff(batchQueue);
   }
-
+  // current virtual dom
   _VNode?: VNode<P>;
-  static getDerivedStateFromProps?(
-    props: Readonly<object>,
-    state: Readonly<object>
-  ): object | null;
+  // user shall implement these
   componentWillMount?(): void;
   componentDidMount?(): void;
+
   componentWillUnmount?(): void;
-  componentWillReceiveProps?(nextProps: Readonly<P>): void;
   shouldComponentUpdate?(
     nextProps: Readonly<P>,
     nextState: Readonly<S>
@@ -96,8 +94,12 @@ export class Component<P = {}, S = {}> {
     previousProps: Readonly<P>,
     previousState: Readonly<S>
   ): void;
+  static getDerivedStateFromProps?(
+    props: Readonly<object>,
+    state: Readonly<object>
+  ): object | null;
   componentDidCatch?(error: any): void;
-  _dirty?: boolean;
+  // debug purposes
   _lastLifeCycleMethod?:
     | "componentWillMount"
     | "componentDidMount"
@@ -105,6 +107,7 @@ export class Component<P = {}, S = {}> {
     | "shouldComponentUpdate"
     | "componentWillUpdate"
     | "componentDidUpdate";
+  _dirty?: boolean;
 }
 
 function enqueueRender(c: Component) {

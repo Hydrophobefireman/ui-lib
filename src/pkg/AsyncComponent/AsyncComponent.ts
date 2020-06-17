@@ -1,6 +1,6 @@
 import { Component } from "../../component";
 
-import { ComponentType, VNode, Props } from "../../types/index";
+import { ComponentType, VNode, Props } from "../../types";
 import { createElementIfNeeded } from "../common";
 import { flattenArray } from "../../util";
 // import { deprecationWarning } from "../../$ui_tools";

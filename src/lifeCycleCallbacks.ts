@@ -1,8 +1,7 @@
 import { Component } from "./component";
-import { HAS_PROMISE, plugins, defer } from "./config";
-import { DOMOps } from "./types/index";
+import { HAS_PROMISE, plugins } from "./config";
+import { DOMOps } from "./types";
 import { commitDOMOps } from "./commit";
-import { LIFECYCLE_DID_MOUNT, LIFECYCLE_DID_UPDATE } from "./constants";
 
 type ProcessOptions = {
   name: Component["_lastLifeCycleMethod"];
@@ -12,6 +11,12 @@ type ProcessOptions = {
 const mountCallbackQueue: ProcessOptions[] = [];
 const updateCallbackQueue: ProcessOptions[] = [];
 
+export function processMountsQueue(): void {
+  processLifeCycleQueue(mountCallbackQueue);
+}
+export function processUpdatesQueue(): void {
+  processLifeCycleQueue(updateCallbackQueue);
+}
 function processLifeCycleQueue(obj: ProcessOptions[]): void {
   let cbObj: ProcessOptions;
   while ((cbObj = obj.pop())) {
@@ -21,30 +26,28 @@ function processLifeCycleQueue(obj: ProcessOptions[]): void {
 
 export function scheduleLifeCycleCallbacks(options: ProcessOptions): any {
   const name = options.name;
-  if (name === LIFECYCLE_DID_MOUNT) return mountCallbackQueue.push(options);
-  else if (name === LIFECYCLE_DID_UPDATE)
+  if (name === "componentDidMount") return mountCallbackQueue.push(options);
+  else if (name === "componentDidUpdate")
     return updateCallbackQueue.push(options);
   else __executeCallback(options);
 }
 
 function __executeCallback(cbObj: ProcessOptions) {
-  const fName = cbObj.name;
-  const component = cbObj.bind;
-  const func = component[fName];
-  component._lastLifeCycleMethod = fName;
-  if (!func) return;
-
   const args = cbObj.args;
-  const hasCatch = typeof component.componentDidCatch == "function";
-  const cb = (): void => func.apply(component, args);
+  const component = cbObj.bind;
+  const fName = cbObj.name;
+  component._lastLifeCycleMethod = fName;
+  const func = component[fName];
+  const hasCatch = !!component.componentDidCatch;
+  if (!func) return;
+  const cb = () => func.apply(component, args);
   if (HAS_PROMISE) {
-    defer(cb).catch((error: Error) => {
-      if (hasCatch) {
-        component.componentDidCatch(error);
-      } else {
+    Promise.resolve()
+      .then(cb)
+      .catch((error) => {
+        if (hasCatch) return component.componentDidCatch(error);
         throw error;
-      }
-    });
+      });
   } else {
     try {
       cb();
@@ -58,6 +61,6 @@ function __executeCallback(cbObj: ProcessOptions) {
 export function onDiff(queue: DOMOps[]) {
   commitDOMOps(queue);
   plugins.diffed();
-  processLifeCycleQueue(mountCallbackQueue);
-  processLifeCycleQueue(updateCallbackQueue);
+  processMountsQueue();
+  processUpdatesQueue();
 }

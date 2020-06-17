@@ -1,9 +1,8 @@
-import { VNode, DiffMeta, UIElement } from "../types/index";
-import { Fragment, createElement } from "../create_element";
+import { VNode, DiffMeta } from "../types";
+import { Fragment, createElement, PlaceHolder } from "../create_element";
+import { EMPTY_ARR, EMPTY_OBJ, copyVNodePointers } from "../util";
 import { diff } from "./index";
-import { NULL_TYPE, EMPTY_ARRAY, EMPTY_OBJ } from "../constants";
-import { assign } from "../util";
-import { isFn } from "../toSimpleVNode";
+import { updateInternalVNodes } from "./dom";
 
 type VNodeChildren = VNode["_children"];
 
@@ -13,13 +12,13 @@ export function diffChildren(
   parentDom: HTMLElement,
   meta: DiffMeta
 ) {
-  if (newVNode.type === NULL_TYPE) return;
+  if (newVNode.type === PlaceHolder) return;
 
-  const newChildren: VNodeChildren = newVNode._children || EMPTY_ARRAY;
+  const newChildren: VNodeChildren = newVNode._children || EMPTY_ARR;
 
   const oldChildren: VNodeChildren =
-    (oldVNode || EMPTY_OBJ)._children || EMPTY_ARRAY;
-  if (newChildren === oldChildren) return;
+    (oldVNode || EMPTY_OBJ)._children || EMPTY_ARR;
+
   return diffEachChild(newVNode, newChildren, oldChildren, parentDom, meta);
 }
 
@@ -35,25 +34,84 @@ function diffEachChild(
   const oldChildrenLen = oldChildren.length;
   const larger = Math.max(newChildrenLen, oldChildrenLen);
 
-  const lastSibling: UIElement = isFragment
-    ? ((oldChildren[oldChildrenLen - 1] || EMPTY_OBJ)._dom || EMPTY_OBJ)
-        .nextSibling
-    : null;
-
   for (let i = 0; i < larger; i++) {
     const newChild: VNode =
-      newChildren[i] || (i < newChildrenLen ? createElement(NULL_TYPE) : null);
-
+      newChildren[i] ||
+      (i < newChildrenLen ? createElement(PlaceHolder) : null);
     const unkeyedOldChild = oldChildren[i];
     let oldChild: VNode = unkeyedOldChild || EMPTY_OBJ;
 
-    let next = (oldChildren[i + 1] || EMPTY_OBJ)._dom;
+    copyVNodePointers(newChild, oldChild);
 
-    if (next == null && isFragment) {
-      next = meta.next || lastSibling;
+    if (oldChild === ((EMPTY_ARR as unknown) as VNode)) {
+      const next = i + 1;
+      oldChild = oldChildren[next];
     }
-    const nextMeta: DiffMeta = assign({}, meta, { next });
 
-    diff(newChild, oldChild, parentDom, false, nextMeta);
+    if (newChild && newChild._nextSibDomVNode == null) {
+      const _nextSibDomVNode = isFragment
+        ? newParentVNode._nextSibDomVNode
+        : null;
+      if (_nextSibDomVNode != null) {
+        updateInternalVNodes(
+          newChild,
+          "_nextSibDomVNode",
+          _nextSibDomVNode,
+          "_renderedBy"
+        );
+      }
+    }
+
+    diff(newChild, oldChild, parentDom, null, meta);
+    isFragment &&
+      newChild != null &&
+      updateFragmentDomPointers(newParentVNode, newChild, i);
+  }
+  if (isFragment && newChildrenLen) {
+    const c = newParentVNode._children;
+    const t = c[newChildrenLen - 1]._nextSibDomVNode;
+    updateInternalVNodes(newParentVNode, "_nextSibDomVNode", t, "_renderedBy");
+    updateInternalVNodes(
+      newParentVNode,
+      "_prevSibDomVNode",
+      c[0]._prevSibDomVNode,
+      "_renderedBy"
+    );
   }
 }
+
+function updateFragmentDomPointers(
+  newParentVNode: VNode,
+  x: VNode,
+  index: number
+) {
+  const domChild = x && ((x._dom || x._FragmentDomNodeChildren) as any);
+  let arr = newParentVNode._FragmentDomNodeChildren;
+  if (arr == null) {
+    arr = [];
+    updateInternalVNodes(
+      newParentVNode,
+      "_FragmentDomNodeChildren",
+      arr,
+      "_renderedBy"
+    );
+  }
+  arr[index] = domChild;
+}
+
+// function findKeyedNode(
+//   child: VNode,
+//   oldChildren: VNode[],
+//   oldChildrenLen: number
+// ) {
+//   if (child == null) return;
+//   const key = child.key;
+//   for (let i = 0; i < oldChildrenLen; i++) {
+//     const oldChild = oldChildren[i];
+//     if (oldChild.key == key && oldChild.type === child.type) {
+//       oldChildren[i] = (EMPTY_ARR as unknown) as VNode;
+//       return oldChild;
+//     }
+//   }
+//   // return null;
+// }

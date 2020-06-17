@@ -1,12 +1,13 @@
-import { diffStyle, $ } from "./diff/dom";
-import { DOMOps, UIElement } from "./types/index";
-import {
-  BATCH_MODE_APPEND_CHILD,
-  BATCH_MODE_INSERT_BEFORE,
-  BATCH_MODE_SET_ATTRIBUTE,
-  BATCH_MODE_SET_STYLE,
-  BATCH_MODE_REMOVE_ELEMENT,
-} from "./constants";
+import { updatePointers, diffStyle, $ } from "./diff/dom";
+import { DOMOps, UIElement } from "./types";
+
+export const MODE_APPEND_CHILD = 0;
+export const MODE_REMOVE_CHILD = 1;
+export const MODE_INSERT_BEFORE = 2;
+export const MODE_SET_ATTRIBUTE = 3;
+export const MODE_REMOVE_ATTRIBUTE = 4;
+
+export const MODE_SET_STYLE = 5;
 
 export function commitDOMOps(queue: DOMOps[]) {
   const queueLen = queue.length;
@@ -16,29 +17,32 @@ export function commitDOMOps(queue: DOMOps[]) {
     const action = op.action;
     const refDom = op.refDom;
     const value = op.value;
+    const VNode = op.VNode;
     switch (action) {
-      case BATCH_MODE_APPEND_CHILD:
+      case MODE_APPEND_CHILD:
         refDom.appendChild(dom);
+        updatePointers(VNode);
         break;
-      case BATCH_MODE_INSERT_BEFORE:
+      case MODE_INSERT_BEFORE:
         (value as Node).insertBefore(dom, refDom);
+        updatePointers(VNode);
         break;
-      case BATCH_MODE_SET_ATTRIBUTE:
+      case MODE_REMOVE_ATTRIBUTE:
+      case MODE_SET_ATTRIBUTE:
         // in case of removeAttribute, `op.attr===undefined`
         $(dom, op.attr, value);
         break;
-      case BATCH_MODE_SET_STYLE:
+      case MODE_SET_STYLE:
         diffStyle(dom as UIElement, value.newValue, value.oldValue);
         break;
-      case BATCH_MODE_REMOVE_ELEMENT:
+      case MODE_REMOVE_CHILD:
         removeNode(dom);
         break;
       default:
         break;
     }
   }
-  // queue is immutable, we build a new one everytime
-  //   queue.length = 0;
+  queue.length = 0;
 }
 
 function removeNode(dom: UIElement) {

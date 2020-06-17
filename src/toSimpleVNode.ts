@@ -1,23 +1,9 @@
-import {
-  VNode,
-  Props,
-  FunctionComponent,
-  DiffMeta,
-  ComponentConstructor,
-} from "./types/index";
+import { VNode, Props, FunctionComponent, DiffMeta } from "./types";
 import { Component } from "./component";
 import { scheduleLifeCycleCallbacks } from "./lifeCycleCallbacks";
 import { coerceToVNode, Fragment } from "./create_element";
-import { assign } from "./util";
+import { EMPTY_OBJ, assign, diffReferences } from "./util";
 import { plugins } from "./config";
-import {
-  EMPTY_OBJ,
-  LIFECYCLE_WILL_UPDATE,
-  LIFECYCLE_DID_UPDATE,
-  LIFECYCLE_DID_MOUNT,
-  LIFECYCLE_WILL_MOUNT,
-} from "./constants";
-import { diffReferences } from "./ref";
 
 export const isFn = (vnType: any) =>
   typeof vnType === "function" && vnType !== Fragment;
@@ -31,17 +17,14 @@ export function toSimpleVNode(
   let type: VNode["type"];
   if (VNode != null && isFn((type = VNode.type))) {
     oldVNode = oldVNode || EMPTY_OBJ;
-    let next: VNode;
     if (isClassComponent(type)) {
       /** class component, call lifecycle methods */
-      next = renderClassComponent(VNode, oldVNode, forceUpdate, meta);
+      /*#__NOINLINE__*/
+      return renderClassComponent(VNode, oldVNode, forceUpdate, meta);
     } else {
-      /** run hooks */
-      next = renderFunctionalComponent(VNode, meta);
+      /*#__NOINLINE__*/
+      return renderFunctionalComponent(VNode, meta);
     }
-    VNode._renders = next;
-    next._renderedBy = VNode;
-    return next;
   } else {
     /** VNode is already simple */
     return VNode;
@@ -55,11 +38,12 @@ function renderClassComponent(
   meta?: DiffMeta
 ) {
   let nextLifeCycle: "componentDidMount" | "componentDidUpdate";
-  const cls = VNode.type as ComponentConstructor;
+
+  const cls = (VNode.type as unknown) as typeof Component;
+
   let component = VNode._component;
-  const isExisting = component != null;
-  if (isExisting) {
-    nextLifeCycle = LIFECYCLE_DID_UPDATE;
+
+  if (component != null) {
     /**existing component */
     if (component.shouldComponentUpdate != null && !forceUpdate) {
       const scu = component.shouldComponentUpdate(
@@ -70,23 +54,35 @@ function renderClassComponent(
         return EMPTY_OBJ;
       }
     }
+
+    updateStateFromStaticLifeCycleMethods(component, cls, VNode);
+    scheduleLifeCycleCallbacks({
+      bind: component,
+      name: "componentWillUpdate",
+      args: [VNode.props, component._nextState],
+    });
+    nextLifeCycle = "componentDidUpdate";
   } else {
-    nextLifeCycle = LIFECYCLE_DID_MOUNT;
+    nextLifeCycle = "componentDidMount";
     component = new cls(VNode.props);
     VNode._component = component;
+    updateStateFromStaticLifeCycleMethods(component, cls, VNode);
+
+    scheduleLifeCycleCallbacks({
+      bind: component,
+      name: "componentWillMount",
+    });
+
     component._depth = ++meta.depth;
   }
+
   component._VNode = VNode;
+
   const oldState = component._oldState;
   const oldProps = oldVNode.props;
 
-  scheduleLifeCycleCallbacks({
-    bind: component,
-    name: isExisting ? LIFECYCLE_WILL_UPDATE : LIFECYCLE_WILL_MOUNT,
-    args: isExisting ? [VNode.props, component._nextState] : null,
-  });
+  component.state = component._nextState;
 
-  component.state = applyCurrentState(component, cls, VNode);
   component._oldState = null;
   component._nextState = null;
   component.props = VNode.props;
@@ -95,10 +91,12 @@ function renderClassComponent(
     component.render(component.props, component.state)
   );
 
+  setNextRenderedVNodePointers(nextVNode, VNode);
+
   scheduleLifeCycleCallbacks({
     bind: component,
     name: nextLifeCycle,
-    args: nextLifeCycle === LIFECYCLE_DID_UPDATE ? [oldProps, oldState] : [],
+    args: nextLifeCycle === "componentDidUpdate" ? [oldProps, oldState] : [],
   });
   diffReferences(VNode, oldVNode, component);
   return nextVNode;
@@ -130,16 +128,31 @@ function renderFunctionalComponent(VNode: VNode, meta?: DiffMeta) {
   nextVNode = coerceToVNode(c.render(VNode.props));
   // remove reference of this component
   plugins.hookSetup(null);
+  setNextRenderedVNodePointers(nextVNode, VNode);
 
   return nextVNode;
+}
+
+const COPY_PROPS = {
+  _nextSibDomVNode: 1,
+  _prevSibDomVNode: 1,
+};
+function setNextRenderedVNodePointers(next: VNode, VNode: VNode) {
+  VNode._renders = next;
+  if (next) {
+    next._renderedBy = VNode;
+    for (const i in COPY_PROPS) {
+      next[i] = VNode[i];
+    }
+  }
 }
 
 function getRenderer(props: Props<any>) {
   return this.constructor(props);
 }
 
-function $runGetDerivedStateFromProps(
-  componentClass: ComponentConstructor,
+function _runGetDerivedStateFromProps(
+  componentClass: typeof Component,
   props: Props<any>,
   state: any
 ) {
@@ -150,25 +163,21 @@ function $runGetDerivedStateFromProps(
   return null;
 }
 
-function applyCurrentState(
+function updateStateFromStaticLifeCycleMethods(
   component: Component,
-  cls: ComponentConstructor,
+  cls: typeof Component,
   VNode: VNode
-): {} {
-  const componentStateBeforeRender = component.state || EMPTY_OBJ;
-  const nextState = assign(
-    {},
-    componentStateBeforeRender,
-    component._nextState || EMPTY_OBJ
-  );
-  const ns = $runGetDerivedStateFromProps(cls, VNode.props, nextState);
+): void {
+  const state = component.state || EMPTY_OBJ;
+  const nextState = assign({}, state, component._nextState || EMPTY_OBJ);
+  const ns = _runGetDerivedStateFromProps(cls, VNode.props, nextState);
   if (ns) {
     assign(nextState, ns);
   }
-  return nextState;
+  component._nextState = nextState;
 }
 
 function isClassComponent(type: VNode["type"]): boolean {
-  const proto = ((type as any) as ComponentConstructor).prototype;
+  const proto = ((type as any) as typeof Component).prototype;
   return !!(proto && proto.render);
 }
