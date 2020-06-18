@@ -68,10 +68,7 @@ export class Component<P = {}, S = {}> {
       assign({}, this._VNode),
       this._VNode._parentDom,
       shouldForce,
-      {
-        depth: this._depth,
-        batch: batchQueue,
-      }
+      { depth: this._depth, batch: batchQueue }
     ) as UIElement;
     typeof callback === "function" && callback();
     onDiff(batchQueue);

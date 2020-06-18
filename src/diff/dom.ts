@@ -329,9 +329,10 @@ function $event(
   if (listener == null) {
     dom.removeEventListener(event, eventListenerProxy);
     delete dom._events[event];
+  } else {
+    dom.addEventListener(event, eventListenerProxy);
+    dom._events[event] = listener;
   }
-  dom.addEventListener(event, eventListenerProxy);
-  dom._events[event] = listener;
 }
 
 function eventListenerProxy(e: Event) {
