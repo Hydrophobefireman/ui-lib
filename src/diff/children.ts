@@ -1,8 +1,9 @@
-import { VNode, DiffMeta } from "../types/index";
+import { VNode, DiffMeta, UIElement } from "../types/index";
 import { Fragment, createElement } from "../create_element";
 import { diff } from "./index";
 import { NULL_TYPE, EMPTY_ARRAY, EMPTY_OBJ } from "../constants";
-import { copyVNodePointers, copyPropsUpwards } from "../VNodePointers";
+import { assign } from "../util";
+import { isFn } from "../toSimpleVNode";
 
 type VNodeChildren = VNode["_children"];
 
@@ -34,6 +35,12 @@ function diffEachChild(
   const oldChildrenLen = oldChildren.length;
   const larger = Math.max(newChildrenLen, oldChildrenLen);
 
+  const lastSibling: UIElement = isFragment
+    ? meta.next ||
+      ((oldChildren[oldChildrenLen - 1] || EMPTY_OBJ)._dom || EMPTY_OBJ)
+        .nextSibling
+    : null;
+
   for (let i = 0; i < larger; i++) {
     const newChild: VNode =
       newChildren[i] || (i < newChildrenLen ? createElement(NULL_TYPE) : null);
@@ -41,40 +48,23 @@ function diffEachChild(
     const unkeyedOldChild = oldChildren[i];
     let oldChild: VNode = unkeyedOldChild || EMPTY_OBJ;
 
-    copyVNodePointers(newChild, oldChild);
+    let next =
+      (getDom(oldChild) || (EMPTY_OBJ as UIElement)).nextSibling || lastSibling;
 
-    if (newChild && newChild._nextSibDomVNode == null) {
-      const _nextSibDomVNode = isFragment
-        ? newParentVNode._nextSibDomVNode
-        : null;
-      if (_nextSibDomVNode != null) {
-        copyPropsUpwards(newChild, "_nextSibDomVNode", _nextSibDomVNode);
-      }
-    }
-    diff(newChild, oldChild, parentDom, false, meta);
-    isFragment &&
-      newChild != null &&
-      updateFragmentDomPointers(newParentVNode, newChild, i);
-  }
+    const nextMeta: DiffMeta = assign({}, meta, { next });
 
-  if (isFragment && newChildrenLen) {
-    const c = newParentVNode._children;
-    const t = c[newChildrenLen - 1]._nextSibDomVNode;
-    copyPropsUpwards(newParentVNode, "_nextSibDomVNode", t);
-    copyPropsUpwards(newParentVNode, "_prevSibDomVNode", c[0]._prevSibDomVNode);
+    diff(newChild, oldChild, parentDom, false, nextMeta);
   }
 }
 
-function updateFragmentDomPointers(
-  newParentVNode: VNode,
-  x: VNode,
-  index: number
-) {
-  const domChild = x && ((x._dom || x._FragmentDomNodeChildren) as any);
-  let arr = newParentVNode._FragmentDomNodeChildren;
-  if (arr == null) {
-    arr = [];
-    copyPropsUpwards(newParentVNode, "_FragmentDomNodeChildren", arr);
+export function getDom(VNode: VNode): UIElement {
+  if (!VNode || VNode === EMPTY_OBJ) return;
+  while (isFn(VNode.type)) {
+    VNode = VNode._renders;
   }
-  arr[index] = domChild;
+  if (VNode.type === Fragment) {
+    const children = VNode._children || (EMPTY_ARRAY as VNode["_children"]);
+    return getDom(children[children.length - 1]);
+  }
+  return VNode._dom;
 }

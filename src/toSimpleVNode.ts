@@ -39,7 +39,8 @@ export function toSimpleVNode(
       /** run hooks */
       next = renderFunctionalComponent(VNode, meta);
     }
-    setNextRenderedVNodePointers(next, VNode);
+    VNode._renders = next;
+    next._renderedBy = VNode;
     return next;
   } else {
     /** VNode is already simple */
@@ -170,15 +171,4 @@ function applyCurrentState(
 function isClassComponent(type: VNode["type"]): boolean {
   const proto = ((type as any) as ComponentConstructor).prototype;
   return !!(proto && proto.render);
-}
-const COPY_PROPS = {
-  _nextSibDomVNode: 1,
-  _prevSibDomVNode: 1,
-};
-function setNextRenderedVNodePointers(next: VNode, VNode: VNode) {
-  VNode._renders = next;
-  next._renderedBy = VNode;
-  for (const i in COPY_PROPS) {
-    next[i] = VNode[i];
-  }
 }

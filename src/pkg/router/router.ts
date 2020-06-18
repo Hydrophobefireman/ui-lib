@@ -11,6 +11,13 @@ function fixPath(path: string): string {
   return path.replace(pathFixRegex, "");
 }
 
+function createRouterChild(
+  component: VNode | ComponentType,
+  props: Props<any>
+) {
+  return createElementIfNeeded(component, props);
+}
+
 const _routerSubscriptions: Array<(
   e: PopStateEvent | null,
   options: {}
@@ -123,7 +130,7 @@ export class Router extends Component {
         const childProps = x.props as PathProps;
         const params = Router._getParams(pathinfo.params, test);
         (child as VNode[]).push(
-          createElementIfNeeded(
+          createRouterChild(
             childProps.component,
             assign({}, x.props, { params })
           )

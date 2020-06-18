@@ -5,7 +5,7 @@ import { toSimpleVNode, isFn } from "../toSimpleVNode";
 import { EMPTY_OBJ, NULL_TYPE } from "../constants";
 import { diffReferences } from "../ref";
 
-import { diffChildren } from "./children";
+import { diffChildren, getDom } from "./children";
 import { diffDomNodes } from "./dom";
 import { unmountVNodeAndDestroyDom } from "./unmount";
 
@@ -50,6 +50,8 @@ export function diff(
 
   if (newType !== oldType) {
     // type differs, either different dom nodes or different function/class components
+    const next = getDom(oldVNode);
+    meta.next = (next || EMPTY_OBJ).nextSibling || meta.next;
     unmountVNodeAndDestroyDom(oldVNode, meta);
     oldVNode = EMPTY_OBJ;
   }

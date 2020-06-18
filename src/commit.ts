@@ -1,5 +1,5 @@
 import { diffStyle, $ } from "./diff/dom";
-import { DOMOps, UIElement, VNode } from "./types/index";
+import { DOMOps, UIElement, WritableProps, VNode } from "./types/index";
 import {
   BATCH_MODE_APPEND_CHILD,
   BATCH_MODE_INSERT_BEFORE,
@@ -7,8 +7,6 @@ import {
   BATCH_MODE_SET_STYLE,
   BATCH_MODE_REMOVE_ELEMENT,
 } from "./constants";
-import { copyPropsOverEntireTree } from "./VNodePointers";
-import { clearDomNodePointers } from "./diff/unmount";
 
 export function commitDOMOps(queue: DOMOps[]) {
   const queueLen = queue.length;
@@ -22,11 +20,9 @@ export function commitDOMOps(queue: DOMOps[]) {
     switch (action) {
       case BATCH_MODE_APPEND_CHILD:
         refDom.appendChild(dom);
-        updatePointers(VNode);
         break;
       case BATCH_MODE_INSERT_BEFORE:
         (value as Node).insertBefore(dom, refDom);
-        updatePointers(VNode);
         break;
       case BATCH_MODE_SET_ATTRIBUTE:
         // in case of removeAttribute, `op.attr===undefined`
@@ -38,6 +34,7 @@ export function commitDOMOps(queue: DOMOps[]) {
       case BATCH_MODE_REMOVE_ELEMENT:
         removeNode(dom);
         clearDomNodePointers(dom);
+        clearVNodePointers(VNode);
         break;
       default:
         break;
@@ -54,33 +51,42 @@ function removeNode(dom: UIElement) {
     p.removeChild(dom);
   }
 }
-function updatePointers(newVNode: VNode) {
-  const dom = newVNode._dom;
 
-  let sn = newVNode._nextSibDomVNode;
+const DOM_POINTERS: Record<
+  Exclude<keyof UIElement, keyof HTMLElement | keyof Text>,
+  number
+> = {
+  _VNode: 1,
+  _events: 1,
+};
+function clearDomNodePointers(dom: UIElement) {
+  _clearPointers(DOM_POINTERS, dom);
+}
 
-  if (sn == null) {
-    const nextSib = dom.nextSibling as UIElement;
-    if (nextSib != null) {
-      sn = nextSib._VNode;
-    }
+const VNode_POINTERS: Record<
+  WritableProps | "_children" | "_depth" | "key" | "ref",
+  1 | null
+> = {
+  _children: 1,
+  _component: 1,
+  _depth: 1,
+  _dom: 1,
+  _renderedBy: 1,
+  _renders: 1,
+  _parentDom: 1,
+  key: 1,
+  ref: 1,
+};
+
+function clearVNodePointers(VNode: VNode) {
+  if (VNode == null) return;
+
+  _clearPointers(VNode_POINTERS, VNode);
+}
+
+function _clearPointers(pointersObj: object, el: any) {
+  if (el == null) return;
+  for (const i in pointersObj) {
+    el[i] = null;
   }
-
-  copyPropsOverEntireTree(sn, "_prevSibDomVNode", newVNode);
-
-  copyPropsOverEntireTree(newVNode, "_nextSibDomVNode", sn);
-
-  let pn = newVNode._prevSibDomVNode;
-
-  if (pn == null) {
-    const prevSib = dom.previousSibling as UIElement;
-
-    if (prevSib != null) {
-      pn = prevSib._VNode;
-    }
-  }
-
-  copyPropsOverEntireTree(pn, "_nextSibDomVNode", newVNode);
-
-  copyPropsOverEntireTree(newVNode, "_prevSibDomVNode", pn);
 }

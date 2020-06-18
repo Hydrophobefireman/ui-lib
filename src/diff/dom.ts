@@ -1,4 +1,11 @@
-import { VNode, UIElement, Props, DiffMeta, RenderedDom } from "../types/index";
+import {
+  VNode,
+  UIElement,
+  Props,
+  DiffMeta,
+  RenderedDom,
+  WritableProps,
+} from "../types/index";
 import {
   BATCH_MODE_SET_STYLE,
   BATCH_MODE_SET_ATTRIBUTE,
@@ -10,7 +17,6 @@ import {
 } from "../constants";
 import { IS_ARIA_PROP } from "../constants";
 import { JSXInternal } from "../types/jsx";
-import { getClosestDom, copyPropsUpwards } from "../VNodePointers";
 
 export function diffDomNodes(
   newVNode: VNode,
@@ -50,6 +56,13 @@ export function diffDomNodes(
   }
 }
 
+function copyPropsUpwards(VNode: VNode, prop: WritableProps, value: any) {
+  let vn = VNode;
+  while (vn) {
+    vn[prop] = value;
+    vn = vn._renderedBy;
+  }
+}
 function setComponent_base(VNode: VNode, dom: UIElement) {
   if (!VNode) return;
 
@@ -88,7 +101,7 @@ function diffAttributes(
 
   const isTextNode = typeof newVNode.props === "string";
   if (isTextNode) {
-    return $diffTextNodes(
+    return __diffTextNodes(
       dom,
       (newVNode.props as unknown) as string,
       (oldVNode.props as unknown) as string
@@ -100,16 +113,16 @@ function diffAttributes(
   const nextAttrs = newVNode.props;
 
   if (prevAttrs != null) {
-    $removeOldAttributes(dom, prevAttrs, nextAttrs, meta);
+    __removeOldAttributes(dom, prevAttrs, nextAttrs, meta);
   }
 
-  $diffNewAttributes(dom, prevAttrs || EMPTY_OBJ, nextAttrs, meta);
+  __diffNewAttributes(dom, prevAttrs || EMPTY_OBJ, nextAttrs, meta);
 }
 
 const domSourceOfTruth = { value: 1, checked: 1 };
 const UNSAFE_ATTRS = { key: 1, ref: 1, children: 1 };
 
-function $diffNewAttributes(
+function __diffNewAttributes(
   dom: UIElement,
   prev: Props<any>,
   next: Props<any>,
@@ -210,7 +223,7 @@ function diffClass(
   });
 }
 
-export function $removeOldAttributes(
+export function __removeOldAttributes(
   dom: UIElement,
   prev: Props<any>,
   next: Props<any>,
@@ -227,7 +240,7 @@ export function $removeOldAttributes(
   }
 }
 
-function $diffTextNodes(dom: UIElement, newVal: string, oldVal: string) {
+function __diffTextNodes(dom: UIElement, newVal: string, oldVal: string) {
   return newVal === oldVal || (dom.nodeValue = newVal);
 }
 
@@ -236,24 +249,21 @@ export function batchAppendChild(
   parentDom: HTMLElement,
   meta: DiffMeta
 ) {
-  const domToPlace = newVNode._dom;
+  const domToPlace = newVNode._dom as RenderedDom;
   if (!domToPlace) return;
 
-  const nextSibVNode = newVNode._nextSibDomVNode;
+  const nextSibDomNode = meta.next;
 
-  const nextSibDomNode = getClosestDom(nextSibVNode);
-
-  let shouldAppend: boolean = true;
+  let appendChild: boolean = true;
 
   let insertBefore: HTMLElement;
 
   if (nextSibDomNode && nextSibDomNode !== domToPlace) {
-    shouldAppend = false;
-
+    appendChild = false;
     insertBefore = nextSibDomNode;
   }
 
-  if (!shouldAppend && insertBefore) {
+  if (!appendChild && insertBefore) {
     meta.batch.push({
       node: domToPlace,
       action: BATCH_MODE_INSERT_BEFORE,
@@ -319,10 +329,9 @@ function $event(
   if (listener == null) {
     dom.removeEventListener(event, eventListenerProxy);
     delete dom._events[event];
-  } else {
-    dom.addEventListener(event, eventListenerProxy);
-    dom._events[event] = listener;
   }
+  dom.addEventListener(event, eventListenerProxy);
+  dom._events[event] = listener;
 }
 
 function eventListenerProxy(e: Event) {
