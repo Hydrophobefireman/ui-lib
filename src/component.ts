@@ -5,7 +5,7 @@ import {
   UIElement,
   VNode,
   DOMOps,
-} from "./types";
+} from "./types/index";
 import { assign } from "./util";
 import config from "./config";
 import { diff } from "./diff/index";

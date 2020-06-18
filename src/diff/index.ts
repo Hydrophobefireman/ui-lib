@@ -1,11 +1,13 @@
-import { VNode, ComponentType, DiffMeta, UIElement } from "../types";
-import { EMPTY_OBJ, isValidVNode } from "../util";
-import { unmountVNodeAndDestroyDom } from "./unmount";
-import { Fragment, flattenVNodeChildren, NULL_TYPE } from "../create_element";
-import { diffChildren } from "./children";
-import { diffDomNodes, updateParentDomPointers } from "./dom";
+import { VNode, DiffMeta, RenderedDom } from "../types/index";
+import { isValidVNode } from "../util";
+import { Fragment, flattenVNodeChildren } from "../create_element";
 import { toSimpleVNode, isFn } from "../toSimpleVNode";
+import { EMPTY_OBJ, NULL_TYPE } from "../constants";
 import { diffReferences } from "../ref";
+
+import { diffChildren } from "./children";
+import { diffDomNodes } from "./dom";
+import { unmountVNodeAndDestroyDom } from "./unmount";
 
 // import { processUpdatesQueue } from "../lifeCycleCallbacks";
 
@@ -23,15 +25,11 @@ export function diff(
   parentDom: HTMLElement,
   force: boolean,
   meta: DiffMeta
-): Element | Text | void {
-  if (typeof newVNode === "boolean") newVNode = null;
-
-  if (newVNode == null) {
+): RenderedDom | RenderedDom[] {
+  if (newVNode == null || typeof newVNode === "boolean") {
     unmountVNodeAndDestroyDom(oldVNode, meta);
     return;
   }
-  /** SCU returned False */
-  if (newVNode === EMPTY_OBJ) return null;
 
   if (!isValidVNode(newVNode)) {
     return null;
@@ -40,13 +38,15 @@ export function diff(
     return newVNode._dom;
   }
   oldVNode = oldVNode || EMPTY_OBJ;
-  let oldType: string | ComponentType = oldVNode.type;
-  let newType: string | ComponentType = newVNode.type;
+  let oldType: VNode["type"] = oldVNode.type;
+  let newType: VNode["type"] = newVNode.type;
+
   let isComplex = isFn(newType);
 
   if (newType === oldType && isComplex) {
     newVNode._component = oldVNode._component;
   }
+  newVNode._parentDom = parentDom;
 
   if (newType !== oldType) {
     // type differs, either different dom nodes or different function/class components
@@ -58,11 +58,14 @@ export function diff(
     /** if we have a function/class Component, get the next rendered VNode */
     newVNode = toSimpleVNode(newVNode, oldVNode, force, meta);
   }
+
   if (isFn(oldVNode.type)) {
     // also get the next rendered VNode from the old VNode
     oldVNode = oldVNode._renders;
   }
   if (newVNode !== tmp) {
+    /** SCU returned False */
+    if (newVNode === EMPTY_OBJ) return;
     // we received a new VNode from calling Component.render, start a new diff
     return diff(newVNode, oldVNode, parentDom, force, meta);
   }
@@ -72,17 +75,15 @@ export function diff(
   oldType = oldVNode.type;
   newType = newVNode.type;
 
-  updateParentDomPointers(newVNode, parentDom);
-
-  let dom: UIElement;
+  let dom: RenderedDom;
   if (newType === Fragment) {
     diffChildren(newVNode, oldVNode, parentDom, meta);
   } else {
     if (oldType !== newType) {
-      oldVNode = EMPTY_OBJ;
+      oldVNode = null;
     }
     diffDomNodes(newVNode, oldVNode, parentDom, meta);
-    dom = newVNode._dom;
+    dom = newVNode._dom as RenderedDom;
     diffChildren(newVNode, oldVNode, dom, meta);
     diffReferences(newVNode, oldVNode, dom);
   }

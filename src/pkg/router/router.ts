@@ -1,6 +1,6 @@
 import { Component } from "../../component";
 import { createElement, Fragment } from "../../create_element";
-import { VNode, Props, ComponentType } from "../../types";
+import { VNode, Props, ComponentType } from "../../types/index";
 import { assign } from "../../util";
 import { createElementIfNeeded } from "../common";
 
@@ -145,7 +145,7 @@ export class Router extends Component {
     this.setState({ child });
   }
 
-  render(props: Router["props"], state: Router["state"]) {
+  render(_: Router["props"], state: Router["state"]) {
     const child = state.child;
     return createElement(Fragment, null, child);
   }

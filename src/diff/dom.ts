@@ -1,20 +1,32 @@
-import { VNode, UIElement, Props, DiffMeta } from "../types";
-import { EMPTY_OBJ, getClosestDom } from "../util";
-import { NULL_TYPE } from "../create_element";
 import {
-  MODE_SET_STYLE,
-  MODE_SET_ATTRIBUTE,
-  MODE_REMOVE_ATTRIBUTE,
-  MODE_INSERT_BEFORE,
-  MODE_APPEND_CHILD,
-} from "../commit";
-import { JSXInternal } from "../jsx";
+  VNode,
+  UIElement,
+  Props,
+  DiffMeta,
+  RenderedDom,
+  WritableProps,
+} from "../types/index";
+import {
+  BATCH_MODE_SET_STYLE,
+  BATCH_MODE_SET_ATTRIBUTE,
+  BATCH_MODE_REMOVE_ATTRIBUTE,
+  BATCH_MODE_INSERT_BEFORE,
+  BATCH_MODE_APPEND_CHILD,
+  NULL_TYPE,
+  EMPTY_OBJ,
+} from "../constants";
+import { IS_ARIA_PROP } from "../constants";
+import { JSXInternal } from "../types/jsx";
+import { getClosestDom } from "../VNodePointers";
+
 export function diffDomNodes(
   newVNode: VNode,
   oldVNode: VNode,
   parentDom: HTMLElement,
   meta: DiffMeta
 ) {
+  oldVNode = oldVNode || EMPTY_OBJ;
+
   // oldVNode is being unmounted, append a new DOMNode
 
   const shouldAppend = oldVNode === EMPTY_OBJ;
@@ -23,18 +35,18 @@ export function diffDomNodes(
 
   const oldType = oldVNode.type;
 
-  let dom: UIElement;
+  let dom: RenderedDom;
 
   const oldDom = oldVNode._dom;
 
   if (newType !== oldType || oldDom == null) {
     dom = createDomFromVNode(newVNode);
   } else {
-    dom = oldDom;
+    dom = oldDom as RenderedDom;
   }
 
   dom._VNode = newVNode;
-  updateInternalVNodes(newVNode, "_dom", dom, "_renderedBy");
+  copyPropsUpwards(newVNode, "_dom", dom);
 
   diffAttributes(dom, newVNode, shouldAppend ? null : oldVNode, meta);
 
@@ -45,6 +57,13 @@ export function diffDomNodes(
   }
 }
 
+function copyPropsUpwards(VNode: VNode, prop: WritableProps, value: any) {
+  let vn = VNode;
+  while (vn) {
+    vn[prop] = value;
+    vn = vn._renderedBy;
+  }
+}
 function setComponent_base(VNode: VNode, dom: UIElement) {
   if (!VNode) return;
 
@@ -54,84 +73,6 @@ function setComponent_base(VNode: VNode, dom: UIElement) {
   } else {
     setComponent_base(VNode._renderedBy, dom);
   }
-}
-
-export function updatePointers(newVNode: VNode) {
-  const dom = newVNode._dom;
-
-  if (newVNode._parentDom == null) {
-    updateParentDomPointers(newVNode, dom.parentNode);
-  }
-
-  let sn = newVNode._nextSibDomVNode;
-
-  if (sn == null) {
-    const nextSib = dom.nextSibling as UIElement;
-
-    if (nextSib != null) {
-      sn = nextSib._VNode;
-    }
-  }
-
-  copyPropsOverEntireTree(sn, "_prevSibDomVNode", newVNode);
-
-  copyPropsOverEntireTree(newVNode, "_nextSibDomVNode", sn);
-
-  let pn = newVNode._prevSibDomVNode;
-
-  if (pn == null) {
-    const prevSib = dom.previousSibling as UIElement;
-
-    if (prevSib != null) {
-      pn = prevSib._VNode;
-    }
-  }
-
-  copyPropsOverEntireTree(pn, "_nextSibDomVNode", newVNode);
-
-  copyPropsOverEntireTree(newVNode, "_prevSibDomVNode", pn);
-}
-
-export function copyPropsOverEntireTree(
-  VNode: VNode,
-  propVal: keyof VNode,
-  val: any
-) {
-  updateInternalVNodes(VNode, propVal, val, "_renders");
-
-  updateInternalVNodes(VNode, propVal, val, "_renderedBy");
-}
-
-const replaceOtherProp = {
-  _dom: "_FragmentDomNodeChildren",
-  _FragmentDomNodeChildren: "_dom",
-};
-
-export function updateInternalVNodes(
-  VNode: VNode,
-  prop: keyof VNode,
-  val: any,
-  nextGetter: "_renders" | "_renderedBy"
-) {
-  let next = VNode;
-
-  const replace = replaceOtherProp[prop];
-
-  while (next) {
-    if (replace) {
-      next[replace] = null;
-    }
-
-    next[prop] = val;
-
-    next = next[nextGetter];
-  }
-}
-
-export function updateParentDomPointers(VNode: VNode, dom: Node) {
-  if (dom == null) return;
-
-  updateInternalVNodes(VNode, "_parentDom", dom, "_renderedBy");
 }
 
 function createDomFromVNode(newVNode: VNode): UIElement {
@@ -204,14 +145,14 @@ function __diffNewAttributes(
     } else if (attr === "style") {
       meta.batch.push({
         node: dom,
-        action: MODE_SET_STYLE,
+        action: BATCH_MODE_SET_STYLE,
         value: { newValue, oldValue },
       });
       continue;
     }
     meta.batch.push({
       node: dom,
-      action: MODE_SET_ATTRIBUTE,
+      action: BATCH_MODE_SET_ATTRIBUTE,
       attr,
       value: newValue,
     });
@@ -277,7 +218,7 @@ function diffClass(
   if (newValue === oldValue) return;
   meta.batch.push({
     node: dom,
-    action: MODE_SET_ATTRIBUTE,
+    action: BATCH_MODE_SET_ATTRIBUTE,
     attr: "className",
     value: newValue,
   });
@@ -293,7 +234,7 @@ function __removeOldAttributes(
     if (next[i] == null && prev[i] != null) {
       meta.batch.push({
         node: dom,
-        action: MODE_REMOVE_ATTRIBUTE,
+        action: BATCH_MODE_REMOVE_ATTRIBUTE,
         attr: i,
       });
     }
@@ -307,7 +248,6 @@ function __diffTextNodes(dom: UIElement, newVal: string, oldVal: string) {
 export function batchAppendChild(
   newVNode: VNode,
   parentDom: HTMLElement,
-
   meta: DiffMeta
 ) {
   const domToPlace = newVNode._dom;
@@ -330,7 +270,7 @@ export function batchAppendChild(
   if (!shouldAppend && insertBefore) {
     meta.batch.push({
       node: domToPlace,
-      action: MODE_INSERT_BEFORE,
+      action: BATCH_MODE_INSERT_BEFORE,
       refDom: insertBefore,
       value: parentDom,
       VNode: newVNode,
@@ -338,7 +278,7 @@ export function batchAppendChild(
   } else {
     meta.batch.push({
       node: domToPlace,
-      action: MODE_APPEND_CHILD,
+      action: BATCH_MODE_APPEND_CHILD,
       refDom: parentDom,
       VNode: newVNode,
     });
@@ -368,14 +308,14 @@ export function batchAppendChild(
 //     next = next[nextGetter];
 //   }
 // }
-const ariaType = /^aria[\-A-Z]/;
+
 /** dom helper */
 export function $(dom: UIElement, prop: string, value: any) {
   if (prop[0] === "o" && prop[1] === "n") {
     return $event(dom, prop as keyof JSXInternal.DOMEvents<any>, value);
   }
   const shouldRemove =
-    value == null || (value === false && !ariaType.test(prop));
+    value == null || (value === false && !IS_ARIA_PROP.test(prop));
 
   if (prop in dom) {
     return (dom[prop] = shouldRemove ? "" : value);

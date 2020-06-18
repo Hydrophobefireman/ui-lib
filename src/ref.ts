@@ -1,6 +1,6 @@
-import { VNode, RenderedDom } from "./types";
+import { VNode, RenderedDom } from "./types/index";
 import { Component } from "./component";
-import { EMPTY_OBJ } from "./util";
+import { EMPTY_OBJ } from "./constants";
 
 export function setRef<T>(
   ref: ((value: T) => void) | { current: T },

@@ -1,5 +1,5 @@
 import { createElement } from "../create_element";
-import { VNode } from "../types";
+import { VNode } from "../types/index";
 
 const ignore = ["boolean", "string", "number"];
 export function createElementIfNeeded(x: any, props?: any): VNode {

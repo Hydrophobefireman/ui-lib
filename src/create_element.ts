@@ -4,9 +4,10 @@ import {
   Props,
   createElementPropType,
   ComponentChild,
-} from "./types";
+} from "./types/index";
 
-import { flattenArray, EMPTY_OBJ, EMPTY_ARR } from "./util";
+import { flattenArray } from "./util";
+import { EMPTY_OBJ, NULL_TYPE, EMPTY_ARRAY } from "./constants";
 
 export const Fragment: any = function Fragment() {};
 
@@ -48,7 +49,7 @@ export function createElement<P = {}, R = any>(
   let _children: any[];
   if (props.children != null) {
     _children = flattenArray([props.children]);
-  } else if ((children = EMPTY_ARR.slice.call(arguments, 2)).length) {
+  } else if ((children = EMPTY_ARRAY.slice.call(arguments, 2)).length) {
     _children = flattenArray(children);
   }
   (props as any).children = _children;
@@ -129,15 +130,3 @@ function getVNode<P, R>(
     constructor: undefined,
   } as VNode<P, R>;
 }
-/**
- * Special constant to mark `null` elements
- * @example
- * function App() {
- *  return <div>{someCondition && <div>It's True!</div> }</div>
- * }
- * @description
- * in case `someCondition` is falsey, we will render a comment (`<!--$-->`) in the dom instead
- * this makes it easier for us to detect changes and additions/removals in case of <Fragment>
- * supporting which is the reason this "workaround" exists
- */
-export const NULL_TYPE: any = {};

@@ -1,26 +1,31 @@
 import { Component } from "../../component";
-import config, { addPluginCallback, HAS_RAF } from "../../config";
+import config, { addPluginCallback, HAS_RAF, defer } from "../../config";
+
+/**
+ * This ensures that we begin our render work  even if we don't get an animation frame for 100ms
+ * this could happen in cases like we're in an inactive tab
+ * but we need to render the component and it's children
+ * as we might delay some side effects
+ * however if the user wishes to have the rendering stop until the tab is active
+ * they can set `config.scheduleRender` to `requestAnimationFrame`
+ */
+function reqAnimFrame(cb: () => void) {
+  const done = () => {
+    cancelAnimationFrame(raf);
+    clearTimeout(timeout);
+    cb();
+  };
+  let raf: number;
+  let timeout: NodeJS.Timeout;
+  timeout = setTimeout(done, config.RAF_TIMEOUT);
+  raf = requestAnimationFrame(done);
+}
 
 type PendingEffects = Component["_pendingEffects"];
 
 let hookIndex = 0;
 
 let hookCandidate: Component = null;
-
-function reqAnimFrame(cb: () => void) {
-  let raf: number;
-  let timeout: NodeJS.Timeout;
-  const done = () => {
-    clearTimeout(timeout);
-    cancelAnimationFrame(raf);
-    cb();
-  };
-  timeout = setTimeout(done, config.RAF_TIMEOUT);
-  raf = requestAnimationFrame(done);
-}
-const nextFrame = HAS_RAF
-  ? (reqAnimFrame as Window["requestAnimationFrame"])
-  : (config.scheduleRender as Window["requestAnimationFrame"]);
 
 export const rafPendingCallbacks: PendingEffects[] = [];
 
@@ -59,8 +64,9 @@ function scheduleEffects() {
   rafPendingCallbacks.length = 0;
 }
 
+const effectScheduler = HAS_RAF ? reqAnimFrame : defer;
 function setEffectiveCallbacks() {
-  nextFrame(scheduleEffects);
+  effectScheduler(scheduleEffects);
 }
 
 function prepForNextHookCandidate(c: Component) {
