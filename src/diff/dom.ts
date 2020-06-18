@@ -45,8 +45,8 @@ export function diffDomNodes(
   }
 
   dom._VNode = newVNode;
-  copyPropsUpwards(newVNode, "_dom", dom);
-
+  // copyPropsUpwards(newVNode, "_dom", dom);
+  newVNode._dom = dom;
   diffAttributes(dom, newVNode, shouldAppend ? null : oldVNode, meta);
 
   setComponent_base(newVNode, dom);

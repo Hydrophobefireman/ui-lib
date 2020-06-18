@@ -35,6 +35,7 @@ const config = {
     : defer,
   eagerlyHydrate: true,
   RAF_TIMEOUT: 100,
+  debounceEffect: null,
 };
 
 export default config;

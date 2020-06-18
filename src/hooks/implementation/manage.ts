@@ -64,7 +64,8 @@ function scheduleEffects() {
   rafPendingCallbacks.length = 0;
 }
 
-const effectScheduler = HAS_RAF ? reqAnimFrame : defer;
+const effectScheduler =
+  config.debounceEffect || (HAS_RAF ? reqAnimFrame : defer);
 function setEffectiveCallbacks() {
   effectScheduler(scheduleEffects);
 }

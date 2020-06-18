@@ -50,8 +50,10 @@ export function diff(
 
   if (newType !== oldType) {
     // type differs, either different dom nodes or different function/class components
-    const next = getDom(oldVNode);
-    meta.next = (next || EMPTY_OBJ).nextSibling || meta.next;
+    if (!meta.next) {
+      const next = getDom(oldVNode);
+      meta.next = (next || EMPTY_OBJ).nextSibling;
+    }
     unmountVNodeAndDestroyDom(oldVNode, meta);
     oldVNode = EMPTY_OBJ;
   }
