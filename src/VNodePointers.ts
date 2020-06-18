@@ -1,5 +1,5 @@
 import { EMPTY_OBJ } from "./constants";
-import { VNode, UIElement } from "./types/index";
+import { VNode, UIElement, WritableProps } from "./types/index";
 
 export function getClosestDom(VNode: VNode): UIElement {
   if (!VNode) return;
@@ -55,12 +55,11 @@ export function updatePointers(newVNode: VNode) {
 
 export function copyPropsOverEntireTree(
   VNode: VNode,
-  propVal: keyof VNode,
+  propVal: WritableProps,
   val: any
 ) {
-  updateInternalVNodes(VNode, propVal, val, "_renders");
-
-  updateInternalVNodes(VNode, propVal, val, "_renderedBy");
+  copyPropsDownwards(VNode, propVal, val);
+  copyPropsUpwards(VNode, propVal, val);
 }
 
 const replaceOtherProp = {
@@ -68,9 +67,9 @@ const replaceOtherProp = {
   _FragmentDomNodeChildren: "_dom",
 };
 
-export function updateInternalVNodes(
+function updateInternalVNodes(
   VNode: VNode,
-  prop: string,
+  prop: WritableProps,
   val: any,
   nextGetter: "_renders" | "_renderedBy"
 ) {
@@ -87,7 +86,6 @@ export function updateInternalVNodes(
     next = next[nextGetter];
   }
 }
-
 
 const propPSD = "_prevSibDomVNode";
 const propNSD = "_nextSibDomVNode";
@@ -118,4 +116,20 @@ export function copyVNodePointers(newVNode: VNode, oldVNode: VNode) {
     copyPropsOverEntireTree(newVNode, propNSD, _nextSibDomVNode);
     copyPropsOverEntireTree(_nextSibDomVNode, propPSD, newVNode);
   }
+}
+
+export function copyPropsUpwards(
+  VNode: VNode,
+  prop: WritableProps,
+  value: any
+): void {
+  updateInternalVNodes(VNode, prop, value, "_renderedBy");
+}
+
+export function copyPropsDownwards(
+  VNode: VNode,
+  prop: WritableProps,
+  value: any
+): void {
+  updateInternalVNodes(VNode, prop, value, "_renders");
 }

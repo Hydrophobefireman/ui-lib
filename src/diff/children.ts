@@ -1,10 +1,8 @@
-import { VNode, DiffMeta, UIElement } from "../types/index";
+import { VNode, DiffMeta } from "../types/index";
 import { Fragment, createElement } from "../create_element";
 import { diff } from "./index";
 import { NULL_TYPE, EMPTY_ARRAY, EMPTY_OBJ } from "../constants";
-import { assign } from "../util";
-import { isFn } from "../toSimpleVNode";
-import { copyVNodePointers, updateInternalVNodes } from "../VNodePointers";
+import { copyVNodePointers, copyPropsUpwards } from "../VNodePointers";
 
 type VNodeChildren = VNode["_children"];
 
@@ -50,12 +48,7 @@ function diffEachChild(
         ? newParentVNode._nextSibDomVNode
         : null;
       if (_nextSibDomVNode != null) {
-        updateInternalVNodes(
-          newChild,
-          "_nextSibDomVNode",
-          _nextSibDomVNode,
-          "_renderedBy"
-        );
+        copyPropsUpwards(newChild, "_nextSibDomVNode", _nextSibDomVNode);
       }
     }
     diff(newChild, oldChild, parentDom, false, meta);
@@ -64,16 +57,11 @@ function diffEachChild(
       updateFragmentDomPointers(newParentVNode, newChild, i);
   }
 
-   if (isFragment && newChildrenLen) {
+  if (isFragment && newChildrenLen) {
     const c = newParentVNode._children;
     const t = c[newChildrenLen - 1]._nextSibDomVNode;
-    updateInternalVNodes(newParentVNode, "_nextSibDomVNode", t, "_renderedBy");
-    updateInternalVNodes(
-      newParentVNode,
-      "_prevSibDomVNode",
-      c[0]._prevSibDomVNode,
-      "_renderedBy"
-    );
+    copyPropsUpwards(newParentVNode, "_nextSibDomVNode", t);
+    copyPropsUpwards(newParentVNode, "_prevSibDomVNode", c[0]._prevSibDomVNode);
   }
 }
 
@@ -86,12 +74,7 @@ function updateFragmentDomPointers(
   let arr = newParentVNode._FragmentDomNodeChildren;
   if (arr == null) {
     arr = [];
-    updateInternalVNodes(
-      newParentVNode,
-      "_FragmentDomNodeChildren",
-      arr,
-      "_renderedBy"
-    );
+    copyPropsUpwards(newParentVNode, "_FragmentDomNodeChildren", arr);
   }
   arr[index] = domChild;
 }

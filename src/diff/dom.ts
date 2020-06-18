@@ -1,11 +1,4 @@
-import {
-  VNode,
-  UIElement,
-  Props,
-  DiffMeta,
-  RenderedDom,
-  WritableProps,
-} from "../types/index";
+import { VNode, UIElement, Props, DiffMeta, RenderedDom } from "../types/index";
 import {
   BATCH_MODE_SET_STYLE,
   BATCH_MODE_SET_ATTRIBUTE,
@@ -17,7 +10,7 @@ import {
 } from "../constants";
 import { IS_ARIA_PROP } from "../constants";
 import { JSXInternal } from "../types/jsx";
-import { getClosestDom } from "../VNodePointers";
+import { getClosestDom, copyPropsUpwards } from "../VNodePointers";
 
 export function diffDomNodes(
   newVNode: VNode,
@@ -57,13 +50,6 @@ export function diffDomNodes(
   }
 }
 
-function copyPropsUpwards(VNode: VNode, prop: WritableProps, value: any) {
-  let vn = VNode;
-  while (vn) {
-    vn[prop] = value;
-    vn = vn._renderedBy;
-  }
-}
 function setComponent_base(VNode: VNode, dom: UIElement) {
   if (!VNode) return;
 

@@ -1,4 +1,4 @@
-	import {
+import {
   VNode,
   Props,
   FunctionComponent,
@@ -179,6 +179,6 @@ function setNextRenderedVNodePointers(next: VNode, VNode: VNode) {
   VNode._renders = next;
   next._renderedBy = VNode;
   for (const i in COPY_PROPS) {
-    next[i] = VNode[i];   
+    next[i] = VNode[i];
   }
 }
