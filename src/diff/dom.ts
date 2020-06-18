@@ -88,7 +88,7 @@ function diffAttributes(
 
   const isTextNode = typeof newVNode.props === "string";
   if (isTextNode) {
-    return __diffTextNodes(
+    return $diffTextNodes(
       dom,
       (newVNode.props as unknown) as string,
       (oldVNode.props as unknown) as string
@@ -100,16 +100,16 @@ function diffAttributes(
   const nextAttrs = newVNode.props;
 
   if (prevAttrs != null) {
-    __removeOldAttributes(dom, prevAttrs, nextAttrs, meta);
+    $removeOldAttributes(dom, prevAttrs, nextAttrs, meta);
   }
 
-  __diffNewAttributes(dom, prevAttrs || EMPTY_OBJ, nextAttrs, meta);
+  $diffNewAttributes(dom, prevAttrs || EMPTY_OBJ, nextAttrs, meta);
 }
 
 const domSourceOfTruth = { value: 1, checked: 1 };
 const UNSAFE_ATTRS = { key: 1, ref: 1, children: 1 };
 
-function __diffNewAttributes(
+function $diffNewAttributes(
   dom: UIElement,
   prev: Props<any>,
   next: Props<any>,
@@ -210,14 +210,14 @@ function diffClass(
   });
 }
 
-function __removeOldAttributes(
+export function $removeOldAttributes(
   dom: UIElement,
   prev: Props<any>,
   next: Props<any>,
   meta: DiffMeta
 ) {
   for (const i in prev) {
-    if (next[i] == null && prev[i] != null) {
+    if (!UNSAFE_ATTRS[i] && next[i] == null && prev[i] != null) {
       meta.batch.push({
         node: dom,
         action: BATCH_MODE_REMOVE_ATTRIBUTE,
@@ -227,7 +227,7 @@ function __removeOldAttributes(
   }
 }
 
-function __diffTextNodes(dom: UIElement, newVal: string, oldVal: string) {
+function $diffTextNodes(dom: UIElement, newVal: string, oldVal: string) {
   return newVal === oldVal || (dom.nodeValue = newVal);
 }
 
@@ -319,9 +319,10 @@ function $event(
   if (listener == null) {
     dom.removeEventListener(event, eventListenerProxy);
     delete dom._events[event];
+  } else {
+    dom.addEventListener(event, eventListenerProxy);
+    dom._events[event] = listener;
   }
-  dom.addEventListener(event, eventListenerProxy);
-  dom._events[event] = listener;
 }
 
 function eventListenerProxy(e: Event) {

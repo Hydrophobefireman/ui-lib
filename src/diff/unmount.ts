@@ -14,6 +14,8 @@ import {
 } from "../constants";
 import { setRef } from "../ref";
 import { copyPropsOverEntireTree } from "../VNodePointers";
+import { $removeOldAttributes } from "./dom";
+import { NULL_TYPE } from "../constants";
 
 export function unmountVNodeAndDestroyDom(VNode: VNode, meta: DiffMeta): void {
   /** short circuit */
@@ -34,24 +36,27 @@ export function unmountVNodeAndDestroyDom(VNode: VNode, meta: DiffMeta): void {
     });
   }
 
-  let child: VNode;
   const childArray = VNode._children;
+  /*#__NOINLINE__*/
+  _processNodeCleanup(VNode, meta);
+
+  let child: VNode;
+
   if (childArray) {
     while (childArray.length) {
       child = childArray.pop();
       unmountVNodeAndDestroyDom(child, meta);
     }
   }
-
-  /*#__NOINLINE__*/
-  _processNodeCleanup(VNode, meta);
 }
 function _processNodeCleanup(VNode: VNode, meta: DiffMeta) {
-  if (typeof VNode.type !== "function") {
+  const type = VNode.type;
+  if (typeof type !== "function") {
     const dom = VNode._dom as RenderedDom;
     if (dom != null) {
-      /*#__NOINLINE__*/
-      clearDomNodePointers(dom);
+      if (type !== NULL_TYPE && type != null) {
+        $removeOldAttributes(dom, VNode.props, EMPTY_OBJ, meta);
+      }
       meta.batch.push({ node: dom, action: BATCH_MODE_REMOVE_ELEMENT });
     }
   }
@@ -65,7 +70,7 @@ const DOM_POINTERS: Record<
   _events: 1,
 };
 export function clearDomNodePointers(dom: UIElement) {
-  _clearPointers(DOM_POINTERS, dom);
+  $clearPointers(DOM_POINTERS, dom);
 }
 
 const VNode_POINTERS: Record<
@@ -83,7 +88,7 @@ const VNode_POINTERS: Record<
   ref: 1,
   _nextSibDomVNode: 1,
   _prevSibDomVNode: 1,
-  _FragmentDomNodeChildren:1
+  _FragmentDomNodeChildren: 1,
 };
 
 export function clearVNodePointers(VNode: VNode) {
@@ -108,10 +113,10 @@ export function clearVNodePointers(VNode: VNode) {
       newNextSib && newNextSib._VNode
     );
   }
-  _clearPointers(VNode_POINTERS, VNode);
+  $clearPointers(VNode_POINTERS, VNode);
 }
 
-function _clearPointers(pointersObj: object, el: any) {
+function $clearPointers(pointersObj: object, el: any) {
   if (el == null) return;
   for (const i in pointersObj) {
     el[i] = null;

@@ -8,6 +8,8 @@ import {
   BATCH_MODE_REMOVE_ELEMENT,
 } from "./constants";
 import { copyPropsOverEntireTree } from "./VNodePointers";
+import { clearDomNodePointers } from "./diff/unmount";
+
 export function commitDOMOps(queue: DOMOps[]) {
   const queueLen = queue.length;
   for (let i = 0; i < queueLen; i++) {
@@ -35,6 +37,7 @@ export function commitDOMOps(queue: DOMOps[]) {
         break;
       case BATCH_MODE_REMOVE_ELEMENT:
         removeNode(dom);
+        clearDomNodePointers(dom);
         break;
       default:
         break;
