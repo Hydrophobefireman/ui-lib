@@ -2,18 +2,27 @@ import { ComponentType, Props, VNode } from "../../types/index";
 
 import { Component } from "../../component";
 import { createElementIfNeeded } from "../common";
-import { flattenArray } from "../../util";
+import { objectWithoutKeys } from "../../util";
 
-// import { deprecationWarning } from "../../$ui_tools";
-
-export class AsyncComponent extends Component {
-  state: {
-    // promise?: Promise<VNode>;
-    // fallback: VNode;
-    inProgress?: boolean;
-    error?: boolean;
-    render?: VNode;
-  };
+type Renderable = ComponentType | VNode;
+type AsyncPromResponse = Promise<Renderable>;
+interface AsyncState {
+  // promise?: Promise<VNode>;
+  // fallback: VNode;
+  inProgress?: boolean;
+  error?: boolean;
+  render?: Renderable;
+}
+interface AsyncProps {
+  promise?: () => AsyncPromResponse;
+  componentPromise?: () => AsyncPromResponse;
+  fallback?: Renderable;
+  fallbackComponent?: Renderable | string;
+  errorComponent?: Renderable | string;
+}
+export class AsyncComponent extends Component<AsyncProps, AsyncState> {
+  state: AsyncState;
+  props: AsyncProps;
   componentDidMount() {
     this._init();
   }
@@ -30,7 +39,7 @@ export class AsyncComponent extends Component {
     const prom = this.props.promise || this.props.componentPromise;
 
     prom()
-      .then((component: ComponentType | VNode) => {
+      .then((component: Renderable) => {
         this.setState({ render: component, inProgress: false });
       })
       .catch((x: Error) => this.setState({ error: true, inProgress: false }));
@@ -45,7 +54,7 @@ export class AsyncComponent extends Component {
       return createElementIfNeeded(props.errorComponent) || "An Error Occured";
     return createElementIfNeeded(
       state.render,
-      _objectWithoutKeys(props, [
+      objectWithoutKeys(props, [
         "fallback",
         "fallbackComponent",
         "promise",
@@ -53,15 +62,4 @@ export class AsyncComponent extends Component {
       ])
     );
   }
-}
-
-function _objectWithoutKeys<T = {}>(obj: T, propArr: (keyof T)[]) {
-  propArr = (flattenArray([propArr] as (keyof T)[][]) as any) as (keyof T)[];
-  const ret = {} as T;
-  for (const i in obj) {
-    if (propArr.indexOf(i) === -1) {
-      ret[i] = obj[i];
-    }
-  }
-  return ret;
 }

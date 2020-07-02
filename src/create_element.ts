@@ -1,15 +1,16 @@
 import {
   ComponentChild,
   ComponentChildren,
-  Props,
   VNode,
   createElementPropType,
 } from "./types/index";
 import { EMPTY_ARRAY, EMPTY_OBJ, NULL_TYPE } from "./constants";
 
-import { flattenArray } from "./util";
+import { flattenArray, objectWithoutKeys } from "./util";
 
 export const Fragment: any = function Fragment() {};
+
+const skipProps: Partial<keyof VNode>[] = ["key", "ref"];
 
 /** return a VNode
  * @example
@@ -25,7 +26,7 @@ export const Fragment: any = function Fragment() {};
  */
 export function createElement<P = {}, R = any>(
   type: VNode<P>["type"],
-  props?: createElementPropType<P> | null,
+  props?: createElementPropType<P>,
   ...children: ComponentChildren[]
 ): VNode<P> | null;
 export function createElement<P = {}, R = any>(
@@ -42,8 +43,9 @@ export function createElement<P = {}, R = any>(
   // don't pass ref & key to the component
   const ref: R = props.ref;
   const key = props.key;
+  // TODO remove any
+  (props as any) = objectWithoutKeys(props, skipProps);
 
-  props = getPropsWithoutSpecialKeys(props);
   // children provided as the extra args are used
   // mark props.children as empty_arr so we know the no child was passed
   let _children: any[];
@@ -54,20 +56,6 @@ export function createElement<P = {}, R = any>(
   }
   (props as any).children = _children;
   return getVNode<P, R>(type, props, key, ref);
-}
-
-const skipProps = { key: 1, ref: 1 };
-
-/** remove any prop if it exists in `skipProps` */
-
-function getPropsWithoutSpecialKeys<P>(props: createElementPropType<P>) {
-  const obj = {};
-  for (const i in props) {
-    if (!skipProps[i]) {
-      obj[i] = props[i];
-    }
-  }
-  return obj as Props<P>;
 }
 
 export function coerceToVNode(VNode: ComponentChild | VNode): VNode {

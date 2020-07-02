@@ -54,3 +54,20 @@ export function isValidVNode(V: VNode, undef?: undefined) {
   }
   return true;
 }
+
+interface OmitFrom {
+  <T, K extends [...(keyof T)[]]>(obj: T, keys: K): Omit<T, K[number]>;
+}
+
+export const objectWithoutKeys: OmitFrom = (obj, keys) => {
+  let ret = {} as {
+    [K in keyof typeof obj]: typeof obj[K];
+  };
+  let key: keyof typeof obj;
+  for (key in obj) {
+    if (keys.indexOf(key) === -1) {
+      ret[key] = obj[key];
+    }
+  }
+  return ret;
+};

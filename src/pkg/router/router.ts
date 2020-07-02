@@ -59,9 +59,9 @@ type PathProps = {
   match: RoutePath;
   component: any;
 };
-
-export class Router extends Component {
-  state: { renderPath?: string; child?: VNode };
+type RouterState = { renderPath?: string; child?: VNode[] };
+export class Router extends Component<{}, RouterState> {
+  state: RouterState;
   constructor(props: Props<{}>) {
     super(props);
     this.state = {};
@@ -122,7 +122,7 @@ export class Router extends Component {
     const renderPath = fixPath(Router.path);
     const children = this.props.children as VNode[];
 
-    let child: VNode[] | VNode = [];
+    let child: VNode[] = [];
     children.forEach((x) => {
       const childProps = x.props as PathProps;
       const pathinfo = createRoutePath(childProps.match);
@@ -139,7 +139,7 @@ export class Router extends Component {
       }
     });
     if (!child.length) {
-      child = createElement(
+      (child as any) = createElement(
         this.props.fallbackComponent || this._notFoundComponent
       );
     }
@@ -203,4 +203,4 @@ export function A(props: any) {
   return createElement("a", props);
 }
 
-export const Path = {};
+export const Path: any = {};
