@@ -1,12 +1,12 @@
-import { VNode, DiffMeta, RenderedDom } from "../types/index";
-import { isValidVNode } from "../util";
-import { Fragment, flattenVNodeChildren } from "../create_element";
-import { toSimpleVNode, isFn } from "../toSimpleVNode";
+import { DiffMeta, RenderedDom, VNode } from "../types/index";
 import { EMPTY_OBJ, NULL_TYPE } from "../constants";
-import { diffReferences } from "../ref";
-
+import { Fragment, flattenVNodeChildren } from "../create_element";
 import { diffChildren, getDom } from "./children";
+import { isFn, toSimpleVNode } from "../toSimpleVNode";
+
 import { diffDomNodes } from "./dom";
+import { diffReferences } from "../ref";
+import { isValidVNode } from "../util";
 import { unmountVNodeAndDestroyDom } from "./unmount";
 
 // import { processUpdatesQueue } from "../lifeCycleCallbacks";

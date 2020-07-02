@@ -1,20 +1,15 @@
 import {
-  VNode,
-  UIElement,
-  DiffMeta,
-  RenderedDom,
-  WritableProps,
-} from "../types/index";
-import { scheduleLifeCycleCallbacks } from "../lifeCycleCallbacks";
-import { Fragment } from "../create_element";
-import {
-  EMPTY_OBJ,
   BATCH_MODE_REMOVE_ELEMENT,
+  EMPTY_OBJ,
   LIFECYCLE_WILL_UNMOUNT,
   NULL_TYPE,
 } from "../constants";
-import { setRef } from "../ref";
+import { DiffMeta, RenderedDom, VNode } from "../types/index";
+
 import { __removeOldAttributes as $removeOldAttributes } from "./dom";
+import { Fragment } from "../create_element";
+import { scheduleLifeCycleCallbacks } from "../lifeCycleCallbacks";
+import { setRef } from "../ref";
 
 export function unmountVNodeAndDestroyDom(VNode: VNode, meta: DiffMeta): void {
   /** short circuit */

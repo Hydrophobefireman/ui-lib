@@ -1,13 +1,13 @@
 import {
-  ComponentChildren,
-  VNode,
-  Props,
-  createElementPropType,
   ComponentChild,
+  ComponentChildren,
+  Props,
+  VNode,
+  createElementPropType,
 } from "./types/index";
+import { EMPTY_ARRAY, EMPTY_OBJ, NULL_TYPE } from "./constants";
 
 import { flattenArray } from "./util";
-import { EMPTY_OBJ, NULL_TYPE, EMPTY_ARRAY } from "./constants";
 
 export const Fragment: any = function Fragment() {};
 

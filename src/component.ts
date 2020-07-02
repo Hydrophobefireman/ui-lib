@@ -1,11 +1,12 @@
 import {
   ComponentChild,
+  DOMOps,
   Props,
-  setStateArgType,
   UIElement,
   VNode,
-  DOMOps,
+  setStateArgType,
 } from "./types/index";
+
 import { assign } from "./util";
 import config from "./config";
 import { diff } from "./diff/index";

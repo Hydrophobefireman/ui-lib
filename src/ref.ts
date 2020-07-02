@@ -1,4 +1,5 @@
-import { VNode, RenderedDom } from "./types/index";
+import { RenderedDom, VNode } from "./types/index";
+
 import { Component } from "./component";
 import { EMPTY_OBJ } from "./constants";
 

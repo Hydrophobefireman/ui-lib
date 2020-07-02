@@ -1,20 +1,21 @@
 import {
-  VNode,
-  UIElement,
-  Props,
+  BATCH_MODE_APPEND_CHILD,
+  BATCH_MODE_INSERT_BEFORE,
+  BATCH_MODE_REMOVE_ATTRIBUTE,
+  BATCH_MODE_SET_ATTRIBUTE,
+  BATCH_MODE_SET_STYLE,
+  EMPTY_OBJ,
+  NULL_TYPE,
+} from "../constants";
+import {
   DiffMeta,
+  Props,
   RenderedDom,
+  UIElement,
+  VNode,
   WritableProps,
 } from "../types/index";
-import {
-  BATCH_MODE_SET_STYLE,
-  BATCH_MODE_SET_ATTRIBUTE,
-  BATCH_MODE_REMOVE_ATTRIBUTE,
-  BATCH_MODE_INSERT_BEFORE,
-  BATCH_MODE_APPEND_CHILD,
-  NULL_TYPE,
-  EMPTY_OBJ,
-} from "../constants";
+
 import { IS_ARIA_PROP } from "../constants";
 import { JSXInternal } from "../types/jsx";
 

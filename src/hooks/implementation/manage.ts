@@ -1,5 +1,6 @@
+import config, { HAS_RAF, addPluginCallback, defer } from "../../config";
+
 import { Component } from "../../component";
-import config, { addPluginCallback, HAS_RAF, defer } from "../../config";
 
 /**
  * This ensures that we begin our render work  even if we don't get an animation frame for 100ms

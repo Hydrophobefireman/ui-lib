@@ -1,6 +1,7 @@
+import { ComponentType, Props, VNode } from "../../types/index";
+import { Fragment, createElement } from "../../create_element";
+
 import { Component } from "../../component";
-import { createElement, Fragment } from "../../create_element";
-import { VNode, Props, ComponentType } from "../../types/index";
 import { assign } from "../../util";
 import { createElementIfNeeded } from "../common";
 

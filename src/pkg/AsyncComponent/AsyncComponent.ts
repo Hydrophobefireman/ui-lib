@@ -1,8 +1,9 @@
-import { Component } from "../../component";
+import { ComponentType, Props, VNode } from "../../types/index";
 
-import { ComponentType, VNode, Props } from "../../types/index";
+import { Component } from "../../component";
 import { createElementIfNeeded } from "../common";
 import { flattenArray } from "../../util";
+
 // import { deprecationWarning } from "../../$ui_tools";
 
 export class AsyncComponent extends Component {

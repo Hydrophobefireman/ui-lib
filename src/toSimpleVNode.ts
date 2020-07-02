@@ -1,23 +1,24 @@
 import {
-  VNode,
-  Props,
-  FunctionComponent,
-  DiffMeta,
   ComponentConstructor,
+  DiffMeta,
+  FunctionComponent,
+  Props,
+  VNode,
 } from "./types/index";
-import { Component } from "./component";
-import { scheduleLifeCycleCallbacks } from "./lifeCycleCallbacks";
-import { coerceToVNode, Fragment } from "./create_element";
-import { assign } from "./util";
-import { plugins } from "./config";
 import {
   EMPTY_OBJ,
-  LIFECYCLE_WILL_UPDATE,
-  LIFECYCLE_DID_UPDATE,
   LIFECYCLE_DID_MOUNT,
+  LIFECYCLE_DID_UPDATE,
   LIFECYCLE_WILL_MOUNT,
+  LIFECYCLE_WILL_UPDATE,
 } from "./constants";
+import { Fragment, coerceToVNode } from "./create_element";
+
+import { Component } from "./component";
+import { assign } from "./util";
 import { diffReferences } from "./ref";
+import { plugins } from "./config";
+import { scheduleLifeCycleCallbacks } from "./lifeCycleCallbacks";
 
 export const isFn = (vnType: any) =>
   typeof vnType === "function" && vnType !== Fragment;

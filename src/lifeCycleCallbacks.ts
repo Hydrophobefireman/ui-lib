@@ -1,8 +1,9 @@
+import { HAS_PROMISE, defer, plugins } from "./config";
+import { LIFECYCLE_DID_MOUNT, LIFECYCLE_DID_UPDATE } from "./constants";
+
 import { Component } from "./component";
-import { HAS_PROMISE, plugins, defer } from "./config";
 import { DOMOps } from "./types/index";
 import { commitDOMOps } from "./commit";
-import { LIFECYCLE_DID_MOUNT, LIFECYCLE_DID_UPDATE } from "./constants";
 
 type ProcessOptions = {
   name: Component["_lastLifeCycleMethod"];

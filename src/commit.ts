@@ -1,12 +1,12 @@
-import { diffStyle, $ } from "./diff/dom";
-import { DOMOps, UIElement, WritableProps, VNode } from "./types/index";
+import { $, diffStyle } from "./diff/dom";
 import {
   BATCH_MODE_APPEND_CHILD,
   BATCH_MODE_INSERT_BEFORE,
+  BATCH_MODE_REMOVE_ELEMENT,
   BATCH_MODE_SET_ATTRIBUTE,
   BATCH_MODE_SET_STYLE,
-  BATCH_MODE_REMOVE_ELEMENT,
 } from "./constants";
+import { DOMOps, UIElement, VNode, WritableProps } from "./types/index";
 
 export function commitDOMOps(queue: DOMOps[]) {
   const queueLen = queue.length;
