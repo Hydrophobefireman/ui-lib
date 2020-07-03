@@ -22,7 +22,7 @@ function unmount() {
   (this as Component)._pendingEffects = null;
 }
 
-export function useEffect(callback: () => void, dependencies: any[]): void {
+export function useEffect(callback: () => void, dependencies?: any[]): void {
   const state = getHookStateAtCurrentRender();
 
   const candidate = state[0];
@@ -30,12 +30,10 @@ export function useEffect(callback: () => void, dependencies: any[]): void {
 
   const hookData = candidate._hooksData;
 
-  const tmp = <any>{};
-
-  let currentHook: HookDefault = hookData[hookIndex] || tmp;
+  let currentHook: HookDefault = hookData[hookIndex] || {};
 
   const pending: Component["_pendingEffects"] = (candidate._pendingEffects =
-    candidate._pendingEffects || tmp);
+    candidate._pendingEffects || {});
   const oldEffect = pending[hookIndex];
   if (!argsChanged(currentHook.args, dependencies)) {
     // mark the effect as resolved
@@ -43,7 +41,7 @@ export function useEffect(callback: () => void, dependencies: any[]): void {
     if (oldEffect) oldEffect.resolved = true;
     return;
   }
-  currentHook = getCurrentHookValueOrSetDefault(hookData, hookIndex, tmp);
+  currentHook = getCurrentHookValueOrSetDefault(hookData, hookIndex, {});
   currentHook.args = dependencies;
 
   // TODO
