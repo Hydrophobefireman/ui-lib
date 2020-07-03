@@ -21,3 +21,5 @@ export {
 export { createRef } from "./ref";
 
 export * from "./hooks/index";
+export * from "./types/index";
+export * from "./types/jsx";
