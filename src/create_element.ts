@@ -10,7 +10,7 @@ import { flattenArray, objectWithoutKeys } from "./util";
 
 export const Fragment: any = function Fragment() {};
 
-const skipProps: Partial<keyof VNode>[] = ["key", "ref"];
+const skipProps: (keyof VNode)[] = ["key", "ref"];
 
 /** return a VNode
  * @example
