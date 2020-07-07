@@ -5,11 +5,7 @@ import {
   $push,
 } from "./manage";
 
-import {
-  argsChanged,
-  getCurrentHookValueOrSetDefault,
-  HookDefault,
-} from "./util";
+import { argsChanged } from "./util";
 
 import { Component } from "../../component";
 import { EMPTY_OBJ } from "../../constants";
@@ -30,7 +26,8 @@ export function useEffect(callback: () => void, dependencies?: any[]): void {
 
   const hookData = candidate._hooksData;
 
-  let currentHook: HookDefault = hookData[hookIndex] || {};
+  let currentHook =
+    hookData[hookIndex] || ({} as typeof candidate._hooksData[0]);
 
   const pending: Component["_pendingEffects"] = (candidate._pendingEffects =
     candidate._pendingEffects || {});
@@ -41,7 +38,7 @@ export function useEffect(callback: () => void, dependencies?: any[]): void {
     if (oldEffect) oldEffect.resolved = true;
     return;
   }
-  currentHook = getCurrentHookValueOrSetDefault(hookData, hookIndex, {});
+  hookData[hookIndex] = currentHook;
   currentHook.args = dependencies;
 
   // TODO

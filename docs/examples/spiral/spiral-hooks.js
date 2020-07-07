@@ -11,7 +11,6 @@ import {
 // thus we have to use setTimeout to preventthe animation from practically
 // slowing down by 2x
 config.scheduleRender = setTimeout.bind(window);
-
 /** @jsx h */
 const COUNT = 200;
 const LOOPS = 6;

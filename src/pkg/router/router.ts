@@ -1,4 +1,4 @@
-import { ComponentType, Props, VNode } from "../../types/index";
+import { Props, VNode } from "../../types/index";
 import { Fragment, createElement } from "../../create_element";
 
 import { Component } from "../../component";
@@ -12,13 +12,6 @@ function fixPath(path: string): string {
   return path.replace(pathFixRegex, "");
 }
 
-function createRouterChild(
-  component: VNode | ComponentType,
-  props: Props<any>
-) {
-  return createElementIfNeeded(component, props);
-}
-
 const _routerSubscriptions: Array<(
   e: PopStateEvent | null,
   options: {}
@@ -30,16 +23,13 @@ export const RouterSubscription = {
     if (!_routerSubscriptions.includes(fun)) _routerSubscriptions.push(fun);
   },
   unsubscribe(fun: Subscription) {
-    for (let i = 0; i < _routerSubscriptions.length; i++) {
-      if (_routerSubscriptions[i] === fun)
-        return _routerSubscriptions.splice(i, 1);
-    }
+    _routerSubscriptions.splice(_routerSubscriptions.indexOf(fun), 1);
   },
 
   emit(e: PopStateEvent | string, options: {}) {
-    for (const subscription of _routerSubscriptions) {
-      subscription(e as PopStateEvent, options);
-    }
+    _routerSubscriptions.forEach((subscription) =>
+      subscription(e as PopStateEvent, options)
+    );
   },
   unsubscribeAll() {
     _routerSubscriptions.length = 0;
@@ -131,7 +121,7 @@ export class Router extends Component<{}, RouterState> {
         const childProps = x.props as PathProps;
         const params = Router._getParams(pathinfo.params, test);
         (child as VNode[]).push(
-          createRouterChild(
+          createElementIfNeeded(
             childProps.component,
             assign({}, x.props, { params })
           )
