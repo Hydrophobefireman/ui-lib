@@ -6,6 +6,9 @@ import {
   BATCH_MODE_SET_STYLE,
   EMPTY_OBJ,
   NULL_TYPE,
+  IS_SVG_ATTR,
+  BATCH_MODE_REMOVE_ATTRIBUTE_NS,
+  BATCH_MODE_SET_SVG_ATTRIBUTE,
 } from "../constants";
 import {
   DiffMeta,
@@ -40,7 +43,7 @@ export function diffDomNodes(
   const oldDom = oldVNode._dom;
 
   if (newType !== oldType || oldDom == null) {
-    dom = createDomFromVNode(newVNode);
+    dom = createDomFromVNode(newVNode, meta);
   } else {
     dom = oldDom as RenderedDom;
   }
@@ -75,16 +78,23 @@ function setComponent_base(VNode: VNode, dom: UIElement) {
   }
 }
 
-function createDomFromVNode(newVNode: VNode): UIElement {
+function createDomFromVNode(newVNode: VNode, meta: DiffMeta): UIElement {
   if (typeof newVNode.props === "string") {
     return (document.createTextNode("") as unknown) as UIElement;
   } else {
     const type = newVNode.type;
-
     if (type === NULL_TYPE) {
       return (document.createComment("$") as unknown) as UIElement;
     }
-    const dom = document.createElement(type as string) as UIElement;
+    let dom: UIElement;
+    if (meta.isSvg) {
+      dom = (document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        type as string
+      ) as unknown) as UIElement;
+    } else {
+      dom = document.createElement(type as string) as UIElement;
+    }
     dom._events = {};
     return dom;
   }
@@ -152,7 +162,9 @@ function __diffNewAttributes(
     }
     meta.batch.push({
       node: dom,
-      action: BATCH_MODE_SET_ATTRIBUTE,
+      action: meta.isSvg
+        ? BATCH_MODE_SET_SVG_ATTRIBUTE
+        : BATCH_MODE_SET_ATTRIBUTE,
       attr,
       value: newValue,
     });
@@ -219,7 +231,7 @@ function diffClass(
   meta.batch.push({
     node: dom,
     action: BATCH_MODE_SET_ATTRIBUTE,
-    attr: "className",
+    attr: meta.isSvg ? "class" : "className",
     value: newValue,
   });
 }
@@ -230,11 +242,16 @@ export function __removeOldAttributes(
   next: Props<any>,
   meta: DiffMeta
 ) {
-  for (const i in prev) {
+  const isSvg = meta.isSvg;
+  for (let i in prev) {
     if (!UNSAFE_ATTRS[i] && next[i] == null && prev[i] != null) {
+      const attributeRemovalMode =
+        i === (i = i.replace(IS_SVG_ATTR, ""))
+          ? BATCH_MODE_REMOVE_ATTRIBUTE
+          : BATCH_MODE_REMOVE_ATTRIBUTE_NS;
       meta.batch.push({
         node: dom,
-        action: BATCH_MODE_REMOVE_ATTRIBUTE,
+        action: attributeRemovalMode,
         attr: i,
       });
     }

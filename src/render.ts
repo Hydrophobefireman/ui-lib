@@ -22,6 +22,7 @@ export function render(VNode: VNode, parentDom: VNodeHost) {
   diff(normalizedVNode, old, parentDom, false, {
     depth: 0,
     batch: batchQueue,
+    isSvg: ((parentDom as unknown) as SVGElement).ownerSVGElement !== undefined,
   });
   // parentDom._hosts = normalizedVNode;
   onDiff(batchQueue);

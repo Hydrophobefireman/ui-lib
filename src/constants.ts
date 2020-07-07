@@ -2,6 +2,7 @@ export const EMPTY_OBJ: any = {};
 export const EMPTY_ARRAY: any[] = [];
 
 export const IS_ARIA_PROP = /^aria[\-A-Z]/;
+export const IS_SVG_ATTR = /^xlink:?/;
 
 export const BATCH_MODE_SET_ATTRIBUTE = 1;
 export const BATCH_MODE_REMOVE_ATTRIBUTE = BATCH_MODE_SET_ATTRIBUTE;
@@ -9,6 +10,8 @@ export const BATCH_MODE_REMOVE_ELEMENT = 2;
 export const BATCH_MODE_SET_STYLE = 3;
 export const BATCH_MODE_APPEND_CHILD = 4;
 export const BATCH_MODE_INSERT_BEFORE = 5;
+export const BATCH_MODE_SET_SVG_ATTRIBUTE = 6;
+export const BATCH_MODE_REMOVE_ATTRIBUTE_NS = 7;
 
 /**
  * Special constant to mark `null` elements

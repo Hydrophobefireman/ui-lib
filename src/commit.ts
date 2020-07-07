@@ -5,6 +5,9 @@ import {
   BATCH_MODE_REMOVE_ELEMENT,
   BATCH_MODE_SET_ATTRIBUTE,
   BATCH_MODE_SET_STYLE,
+  BATCH_MODE_REMOVE_ATTRIBUTE_NS,
+  BATCH_MODE_SET_SVG_ATTRIBUTE,
+  IS_SVG_ATTR,
 } from "./constants";
 import { DOMOps, UIElement, VNode, WritableProps } from "./types/index";
 
@@ -17,6 +20,7 @@ export function commitDOMOps(queue: DOMOps[]) {
     const refDom = op.refDom;
     const value = op.value;
     const VNode = op.VNode;
+    let attr = op.attr;
     switch (action) {
       case BATCH_MODE_APPEND_CHILD:
         refDom.appendChild(dom);
@@ -26,7 +30,7 @@ export function commitDOMOps(queue: DOMOps[]) {
         break;
       case BATCH_MODE_SET_ATTRIBUTE:
         // in case of removeAttribute, `op.attr===undefined`
-        $(dom, op.attr, value);
+        $(dom, attr, value);
         break;
       case BATCH_MODE_SET_STYLE:
         diffStyle(dom as UIElement, value.newValue, value.oldValue);
@@ -35,6 +39,21 @@ export function commitDOMOps(queue: DOMOps[]) {
         removeNode(dom);
         clearDomNodePointers(dom);
         clearVNodePointers(VNode);
+        break;
+      case BATCH_MODE_REMOVE_ATTRIBUTE_NS:
+        dom.removeAttributeNS("http://www.w3.org/1999/xlink", attr);
+        break;
+      case BATCH_MODE_SET_SVG_ATTRIBUTE:
+        const isSVGSpecificAttr =
+          attr !== (attr = attr.replace(IS_SVG_ATTR, ""));
+
+        isSVGSpecificAttr
+          ? dom.setAttributeNS(
+              "http://www.w3.org/1999/xlink",
+              attr.toLowerCase(),
+              value
+            )
+          : dom.setAttribute(attr, value);
         break;
       default:
         break;

@@ -88,6 +88,7 @@ export function diff(
     }
     diffDomNodes(newVNode, oldVNode, parentDom, meta);
     dom = newVNode._dom as RenderedDom;
+    meta.isSvg = newType != "foreignObject" && meta.isSvg;
     diffChildren(newVNode, oldVNode, dom, meta);
     diffReferences(newVNode, oldVNode, dom);
   }

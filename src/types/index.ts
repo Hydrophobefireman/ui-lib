@@ -87,6 +87,7 @@ export interface VNodeHost extends HTMLElement {
 export type DiffMeta = {
   depth: number;
   batch: DOMOps[];
+  isSvg: boolean;
   next?: UIElement;
 };
 
@@ -99,8 +100,9 @@ export interface DOMOps {
     | 2 // BATCH_MODE_REMOVE_ELEMENT
     | 3 // BATCH_MODE_SET_STYLE
     | 4 // BATCH_MODE_APPEND_CHILD
-    | 5; //  BATCH_MODE_INSERT_BEFORE
-
+    | 5 //  BATCH_MODE_INSERT_BEFORE
+    | 6 // BATCH_MODE_SET_SVG_ATTRIBUTE
+    | 7; // BATCH_MODE_REMOVE_ATTRIBUTE_NS
   refDom?: HTMLElement;
   VNode?: VNode;
   attr?: string;
