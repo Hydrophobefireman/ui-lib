@@ -1,4 +1,4 @@
-import { Component, render, h } from "../../ui/index.js";
+import { Component, render, h, config } from "../../ui/index.js";
 function _defineProperty(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {

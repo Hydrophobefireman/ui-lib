@@ -11,11 +11,11 @@ import { Fragment } from "../create_element";
 import { scheduleLifeCycleCallbacks } from "../lifeCycleCallbacks";
 import { setRef } from "../ref";
 
-export function unmountVNodeAndDestroyDom(VNode: VNode, meta: DiffMeta): void {
+export function unmount(VNode: VNode, meta: DiffMeta): void {
   /** short circuit */
   if (VNode == null || VNode === EMPTY_OBJ) return;
   setRef(VNode.ref, null);
-  unmountVNodeAndDestroyDom(VNode._renders, meta);
+  unmount(VNode._renders, meta);
 
   const component = VNode._component;
   if (component != null) {
@@ -24,6 +24,7 @@ export function unmountVNodeAndDestroyDom(VNode: VNode, meta: DiffMeta): void {
     component.forceUpdate = Fragment;
     /** todo check for side effects */
     component._VNode = null;
+
     scheduleLifeCycleCallbacks({
       name: LIFECYCLE_WILL_UNMOUNT,
       bind: component,
@@ -35,7 +36,7 @@ export function unmountVNodeAndDestroyDom(VNode: VNode, meta: DiffMeta): void {
   if (childArray) {
     while (childArray.length) {
       child = childArray.pop();
-      unmountVNodeAndDestroyDom(child, meta);
+      unmount(child, meta);
     }
   }
 

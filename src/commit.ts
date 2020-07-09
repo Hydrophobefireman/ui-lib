@@ -1,7 +1,6 @@
 import { $, diffStyle } from "./diff/dom";
 import {
-  BATCH_MODE_APPEND_CHILD,
-  BATCH_MODE_INSERT_BEFORE,
+  BATCH_MODE_PLACE_NODE,
   BATCH_MODE_REMOVE_ELEMENT,
   BATCH_MODE_SET_ATTRIBUTE,
   BATCH_MODE_SET_STYLE,
@@ -22,10 +21,7 @@ export function commitDOMOps(queue: DOMOps[]) {
     const VNode = op.VNode;
     let attr = op.attr;
     switch (action) {
-      case BATCH_MODE_APPEND_CHILD:
-        refDom.appendChild(dom);
-        break;
-      case BATCH_MODE_INSERT_BEFORE:
+      case BATCH_MODE_PLACE_NODE:
         (value as Node).insertBefore(dom, refDom);
         break;
       case BATCH_MODE_SET_ATTRIBUTE:
@@ -53,7 +49,7 @@ export function commitDOMOps(queue: DOMOps[]) {
               attr.toLowerCase(),
               value
             )
-          : dom.setAttribute(attr, value);
+          : $(dom, attr, value, true);
         break;
       default:
         break;

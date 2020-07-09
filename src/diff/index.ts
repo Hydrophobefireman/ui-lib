@@ -7,7 +7,7 @@ import { isFn, toSimpleVNode } from "../toSimpleVNode";
 import { diffDomNodes } from "./dom";
 import { diffReferences } from "../ref";
 import { isValidVNode } from "../util";
-import { unmountVNodeAndDestroyDom } from "./unmount";
+import { unmount } from "./unmount";
 
 // import { processUpdatesQueue } from "../lifeCycleCallbacks";
 
@@ -27,7 +27,7 @@ export function diff(
   meta: DiffMeta
 ): RenderedDom | RenderedDom[] {
   if (newVNode == null || typeof newVNode === "boolean") {
-    unmountVNodeAndDestroyDom(oldVNode, meta);
+    unmount(oldVNode, meta);
     return;
   }
 
@@ -54,13 +54,14 @@ export function diff(
       const next = getDom(oldVNode);
       meta.next = (next || EMPTY_OBJ).nextSibling;
     }
-    unmountVNodeAndDestroyDom(oldVNode, meta);
+    unmount(oldVNode, meta);
     oldVNode = EMPTY_OBJ;
   }
   const tmp = newVNode;
   if (typeof newVNode.props !== "string" && newType !== NULL_TYPE) {
     /** if we have a function/class Component, get the next rendered VNode */
     newVNode = toSimpleVNode(newVNode, oldVNode, force, meta);
+    meta.isSvg = newVNode.type === "svg" || meta.isSvg;
   }
 
   if (isFn(oldVNode.type)) {
@@ -78,14 +79,13 @@ export function diff(
 
   oldType = oldVNode.type;
   newType = newVNode.type;
-
+  if (oldType !== newType) {
+    oldVNode = null;
+  }
   let dom: RenderedDom;
   if (newType === Fragment) {
     diffChildren(newVNode, oldVNode, parentDom, meta);
   } else {
-    if (oldType !== newType) {
-      oldVNode = null;
-    }
     diffDomNodes(newVNode, oldVNode, parentDom, meta);
     dom = newVNode._dom as RenderedDom;
     meta.isSvg = newType != "foreignObject" && meta.isSvg;

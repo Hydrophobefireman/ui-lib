@@ -42,7 +42,6 @@ export function toSimpleVNode(
     }
     VNode._renders = next;
     next._renderedBy = VNode;
-    meta.isSvg = next.type === "svg" || meta.isSvg;
     return next;
   } else {
     /** VNode is already simple */

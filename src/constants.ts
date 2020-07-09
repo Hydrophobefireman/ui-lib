@@ -8,10 +8,9 @@ export const BATCH_MODE_SET_ATTRIBUTE = 1;
 export const BATCH_MODE_REMOVE_ATTRIBUTE = BATCH_MODE_SET_ATTRIBUTE;
 export const BATCH_MODE_REMOVE_ELEMENT = 2;
 export const BATCH_MODE_SET_STYLE = 3;
-export const BATCH_MODE_APPEND_CHILD = 4;
-export const BATCH_MODE_INSERT_BEFORE = 5;
-export const BATCH_MODE_SET_SVG_ATTRIBUTE = 6;
-export const BATCH_MODE_REMOVE_ATTRIBUTE_NS = 7;
+export const BATCH_MODE_PLACE_NODE = 4;
+export const BATCH_MODE_SET_SVG_ATTRIBUTE = 5;
+export const BATCH_MODE_REMOVE_ATTRIBUTE_NS = 6;
 
 /**
  * Special constant to mark `null` elements
