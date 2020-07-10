@@ -36,8 +36,6 @@ export class Component<P = {}, S = {}> {
   _oldState?: S;
   // before applying to `Component.state`, pass the next state for `componentWillUpdate`
   _nextState?: S;
-  // the DOM this component points to, returns null for a fragment as a top level child
-  base?: UIElement | null;
 
   render(props?: Props<P>, state?: Readonly<S>): ComponentChild {
     return null;
