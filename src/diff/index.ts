@@ -92,5 +92,6 @@ export function diff(
     diffChildren(newVNode, oldVNode, dom, meta);
     diffReferences(newVNode, oldVNode, dom);
   }
+
   return dom;
 }

@@ -7,6 +7,7 @@ import {
   BATCH_MODE_REMOVE_ATTRIBUTE_NS,
   BATCH_MODE_SET_SVG_ATTRIBUTE,
   IS_SVG_ATTR,
+  BATCH_MODE_CLEAR_POINTERS,
 } from "./constants";
 import { DOMOps, UIElement, VNode, WritableProps } from "./types/index";
 
@@ -33,8 +34,10 @@ export function commitDOMOps(queue: DOMOps[]) {
         break;
       case BATCH_MODE_REMOVE_ELEMENT:
         removeNode(dom);
-        clearDomNodePointers(dom);
-        clearVNodePointers(VNode);
+        removePointers(VNode, dom);
+        break;
+      case BATCH_MODE_CLEAR_POINTERS:
+        removePointers(VNode, dom);
         break;
       case BATCH_MODE_REMOVE_ATTRIBUTE_NS:
         dom.removeAttributeNS("http://www.w3.org/1999/xlink", attr);
@@ -66,7 +69,10 @@ function removeNode(dom: UIElement) {
     p.removeChild(dom);
   }
 }
-
+function removePointers(VNode: VNode, dom: UIElement) {
+  clearDomNodePointers(dom);
+  clearVNodePointers(VNode);
+}
 const DOM_POINTERS: Record<
   Exclude<keyof UIElement, keyof HTMLElement | keyof Text>,
   number
@@ -74,9 +80,6 @@ const DOM_POINTERS: Record<
   _VNode: 1,
   _events: 1,
 };
-function clearDomNodePointers(dom: UIElement) {
-  _clearPointers(DOM_POINTERS, dom);
-}
 
 const VNode_POINTERS: Record<
   WritableProps | "_children" | "_depth" | "key" | "ref",
@@ -93,6 +96,9 @@ const VNode_POINTERS: Record<
   ref: 1,
 };
 
+function clearDomNodePointers(dom: UIElement) {
+  _clearPointers(DOM_POINTERS, dom);
+}
 function clearVNodePointers(VNode: VNode) {
   if (VNode == null) return;
 

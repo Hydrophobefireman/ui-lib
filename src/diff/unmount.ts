@@ -2,11 +2,11 @@ import {
   BATCH_MODE_REMOVE_ELEMENT,
   EMPTY_OBJ,
   LIFECYCLE_WILL_UNMOUNT,
-  NULL_TYPE,
+  BATCH_MODE_REMOVE_ATTRIBUTE,
+  BATCH_MODE_CLEAR_POINTERS,
 } from "../constants";
-import { DiffMeta, RenderedDom, VNode } from "../types/index";
+import { DiffMeta, RenderedDom, VNode, UIElement } from "../types/index";
 
-import { __removeOldAttributes as $removeOldAttributes } from "./dom";
 import { Fragment } from "../create_element";
 import { scheduleLifeCycleCallbacks } from "../lifeCycleCallbacks";
 import { setRef } from "../ref";
@@ -31,30 +31,50 @@ export function unmount(VNode: VNode, meta: DiffMeta): void {
     });
   }
 
-  let child: VNode;
   const childArray = VNode._children;
+  _processNodeCleanup(VNode, meta);
+
   if (childArray) {
-    while (childArray.length) {
-      child = childArray.pop();
-      unmount(child, meta);
+    const cl = childArray.length;
+    for (let i = 0; i < cl; i++) {
+      const child: VNode = childArray[i];
+      const node = child._dom;
+      clearListeners(child, node, meta);
+      meta.batch.push({
+        action: BATCH_MODE_CLEAR_POINTERS,
+        VNode: VNode,
+        node,
+      });
     }
+    childArray.length = 0;
   }
 
   /*#__NOINLINE__*/
-  _processNodeCleanup(VNode, meta);
 }
 function _processNodeCleanup(VNode: VNode, meta: DiffMeta) {
   const type = VNode.type;
   if (typeof type !== "function") {
     const dom = VNode._dom as RenderedDom;
     if (dom != null) {
-      if (type !== NULL_TYPE && type != null) {
-        $removeOldAttributes(dom, VNode.props, EMPTY_OBJ, meta);
-      }
+      clearListeners(VNode, dom, meta);
       meta.batch.push({
         node: dom,
         action: BATCH_MODE_REMOVE_ELEMENT,
         VNode: VNode,
+      });
+    }
+  }
+}
+
+function clearListeners(VNode: VNode, dom: UIElement, meta: DiffMeta) {
+  const props = VNode.props;
+
+  for (const prop in props) {
+    if (prop[0] === "o" && prop[1] === "n") {
+      meta.batch.push({
+        action: BATCH_MODE_REMOVE_ATTRIBUTE,
+        node: dom,
+        attr: prop,
       });
     }
   }

@@ -11,6 +11,7 @@ export const BATCH_MODE_SET_STYLE = 3;
 export const BATCH_MODE_PLACE_NODE = 4;
 export const BATCH_MODE_SET_SVG_ATTRIBUTE = 5;
 export const BATCH_MODE_REMOVE_ATTRIBUTE_NS = 6;
+export const BATCH_MODE_CLEAR_POINTERS = 7;
 
 /**
  * Special constant to mark `null` elements
