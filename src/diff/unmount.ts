@@ -11,11 +11,17 @@ import { Fragment } from "../create_element";
 import { scheduleLifeCycleCallbacks } from "../lifeCycleCallbacks";
 import { setRef } from "../ref";
 
-export function unmount(VNode: VNode, meta: DiffMeta): void {
+export function unmount(
+  VNode: VNode,
+  meta: DiffMeta,
+  recursionLevel?: number
+): void {
   /** short circuit */
   if (VNode == null || VNode === EMPTY_OBJ) return;
+  recursionLevel = recursionLevel || 0;
+
   setRef(VNode.ref, null);
-  unmount(VNode._renders, meta);
+  unmount(VNode._renders, meta, recursionLevel);
 
   const component = VNode._component;
   if (component != null) {
@@ -32,34 +38,40 @@ export function unmount(VNode: VNode, meta: DiffMeta): void {
   }
 
   const childArray = VNode._children;
-  _processNodeCleanup(VNode, meta);
+
+  _processNodeCleanup(VNode, meta, recursionLevel);
 
   if (childArray) {
     const cl = childArray.length;
     for (let i = 0; i < cl; i++) {
       const child: VNode = childArray[i];
-      const node = child._dom;
-      clearListeners(child, node, meta);
-      meta.batch.push({
-        action: BATCH_MODE_CLEAR_POINTERS,
-        VNode: VNode,
-        node,
-      });
+      unmount(child, meta, recursionLevel + 1);
     }
     childArray.length = 0;
   }
 
   /*#__NOINLINE__*/
 }
-function _processNodeCleanup(VNode: VNode, meta: DiffMeta) {
-  const type = VNode.type;
-  if (typeof type !== "function") {
+function isSimplestVNode(VNode: VNode) {
+  return typeof VNode.type != "function";
+}
+function _processNodeCleanup(
+  VNode: VNode,
+  meta: DiffMeta,
+  recursionLevel: number
+) {
+  if (isSimplestVNode(VNode)) {
     const dom = VNode._dom as RenderedDom;
     if (dom != null) {
       clearListeners(VNode, dom, meta);
       meta.batch.push({
         node: dom,
-        action: BATCH_MODE_REMOVE_ELEMENT,
+        action: recursionLevel
+          ? /** if the parent element is already being unmounted, all we need to do is
+            clear the child element's listeners
+             */
+            BATCH_MODE_CLEAR_POINTERS
+          : BATCH_MODE_REMOVE_ELEMENT,
         VNode: VNode,
       });
     }
@@ -68,7 +80,6 @@ function _processNodeCleanup(VNode: VNode, meta: DiffMeta) {
 
 function clearListeners(VNode: VNode, dom: UIElement, meta: DiffMeta) {
   const props = VNode.props;
-
   for (const prop in props) {
     if (prop[0] === "o" && prop[1] === "n") {
       meta.batch.push({
