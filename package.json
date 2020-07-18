@@ -1,6 +1,6 @@
 {
   "name": "@hydrophobefireman/ui-lib",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "description": "",
   "main": "dist/index.m.js",
   "scripts": {

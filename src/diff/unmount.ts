@@ -18,7 +18,7 @@ export function unmount(
 ): void {
   /** short circuit */
   if (VNode == null || VNode === EMPTY_OBJ) return;
-  recursionLevel = recursionLevel || 0;
+  recursionLevel = VNode.type === Fragment ? -1 : recursionLevel || 0;
 
   setRef(VNode.ref, null);
   unmount(VNode._renders, meta, recursionLevel);
@@ -66,12 +66,13 @@ function _processNodeCleanup(
       clearListeners(VNode, dom, meta);
       meta.batch.push({
         node: dom,
-        action: recursionLevel
-          ? /** if the parent element is already being unmounted, all we need to do is
+        action:
+          recursionLevel > 0
+            ? /** if the parent element is already being unmounted, all we need to do is
             clear the child element's listeners
              */
-            BATCH_MODE_CLEAR_POINTERS
-          : BATCH_MODE_REMOVE_ELEMENT,
+              BATCH_MODE_CLEAR_POINTERS
+            : BATCH_MODE_REMOVE_ELEMENT,
         VNode: VNode,
       });
     }
