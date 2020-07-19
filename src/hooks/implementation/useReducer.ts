@@ -3,7 +3,7 @@ import { consumeCallable, getCurrentHookValueOrSetDefault } from "./util";
 import { getHookStateAtCurrentRender } from "./manage";
 
 type Reducer<T> = (currentValue: T, action: string) => T;
-
+const obj = {};
 export function useReducer<T = any>(
   reducer: Reducer<T>,
   initialValue: T | (() => T),
@@ -23,20 +23,17 @@ export function useReducer<T = any>(
     () => ({
       hookState: setup
         ? setup(initialValue)
-        : consumeCallable(void 0, initialValue),
+        : consumeCallable(null, initialValue),
     })
   );
-  currentHook.args = reducer;
 
   return [
     currentHook.hookState as T,
-    (action?: any) => {
-      const next = ((currentHook.args as unknown) as Reducer<T>)(
-        currentHook.hookState,
-        action
-      );
-      currentHook.hookState = next;
-      candidate.setState({});
-    },
+    currentHook.args ||
+      (currentHook.args = (action?: any) => {
+        const next = (reducer as Reducer<T>)(currentHook.hookState, action);
+        currentHook.hookState = next;
+        candidate.setState(obj);
+      }),
   ];
 }
