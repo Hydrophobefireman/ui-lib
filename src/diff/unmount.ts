@@ -18,7 +18,10 @@ export function unmount(
 ): void {
   /** short circuit */
   if (VNode == null || VNode === EMPTY_OBJ) return;
-  recursionLevel = VNode.type === Fragment ? -1 : recursionLevel || 0;
+  recursionLevel =
+    VNode.type === Fragment || typeof VNode.props === "string"
+      ? -1
+      : recursionLevel || 0;
 
   setRef(VNode.ref, null);
   unmount(VNode._renders, meta, recursionLevel);
