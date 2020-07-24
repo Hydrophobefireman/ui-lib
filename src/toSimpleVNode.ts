@@ -41,7 +41,6 @@ export function toSimpleVNode(
       next = renderFunctionalComponent(VNode, meta);
     }
     VNode._renders = next;
-    next._renderedBy = VNode;
     return next;
   } else {
     /** VNode is already simple */

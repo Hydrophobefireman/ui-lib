@@ -58,17 +58,6 @@ export function diffDomNodes(
   }
 }
 
-// function setComponent_base(VNode: VNode, dom: UIElement) {
-//   if (!VNode) return;
-
-//   if (VNode._component != null) {
-//     /** set the base value of the first component we find while travelling up the tree */
-//     VNode._component.base = dom;
-//   } else {
-//     setComponent_base(VNode._renderedBy, dom);
-//   }
-// }
-
 function createDomFromVNode(newVNode: VNode, meta: DiffMeta): UIElement {
   if (typeof newVNode.props === "string") {
     return (document.createTextNode("") as unknown) as UIElement;
@@ -251,29 +240,6 @@ export function __removeOldAttributes(
 function __diffTextNodes(dom: UIElement, newVal: string, oldVal: string) {
   return newVal === oldVal || (dom.nodeValue = newVal);
 }
-
-// export function copyPropsOverEntireTree(
-//   VNode: VNode,
-//   propVal: WritableProps,
-//   val: any
-// ) {
-//   updateInternalVNodes(VNode, propVal, val, "_renders");
-
-//   updateInternalVNodes(VNode, propVal, val, "_renderedBy");
-// }
-
-// export function updateInternalVNodes(
-//   VNode: VNode,
-//   prop: WritableProps,
-//   val: any,
-//   nextGetter: "_renders" | "_renderedBy"
-// ) {
-//   let next = VNode;
-//   while (next != null) {
-//     next[prop] = val;
-//     next = next[nextGetter];
-//   }
-// }
 
 /** dom helper */
 export function $(dom: UIElement, prop: string, value: any, isSvg?: boolean) {

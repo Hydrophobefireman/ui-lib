@@ -89,7 +89,6 @@ const VNode_POINTERS: Record<
   _component: 1,
   _depth: 1,
   _dom: 1,
-  _renderedBy: 1,
   _renders: 1,
   _parentDom: 1,
   key: 1,
@@ -100,8 +99,6 @@ function clearDomNodePointers(dom: UIElement) {
   _clearPointers(DOM_POINTERS, dom);
 }
 function clearVNodePointers(VNode: VNode) {
-  if (VNode == null) return;
-
   _clearPointers(VNode_POINTERS, VNode);
 }
 

@@ -10,7 +10,7 @@ import { flattenArray, objectWithoutKeys } from "./util";
 
 export const Fragment: any = function Fragment() {};
 
-const skipProps: (keyof VNode)[] = ["key", "ref"];
+export const skipProps: (keyof VNode)[] = ["key", "ref"];
 
 /** return a VNode
  * @example
@@ -97,7 +97,7 @@ export function flattenVNodeChildren<P>(VNode: VNode<P>): VNode[] {
   return flattenArray<unknown>([c], coerceToVNode) as VNode[];
 }
 
-function getVNode<P, R>(
+export function getVNode<P, R>(
   type: VNode<P, R>["type"],
   props: createElementPropType<P>,
   key?: any,
@@ -112,9 +112,8 @@ function getVNode<P, R>(
     _children: null,
     _component: null,
     _renders: null,
-    _renderedBy: null,
     _parentDom: null,
     _depth: 0,
     constructor: undefined,
-  } as VNode<P, R>;
+  };
 }

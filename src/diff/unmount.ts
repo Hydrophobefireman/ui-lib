@@ -11,6 +11,10 @@ import { Fragment } from "../create_element";
 import { scheduleLifeCycleCallbacks } from "../lifeCycleCallbacks";
 import { setRef } from "../ref";
 
+function warnSetState() {
+  console.warn("Component state changed after unmount", this);
+}
+
 export function unmount(
   VNode: VNode,
   meta: DiffMeta,
@@ -29,8 +33,8 @@ export function unmount(
   const component = VNode._component;
   if (component != null) {
     /** maybe disable setState for this component? */
-    component.setState = Fragment;
-    component.forceUpdate = Fragment;
+    component.setState = warnSetState;
+    component.forceUpdate = warnSetState;
     /** todo check for side effects */
     component._VNode = null;
 
@@ -63,8 +67,9 @@ function _processNodeCleanup(
   meta: DiffMeta,
   recursionLevel: number
 ) {
+  let dom: RenderedDom;
   if (isSimplestVNode(VNode)) {
-    const dom = VNode._dom as RenderedDom;
+    dom = VNode._dom;
     if (dom != null) {
       clearListeners(VNode, dom, meta);
       meta.batch.push({
@@ -76,9 +81,11 @@ function _processNodeCleanup(
              */
               BATCH_MODE_CLEAR_POINTERS
             : BATCH_MODE_REMOVE_ELEMENT,
-        VNode: VNode,
+        VNode,
       });
     }
+  } else {
+    meta.batch.push({ action: BATCH_MODE_CLEAR_POINTERS, VNode, node: dom });
   }
 }
 

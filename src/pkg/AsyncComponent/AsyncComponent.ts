@@ -40,7 +40,7 @@ export class AsyncComponent extends Component<AsyncProps, AsyncState> {
 
     prom()
       .then((component: Renderable) => {
-        this.setState({ render: component, inProgress: false });
+        this.setState({ render: component, inProgress: false, error: false });
       })
       .catch((x: Error) => this.setState({ error: true, inProgress: false }));
   }
