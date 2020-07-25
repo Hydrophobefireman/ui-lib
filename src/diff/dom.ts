@@ -262,12 +262,13 @@ function $event(
   listener: JSXInternal.EventHandler<any>
 ) {
   event = event.substr(2).toLowerCase();
+  const eventDict = dom._events;
   if (listener == null) {
     dom.removeEventListener(event, eventListenerProxy);
-    delete dom._events[event];
+    delete eventDict[event];
   } else {
-    dom.addEventListener(event, eventListenerProxy);
-    dom._events[event] = listener;
+    eventDict[event] || dom.addEventListener(event, eventListenerProxy);
+    eventDict[event] = listener;
   }
 }
 

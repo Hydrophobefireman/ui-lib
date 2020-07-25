@@ -4,6 +4,7 @@ import { Fragment, createElement } from "../../create_element";
 import { Component } from "../../component";
 import { assign } from "../../util";
 import { createElementIfNeeded } from "../common";
+import { createRef } from "../../ref";
 
 const pathFixRegex = /\/+$/;
 
@@ -185,12 +186,29 @@ function onLinkClick(e: MouseEvent) {
   loadURL(href);
 }
 
-export function A(props: any) {
-  const href = props.href;
-  if (href != null) {
-    props.onClick = onLinkClick;
+function _call(func: EventListener, arg: MouseEvent, ref: HTMLAnchorElement) {
+  return func.call(ref, arg);
+}
+export class A extends Component {
+  _onClick: (e: MouseEvent) => void;
+  _ref: { current: HTMLAnchorElement };
+  constructor(props: Props<{}>) {
+    super(props);
+    this._ref = createRef<HTMLAnchorElement>();
+    this._onClick = (e: MouseEvent): void => {
+      const current = this._ref.current;
+      _call(onLinkClick, e, current);
+      const userOnClick = this.props.onClick;
+      userOnClick && _call(userOnClick, e, current);
+    };
   }
-  return createElement("a", props);
+
+  render(props: Props<{}>) {
+    return createElement(
+      "a",
+      assign({}, props, { ref: this._ref, onClick: this._onClick })
+    );
+  }
 }
 
 export const Path: any = {};

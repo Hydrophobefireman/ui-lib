@@ -33,7 +33,7 @@ const config = {
   scheduleRender: HAS_RAF
     ? (cb: FrameRequestCallback) => requestAnimationFrame(cb)
     : defer,
-  eagerlyHydrate: true,
+  warnOnUnmountRender: false,
   RAF_TIMEOUT: 100,
   debounceEffect: null,
 };

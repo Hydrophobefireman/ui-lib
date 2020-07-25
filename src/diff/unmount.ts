@@ -10,9 +10,11 @@ import { DiffMeta, RenderedDom, VNode, UIElement } from "../types/index";
 import { Fragment } from "../create_element";
 import { scheduleLifeCycleCallbacks } from "../lifeCycleCallbacks";
 import { setRef } from "../ref";
+import config from "../config";
 
 function warnSetState() {
-  console.warn("Component state changed after unmount", this);
+  config.warnOnUnmountRender &&
+    console.warn("Component state changed after unmount", this);
 }
 
 export function unmount(
