@@ -4,7 +4,7 @@ export { render } from "./render";
 
 export { Component, Component as default } from "./component";
 
-export { default as config } from "./config";
+export { default as config, plugins } from "./config";
 
 /** @TODO create separate packages */
 export { AsyncComponent } from "./pkg/AsyncComponent/AsyncComponent";
