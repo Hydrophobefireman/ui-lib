@@ -1,4 +1,9 @@
-import { Props, VNode } from "../../types/index";
+import {
+  Props,
+  VNode,
+  ComponentType,
+  ComponentConstructor,
+} from "../../types/index";
 import { Fragment, createElement } from "../../create_element";
 
 import { Component } from "../../component";
@@ -137,7 +142,7 @@ export class Router extends Component<{}, RouterState> {
     this.setState({ child });
   }
 
-  render(_: Router["props"], state: Router["state"]) {
+  render(_: Router["props"], state: Router["state"]): VNode {
     const child = state.child;
     return createElement(Fragment, null, child);
   }
@@ -203,7 +208,7 @@ export class A extends Component {
     };
   }
 
-  render(props: Props<{}>) {
+  render(props: Props<{}>): VNode {
     return createElement(
       "a",
       assign({}, props, { ref: this._ref, onClick: this._onClick })
@@ -211,4 +216,7 @@ export class A extends Component {
   }
 }
 
-export const Path: any = {};
+export const Path = ({} as any) as ComponentConstructor<{
+  match: string | RegExp;
+  component: ComponentType | string;
+}>;
