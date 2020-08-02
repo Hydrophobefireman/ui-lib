@@ -47,6 +47,7 @@ export function diff(
     newVNode._component = oldVNode._component;
   }
   newVNode._parentDom = parentDom;
+  newVNode._used = true;
 
   if (newType !== oldType) {
     // type differs, either different dom nodes or different function/class components

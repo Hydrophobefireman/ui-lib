@@ -91,6 +91,7 @@ const VNode_POINTERS: Record<
   _dom: 1,
   _renders: 1,
   _parentDom: 1,
+  _used: 1,
   key: 1,
   ref: 1,
 };

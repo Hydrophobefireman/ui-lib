@@ -20,7 +20,6 @@
     <div id="app"></div>
     <script type="module">
       import Component, { h, Router, render, Path, A } from "../../ui/index.js";
-      console.log(Router);
       const App = function () {
         return h(
           "div",
@@ -29,7 +28,7 @@
             Router,
             null,
             h(Path, {
-              match: ":name",
+              match: "/examples/t_/:name",
               component: (props) => "Current path: " + props.params.name,
             })
           ),

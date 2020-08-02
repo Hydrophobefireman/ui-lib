@@ -22,6 +22,8 @@ export interface VNode<P = {}, R = any> {
   _depth: number;
   // parentDom node -> to call append child on if we can not reorder
   _parentDom: HTMLElement;
+  // used to track reused VNodes
+  _used: boolean;
 }
 
 export type EventListenerDict = JSXInternal.DOMEvents<EventTarget>;

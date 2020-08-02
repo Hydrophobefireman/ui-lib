@@ -5,14 +5,18 @@ function _defineProperty(obj, key, value) {
       value,
       enumerable: true,
       configurable: true,
-      writable: true
+      writable: true,
     });
   } else {
     obj[key] = value;
   }
   return obj;
 } /** @jsx h */
-import Component, { render, createElement as h } from "../../ui/index.js";
+import Component, {
+  render,
+  createElement as h,
+  createRef,
+} from "../../ui/index.js";
 const { memoize } = (globalThis || self).decko;
 let { pow, sqrt, sin, cos, atan2 } = Math;
 
@@ -20,26 +24,28 @@ class Main extends Component {
   constructor(...args) {
     super(...args);
     _defineProperty(this, "state", { text: "", lines: [] });
+    this.ref = createRef();
+    
     _defineProperty(
       this,
       "updatePosition",
 
       () => {
-        this.position = this.base
-          .querySelector(".logo")
-          .getBoundingClientRect();
+        this.position =
+          this.ref.current &&
+          this.ref.current.querySelector(".logo").getBoundingClientRect();
       }
     );
     _defineProperty(
       this,
       "handleMouseMove",
 
-      e => {
+      (e) => {
         if (this.timer) clearTimeout(this.timer), (this.timer = null);
         let t = (e.touches && e.touches[0]) || e;
         this.setState({
-          x: t.pageX - this.position.left,
-          y: t.pageY - this.position.top
+          x: t.pageX - (this.position ? this.position.left : 0),
+          y: t.pageY - (this.position ? this.position.top : 0),
         });
 
         return e.preventDefault(), false;
@@ -49,7 +55,7 @@ class Main extends Component {
       this,
       "color",
 
-      memoize(index => {
+      memoize((index) => {
         let rnd = () => (Math.random() * 255) | 0;
         return `rgb(${rnd()},${rnd()},${rnd()})`;
       })
@@ -58,11 +64,11 @@ class Main extends Component {
       this,
       "textToLines",
 
-      memoize(text => {
+      memoize((text) => {
         text = (text || "").trim();
         return text.split("\n").map((text, i) => ({
           text,
-          color: this.color(i)
+          color: this.color(i),
         }));
       })
     );
@@ -83,7 +89,7 @@ class Main extends Component {
     let lines = this.textToLines(text);
     return h(
       "div",
-      { class: animated ? "animated" : "" },
+      { class: animated ? "animated" : "", ref: this.ref },
       h(
         "div",
         { class: "input" },
@@ -95,7 +101,7 @@ class Main extends Component {
         ),
         h(
           "textarea",
-          { onInput: e => this.setState({ text: e.target.value }) },
+          { onInput: (e) => this.setState({ text: e.target.value }) },
           text
         )
       ),
@@ -124,8 +130,9 @@ const Line = ({ x = 0, y = 0, index, text, color: background }) => {
       dir = atan2(y - yc, x - xc),
       offset = mag < 200 ? mag / 10 - 20 : 0;
 
-    let transform = `translate3d(${cos(dir) * offset}px, ${sin(dir) *
-      offset}px, 0)`;
+    let transform = `translate3d(${cos(dir) * offset}px, ${
+      sin(dir) * offset
+    }px, 0)`;
     return h(
       "span",
       { style: { background, transform, left: `${left}px`, top: `${top}px` } },
@@ -138,8 +145,8 @@ const Line = ({ x = 0, y = 0, index, text, color: background }) => {
       class: "line",
       style: {
         width: `${letters.length * 40}px`,
-        height: "40px"
-      }
+        height: "40px",
+      },
     },
     letters
   );

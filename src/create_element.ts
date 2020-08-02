@@ -7,6 +7,7 @@ import {
 import { EMPTY_ARRAY, EMPTY_OBJ, NULL_TYPE } from "./constants";
 
 import { flattenArray, objectWithoutKeys } from "./util";
+import { cloneElement } from "./clone_element";
 
 export const Fragment: any = function Fragment() {};
 
@@ -71,7 +72,7 @@ export function coerceToVNode(VNode: ComponentChild | VNode): VNode {
     return createElement(Fragment, null, VNode);
   }
   // VNode exists, clone
-  if ((VNode as VNode)._dom != null) {
+  if ((VNode as VNode)._used) {
     const vn = getVNode(
       (VNode as VNode).type,
       (VNode as VNode).props,
@@ -79,6 +80,7 @@ export function coerceToVNode(VNode: ComponentChild | VNode): VNode {
     );
     return vn;
   }
+  (VNode as VNode)._used = true;
   return VNode as VNode;
 }
 /** return a flat array of children and normalize them */
@@ -114,6 +116,7 @@ export function getVNode<P, R>(
     _renders: null,
     _parentDom: null,
     _depth: 0,
+    _used: false,
     constructor: undefined,
   };
 }
