@@ -217,6 +217,6 @@ export class A extends Component {
 }
 
 export const Path = ({} as any) as ComponentConstructor<{
-  match: string | RegExp;
+  match: string | RoutePath;
   component: ComponentType | string;
 }>;
