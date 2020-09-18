@@ -62,7 +62,7 @@ interface RouterState {
   child?: VNode[];
 }
 interface RouterProps {
-  falbackComponent: any;
+  fallbackComponent?: any;
 }
 export class Router extends Component<RouterProps, RouterState> {
   state: RouterState;
