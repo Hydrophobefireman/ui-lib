@@ -11,8 +11,9 @@ import {
   LIFECYCLE_DID_UPDATE,
   LIFECYCLE_WILL_MOUNT,
   LIFECYCLE_WILL_UPDATE,
+  Fragment,
 } from "./constants";
-import { Fragment, coerceToVNode } from "./create_element";
+import { coerceToVNode } from "./create_element";
 
 import { Component } from "./component";
 import { assign } from "./util";

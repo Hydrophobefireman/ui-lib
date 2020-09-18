@@ -3,10 +3,11 @@ import { RenderedDom, VNode } from "./types/index";
 import { Component } from "./component";
 import { EMPTY_OBJ } from "./constants";
 
-export function setRef<T>(
-  ref: ((value: T) => void) | { current: T },
-  value: T
-) {
+export interface RefType<T> {
+  current: T;
+}
+
+export function setRef<T>(ref: ((value: T) => void) | RefType<T>, value: T) {
   if (!ref) return;
   if (typeof ref == "function") ref(value);
   else ref.current = value;
@@ -26,5 +27,5 @@ export function diffReferences(
 }
 
 export function createRef<T>() {
-  return { current: null } as { current: T };
+  return { current: null } as RefType<T>;
 }

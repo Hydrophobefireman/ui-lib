@@ -8,9 +8,10 @@ import {
 } from "./types/index";
 
 import { assign } from "./util";
-import config from "./config";
+import config, { plugins } from "./config";
 import { diff } from "./diff/index";
 import { onDiff } from "./lifeCycleCallbacks";
+import { LifeCycleCallbacks } from "./constants";
 
 const RENDER_QUEUE: Component[] = [];
 
@@ -19,6 +20,7 @@ export class Component<P = {}, S = {}> {
   constructor(props?: P) {
     this.state = {} as any;
     this.props = props as Props<P>;
+    plugins.componentInstance(this, props);
   }
 
   _pendingEffects?: {
@@ -62,6 +64,7 @@ export class Component<P = {}, S = {}> {
     if (this._VNode == null) return;
     const batchQueue: DOMOps[] = [];
     const shouldForce = callback !== false;
+    plugins.diffStart(this, shouldForce);
     diff(
       this._VNode,
       assign({}, this._VNode),
@@ -94,13 +97,7 @@ export class Component<P = {}, S = {}> {
   ): void;
   componentDidCatch?(error: any): void;
   _dirty?: boolean;
-  _lastLifeCycleMethod?:
-    | "componentWillMount"
-    | "componentDidMount"
-    | "componentWillUnmount"
-    | "shouldComponentUpdate"
-    | "componentWillUpdate"
-    | "componentDidUpdate";
+  _lastLifeCycleMethod?: LifeCycleCallbacks;
 }
 
 function enqueueRender(c: Component) {

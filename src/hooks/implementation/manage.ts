@@ -84,8 +84,4 @@ export function getHookStateAtCurrentRender(): [Component, number] {
 }
 // todo manage sideEffects
 addPluginCallback("hookSetup", prepForNextHookCandidate);
-addPluginCallback("diffed", setEffectiveCallbacks);
-
-export function $push(x: PendingEffects) {
-  rafPendingCallbacks.indexOf(x) === -1 && rafPendingCallbacks.push(x);
-}
+addPluginCallback("diffEnd", setEffectiveCallbacks);

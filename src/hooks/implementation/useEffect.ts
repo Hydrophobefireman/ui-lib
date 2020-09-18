@@ -2,13 +2,14 @@ import {
   getHookStateAtCurrentRender,
   runEffectCleanup,
   runHookEffectAndAssignCleanup,
-  $push,
+  rafPendingCallbacks,
 } from "./manage";
 
 import { argsChanged } from "./util";
 
 import { Component } from "../../component";
 import { EMPTY_OBJ } from "../../constants";
+import { $push } from "../../util";
 
 function unmount() {
   const pending = (this as Component)._pendingEffects;
@@ -63,7 +64,7 @@ export function useEffect(callback: () => void, dependencies?: any[]): void {
     cleanUp,
   };
   // only push effect if we haven't already added it to the queue
-  $push(pending);
+  $push(rafPendingCallbacks, pending);
 
   candidate.componentWillUnmount = unmount;
 }

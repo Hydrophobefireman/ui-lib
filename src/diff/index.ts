@@ -1,6 +1,6 @@
 import { DiffMeta, RenderedDom, VNode } from "../types/index";
-import { EMPTY_OBJ, NULL_TYPE } from "../constants";
-import { Fragment, flattenVNodeChildren } from "../create_element";
+import { EMPTY_OBJ, NULL_TYPE, Fragment } from "../constants";
+import { flattenVNodeChildren } from "../create_element";
 import { diffChildren, getDom } from "./children";
 import { isFn, toSimpleVNode } from "../toSimpleVNode";
 

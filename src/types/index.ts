@@ -18,8 +18,6 @@ export interface VNode<P = {}, R = any> {
   _component: Component<P>;
   // these are returned by function/class components
   _renders: VNode<any>;
-  // passes the depth arg to the component
-  _depth: number;
   // parentDom node -> to call append child on if we can not reorder
   _parentDom: HTMLElement;
   // used to track reused VNodes
@@ -110,6 +108,5 @@ type ReadonlyVNodeProps =
   | "props"
   | "key"
   | "ref"
-  | "_children"
-  | "_depth";
+  | "_children";
 export type WritableProps = Exclude<keyof VNode, ReadonlyVNodeProps>;

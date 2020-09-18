@@ -4,12 +4,10 @@ import {
   VNode,
   createElementPropType,
 } from "./types/index";
-import { EMPTY_ARRAY, EMPTY_OBJ, NULL_TYPE } from "./constants";
+import { EMPTY_ARRAY, EMPTY_OBJ, NULL_TYPE, Fragment } from "./constants";
 
 import { flattenArray, objectWithoutKeys } from "./util";
-import { cloneElement } from "./clone_element";
-
-export const Fragment: any = function Fragment() {};
+import { plugins } from "./config";
 
 export const skipProps: (keyof VNode)[] = ["key", "ref"];
 
@@ -56,7 +54,9 @@ export function createElement<P = {}, R = any>(
     _children = flattenArray(children);
   }
   (props as any).children = _children;
-  return getVNode<P, R>(type, props, key, ref);
+  const _vnode = getVNode<P, R>(type, props, key, ref);
+  plugins.createElement(_vnode);
+  return _vnode;
 }
 
 export function coerceToVNode(VNode: ComponentChild | VNode): VNode {
@@ -115,7 +115,6 @@ export function getVNode<P, R>(
     _component: null,
     _renders: null,
     _parentDom: null,
-    _depth: 0,
     _used: false,
     constructor: undefined,
   };

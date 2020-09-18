@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StateDrive test</title>
+  </head>
+  <body>
+    <div id="mount"></div>
+    <script type="module">
+      import * as sd from "https://cdn.skypack.dev/statedrive";
+      import {
+        h,
+        render,
+        useEffect,
+      } from "https://cdn.skypack.dev/@hydrophobefireman/ui-lib";
+      console.log(sd);
+      const state = sd.createState({ name: "nameState" });
+      const numA = sd.createState({});
+      const numB = sd.createState({});
+      const get = sd.get;
+      function App() {
+        const [val, setVal] = sd.useSharedState(state);
+        const [__, setA] = sd.useSharedState(numA);
+        const [_, setB] = sd.useSharedState(numB);
+        const value = sd.useSelector(() => {
+          return (get(numA) || 0) + (get(numB) || 0);
+        }, [numA, numB]);
+        return h(
+          "div",
+          null,
+          "hello {",
+          val,
+          "}",
+          h("br"),
+          h("input", {
+            onInput(e) {
+              setVal(e.target.value);
+            },
+          }),
+          h("br"),
+          h(
+            "div",
+            null,
+            h("span", null, "Number a :"),
+            h("input", {
+              onInput(e) {
+                setA(+e.target.value);
+              },
+            })
+          ),
+          h(
+            "div",
+            null,
+            h("span", null, "Number b :"),
+            h("input", {
+              onInput(e) {
+                setB(+e.target.value);
+              },
+            })
+          ),
+          h("div", null, "Value ", value)
+        );
+      }
+      function Title() {
+        const [val] = sd.useSharedState(state);
+        useEffect(() => (document.title = "Hello " + (val || "")), [val]);
+      }
+      render([h(App), h(Title)], document.getElementById("mount"));
+    </script>
+  </body>
+</html>

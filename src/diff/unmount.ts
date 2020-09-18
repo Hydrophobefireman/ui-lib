@@ -4,10 +4,10 @@ import {
   LIFECYCLE_WILL_UNMOUNT,
   BATCH_MODE_REMOVE_ATTRIBUTE,
   BATCH_MODE_CLEAR_POINTERS,
+  Fragment,
 } from "../constants";
 import { DiffMeta, RenderedDom, VNode, UIElement } from "../types/index";
 
-import { Fragment } from "../create_element";
 import { scheduleLifeCycleCallbacks } from "../lifeCycleCallbacks";
 import { setRef } from "../ref";
 import config from "../config";

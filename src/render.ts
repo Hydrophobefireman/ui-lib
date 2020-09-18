@@ -1,10 +1,11 @@
 // import { clearDOM } from "./util";
 import { DOMOps, VNode, VNodeHost } from "./types/index";
-import { Fragment, createElement } from "./create_element";
+import { createElement } from "./create_element";
 
 import { clearDOM } from "./util";
 import { diff } from "./diff/index";
 import { onDiff } from "./lifeCycleCallbacks";
+import { Fragment } from "./constants";
 
 export function render(VNode: VNode, parentDom: VNodeHost) {
   let old: VNode;

@@ -1,6 +1,6 @@
 import { DiffMeta, UIElement, VNode } from "../types/index";
-import { EMPTY_ARRAY, EMPTY_OBJ, NULL_TYPE } from "../constants";
-import { Fragment, createElement } from "../create_element";
+import { EMPTY_ARRAY, EMPTY_OBJ, NULL_TYPE, Fragment } from "../constants";
+import { createElement } from "../create_element";
 
 import { assign } from "../util";
 import { diff } from "./index";

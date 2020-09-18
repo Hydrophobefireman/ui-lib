@@ -13,6 +13,7 @@ import { DiffMeta, Props, RenderedDom, UIElement, VNode } from "../types/index";
 
 import { IS_ARIA_PROP } from "../constants";
 import { JSXInternal } from "../types/jsx";
+import { plugins } from "../config";
 
 export function diffDomNodes(
   newVNode: VNode,
@@ -67,6 +68,7 @@ function createDomFromVNode(newVNode: VNode, meta: DiffMeta): UIElement {
       return (document.createComment("$") as unknown) as UIElement;
     }
     let dom: UIElement;
+
     if (meta.isSvg) {
       dom = (document.createElementNS(
         "http://www.w3.org/2000/svg",
@@ -76,6 +78,7 @@ function createDomFromVNode(newVNode: VNode, meta: DiffMeta): UIElement {
       dom = document.createElement(type as string) as UIElement;
     }
     dom._events = {};
+    plugins.domNodeCreated(dom, newVNode);
     return dom;
   }
 }

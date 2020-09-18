@@ -31,3 +31,13 @@ export const LIFECYCLE_DID_MOUNT = "componentDidMount";
 export const LIFECYCLE_WILL_UPDATE = "componentWillUpdate";
 export const LIFECYCLE_DID_UPDATE = "componentDidUpdate";
 export const LIFECYCLE_WILL_UNMOUNT = "componentWillUnmount";
+
+export type LifeCycleCallbacks =
+  | "componentWillMount"
+  | "componentDidMount"
+  | "componentWillUnmount"
+  | "shouldComponentUpdate"
+  | "componentWillUpdate"
+  | "componentDidUpdate";
+
+export const Fragment: any = function Fragment() {};

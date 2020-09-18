@@ -82,12 +82,11 @@ const DOM_POINTERS: Record<
 };
 
 const VNode_POINTERS: Record<
-  WritableProps | "_children" | "_depth" | "key" | "ref",
+  WritableProps | "_children" | "key" | "ref",
   1 | null
 > = {
   _children: 1,
   _component: 1,
-  _depth: 1,
   _dom: 1,
   _renders: 1,
   _parentDom: 1,

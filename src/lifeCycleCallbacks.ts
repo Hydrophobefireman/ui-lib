@@ -1,12 +1,16 @@
 import { HAS_PROMISE, defer, plugins } from "./config";
-import { LIFECYCLE_DID_MOUNT, LIFECYCLE_DID_UPDATE } from "./constants";
+import {
+  LIFECYCLE_DID_MOUNT,
+  LIFECYCLE_DID_UPDATE,
+  LifeCycleCallbacks,
+} from "./constants";
 
 import { Component } from "./component";
 import { DOMOps } from "./types/index";
 import { commitDOMOps } from "./commit";
 
 type ProcessOptions = {
-  name: Component["_lastLifeCycleMethod"];
+  name: LifeCycleCallbacks;
   bind: Component;
   args?: any[];
 };
@@ -32,6 +36,7 @@ function __executeCallback(cbObj: ProcessOptions) {
   const fName = cbObj.name;
   const component = cbObj.bind;
   const func = component[fName];
+  plugins.lifeCycle(fName, component);
   component._lastLifeCycleMethod = fName;
   if (!func) return;
 
@@ -58,7 +63,7 @@ function __executeCallback(cbObj: ProcessOptions) {
 
 export function onDiff(queue: DOMOps[]) {
   commitDOMOps(queue);
-  plugins.diffed();
+  plugins.diffEnd();
   processLifeCycleQueue(mountCallbackQueue);
   processLifeCycleQueue(updateCallbackQueue);
 }

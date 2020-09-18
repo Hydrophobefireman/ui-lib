@@ -28,10 +28,12 @@
         A,
         createRoutePath,
         RouterSubscription,
+        addPluginCallback,
         render,
         Path,
       } from "../../ui/index.js";
       const f = Fragment;
+      addPluginCallback("domNodeCreated", console.log);
       class UL extends Component {
         render({ todos = [], show }) {
           const c = h(

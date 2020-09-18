@@ -4,12 +4,12 @@ import {
   ComponentType,
   ComponentConstructor,
 } from "../../types/index";
-import { Fragment, createElement } from "../../create_element";
+import { createElement } from "../../create_element";
 
 import { Component } from "../../component";
-import { assign } from "../../util";
+import { assign, $push } from "../../util";
 import { createElementIfNeeded } from "../common";
-import { createRef } from "../../ref";
+import { Fragment } from "../../constants";
 
 const pathFixRegex = /\/+$/;
 
@@ -23,10 +23,12 @@ const _routerSubscriptions: Array<(
   options: {}
 ) => any> = [];
 
-type Subscription = (e: PopStateEvent | string) => any;
+interface Subscription {
+  (e: PopStateEvent | string): any;
+}
 export const RouterSubscription = {
   subscribe(fun: Subscription) {
-    if (!_routerSubscriptions.includes(fun)) _routerSubscriptions.push(fun);
+    $push(_routerSubscriptions, fun);
   },
   unsubscribe(fun: Subscription) {
     _routerSubscriptions.splice(_routerSubscriptions.indexOf(fun), 1);
@@ -51,14 +53,20 @@ export function redirect(url: string) {
   RouterSubscription.emit(url, { type: "redirect", native: false });
 }
 
-type PathProps = {
+interface PathProps {
   match: RoutePath;
   component: any;
-};
-type RouterState = { renderPath?: string; child?: VNode[] };
-export class Router extends Component<{}, RouterState> {
+}
+interface RouterState {
+  renderPath?: string;
+  child?: VNode[];
+}
+interface RouterProps {
+  falbackComponent: any;
+}
+export class Router extends Component<RouterProps, RouterState> {
   state: RouterState;
-  constructor(props: Props<{}>) {
+  constructor(props: Props<RouterProps>) {
     super(props);
     this.state = {};
     this._routeChangeHandler = this._routeChangeHandler.bind(this);
@@ -156,6 +164,7 @@ interface RoutePath {
   params: { [index: number]: string };
 }
 export function createRoutePath(pathString: string | RoutePath): RoutePath {
+  if (!pathString) throw Error("Invalid value for match: " + pathString);
   if ((pathString as RoutePath).regex != null) return pathString as RoutePath;
   pathString = fixPath(pathString as string);
   const params: { [index: number]: string } = {};
@@ -196,12 +205,10 @@ function _call(func: EventListener, arg: MouseEvent, ref: HTMLAnchorElement) {
 }
 export class A extends Component {
   _onClick: (e: MouseEvent) => void;
-  _ref: { current: HTMLAnchorElement };
   constructor(props: Props<{}>) {
     super(props);
-    this._ref = createRef<HTMLAnchorElement>();
     this._onClick = (e: MouseEvent): void => {
-      const current = this._ref.current;
+      const current = e.currentTarget as HTMLAnchorElement;
       _call(onLinkClick, e, current);
       const userOnClick = this.props.onClick;
       userOnClick && _call(userOnClick, e, current);
@@ -209,10 +216,7 @@ export class A extends Component {
   }
 
   render(props: Props<{}>): VNode {
-    return createElement(
-      "a",
-      assign({}, props, { ref: this._ref, onClick: this._onClick })
-    );
+    return createElement("a", assign({}, props, { onClick: this._onClick }));
   }
 }
 

@@ -1,10 +1,12 @@
-export { createElement, createElement as h, Fragment } from "./create_element";
+export { Fragment } from "./constants";
+
+export { createElement, createElement as h } from "./create_element";
 
 export { render } from "./render";
 
 export { Component, Component as default } from "./component";
 
-export { default as config, plugins } from "./config";
+export { default as config, addPluginCallback } from "./config";
 
 /** @TODO create separate packages */
 export { AsyncComponent } from "./pkg/AsyncComponent/AsyncComponent";
@@ -18,7 +20,7 @@ export {
   Path,
 } from "./pkg/router/router";
 
-export { createRef } from "./ref";
+export { createRef, RefType } from "./ref";
 
 export * from "./hooks/index";
 export * from "./types/index";
