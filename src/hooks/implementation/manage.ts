@@ -83,5 +83,7 @@ export function getHookStateAtCurrentRender(): [Component, number] {
   return [hookCandidate, hookIndex++];
 }
 // todo manage sideEffects
-addPluginCallback("hookSetup", prepForNextHookCandidate);
-addPluginCallback("diffEnd", setEffectiveCallbacks);
+addPluginCallback({
+  hookSetup: prepForNextHookCandidate,
+  diffEnd: setEffectiveCallbacks,
+});

@@ -31,18 +31,16 @@ export const plugins: IPlugins = {
   componentInstance: Fragment,
 };
 
-type PluginCallbacks = keyof typeof plugins;
-
-export function addPluginCallback(
-  type: PluginCallbacks,
-  cb: anyFunc<any>
-): void {
-  if (!cb) throw new Error("invalid callback: " + cb);
-  let oldType: anyFunc<any> = plugins[type];
-  plugins[type] = function () {
-    oldType.apply(0, arguments);
-    cb.apply(0, arguments);
-  };
+export function addPluginCallback(options: Partial<IPlugins>): void {
+  for (const type in options) {
+    const cb = options[type as keyof IPlugins];
+    if (!cb) throw new Error("invalid callback: " + cb);
+    let oldType = plugins[type];
+    plugins[type] = function () {
+      oldType.apply(0, arguments);
+      cb.apply(0, arguments);
+    };
+  }
 }
 
 const config = {
