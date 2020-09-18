@@ -18,14 +18,14 @@
       const state = sd.createState({ name: "nameState" });
       const numA = sd.createState({});
       const numB = sd.createState({});
-      const get = sd.get;
+      // const get = sd.get;
       function App() {
         const [val, setVal] = sd.useSharedState(state);
         const [__, setA] = sd.useSharedState(numA);
         const [_, setB] = sd.useSharedState(numB);
-        const value = sd.useSelector(() => {
+        const value = sd.useSelector(({ get }) => {
           return (get(numA) || 0) + (get(numB) || 0);
-        }, [numA, numB]);
+        });
         return h(
           "div",
           null,
@@ -63,8 +63,9 @@
         );
       }
       function Title() {
-        const [val] = sd.useSharedState(state);
-        useEffect(() => (document.title = "Hello " + (val || "")), [val]);
+        sd.useSelector(({ get }) => {
+          document.title = "Hello " + (get(state) || "");
+        });
       }
       render([h(App), h(Title)], document.getElementById("mount"));
     </script>
