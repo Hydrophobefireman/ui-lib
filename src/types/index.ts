@@ -1,4 +1,3 @@
-import { JSXInternal } from "./jsx";
 import { Component } from "../component";
 
 export type RenderedDom = UIElement;
@@ -23,8 +22,15 @@ export interface VNode<P = {}, R = any> {
   // used to track reused VNodes
   _used: boolean;
 }
+export type ComponentProps<
+  C extends ComponentType<any> | keyof JSX.IntrinsicElements
+> = C extends ComponentType<infer P>
+  ? P
+  : C extends keyof JSX.IntrinsicElements
+  ? JSX.IntrinsicElements[C]
+  : never;
 
-export type EventListenerDict = JSXInternal.DOMEvents<EventTarget>;
+export type EventListenerDict = JSX.DOMEvents<EventTarget>;
 export type createElementPropType<P> = Props<P> | null;
 export type ComponentType<P = {}> =
   | ComponentConstructor<P>
@@ -51,8 +57,8 @@ export type setStateArgType<P, S, K extends keyof S> =
   | (Pick<S, K> | Partial<S> | null);
 
 export type Props<P> = Readonly<
-  { children?: ComponentChildren } & JSXInternal.DOMEvents<EventTarget> &
-    JSXInternal.HTMLAttributes &
+  { children?: ComponentChildren } & JSX.DOMEvents<EventTarget> &
+    JSX.HTMLAttributes &
     Record<string, any> &
     P
 >;
@@ -67,9 +73,7 @@ export type ComponentChild =
 export type ComponentChildren = ComponentChild[] | ComponentChild;
 
 export interface UIElement extends HTMLElement {
-  _events?: Partial<
-    Record<keyof JSXInternal.DOMEvents<any>, JSXInternal.EventHandler<any>>
-  >;
+  _events?: Partial<Record<keyof JSX.DOMEvents<any>, JSX.EventHandler<any>>>;
   _VNode?: VNode;
   data?: string | number;
 }

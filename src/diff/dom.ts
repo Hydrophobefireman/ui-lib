@@ -12,7 +12,6 @@ import {
 import { DiffMeta, Props, RenderedDom, UIElement, VNode } from "../types/index";
 
 import { IS_ARIA_PROP } from "../constants";
-import { JSXInternal } from "../types/jsx";
 import { plugins } from "../config";
 
 export function diffDomNodes(
@@ -247,7 +246,7 @@ function __diffTextNodes(dom: UIElement, newVal: string, oldVal: string) {
 /** dom helper */
 export function $(dom: UIElement, prop: string, value: any, isSvg?: boolean) {
   if (prop[0] === "o" && prop[1] === "n") {
-    return $event(dom, prop as keyof JSXInternal.DOMEvents<any>, value);
+    return $event(dom, prop as keyof JSX.DOMEvents<any>, value);
   }
   const shouldRemove =
     value == null || (value === false && !IS_ARIA_PROP.test(prop));
@@ -262,7 +261,7 @@ export function $(dom: UIElement, prop: string, value: any, isSvg?: boolean) {
 function $event(
   dom: UIElement,
   event: string,
-  listener: JSXInternal.EventHandler<any>
+  listener: JSX.EventHandler<any>
 ) {
   event = event.substr(2).toLowerCase();
   const eventDict = dom._events;

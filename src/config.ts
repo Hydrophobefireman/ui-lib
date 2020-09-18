@@ -2,8 +2,6 @@ import { VNode, UIElement, Props } from "./types/index";
 import { Component } from "./component";
 import { LifeCycleCallbacks, Fragment } from "./constants";
 
-type anyFunc<T> = (...args: T[]) => T;
-
 export const HAS_PROMISE = typeof Promise !== "undefined";
 
 export const defer: <T>(cb: () => T) => Promise<T> = HAS_PROMISE
@@ -19,7 +17,7 @@ export interface IPlugins {
   diffStart(thisVal: Component, force: boolean): void;
   lifeCycle(cb: LifeCycleCallbacks, component: Component): void;
   domNodeCreated(dom: UIElement, VNode: VNode): void;
-  componentInstance<T = {}>(thisVal: Component, props: Props<T>): void;
+  componentInstance(thisVal: Component, props: Props<any>): void;
 }
 export const plugins: IPlugins = {
   createElement: Fragment,

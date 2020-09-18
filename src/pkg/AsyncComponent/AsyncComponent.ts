@@ -26,7 +26,7 @@ export class AsyncComponent extends Component<AsyncProps, AsyncState> {
   componentDidMount() {
     this._init();
   }
-  componentDidUpdate(prevProps: Props<{}>) {
+  componentDidUpdate(prevProps: Props<AsyncProps>) {
     const prevPromise =
       prevProps && (prevProps.promise || prevProps.componentPromise);
     const currPromise = this.props.promise || this.props.componentPromise;
