@@ -49,6 +49,7 @@ const config = {
   RAF_TIMEOUT: 100,
   debounceEffect: null,
   inMemoryRouter: false,
+  memoryRouteStore: localStorage,
 };
 
 export default config;

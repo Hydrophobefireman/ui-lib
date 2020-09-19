@@ -49,7 +49,7 @@ function routeAction(url: string, action?: "pushState" | "replaceState") {
   if (!config.inMemoryRouter) {
     return window.history[action](null, "", url);
   } else {
-    sessionStorage.setItem(sessKey, url);
+    config.memoryRouteStore.setItem(sessKey, url);
   }
 }
 
@@ -73,6 +73,7 @@ interface RouterState {
 interface RouterProps {
   fallbackComponent?: any;
   inMemoryRouter?: boolean;
+  defaultRoute?: string;
 }
 export class Router extends Component<RouterProps, RouterState> {
   state: RouterState;
@@ -139,7 +140,9 @@ export class Router extends Component<RouterProps, RouterState> {
   _routeChangeHandler(_e: PopStateEvent | string): void {
     const renderPath = fixPath(
       config.inMemoryRouter
-        ? sessionStorage.getItem(sessKey) || "/"
+        ? config.memoryRouteStore.getItem(sessKey) ||
+            this.props.defaultRoute ||
+            "/"
         : Router.path
     );
     const children = this.props.children as VNode[];
