@@ -115,7 +115,10 @@
             h(UL, { todos, show: this.state.show }),
             h(
               Router,
-              { fallbackComponent: () => h("div", null, "Not Found") },
+              {
+                fallbackComponent: () => h("div", null, "Not Found"),
+                inMemoryRouter: true,
+              },
               h(Path, {
                 match: createRoutePath(base + "page1(/?)"),
                 component: function () {

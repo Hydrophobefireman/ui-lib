@@ -10,6 +10,7 @@ import { Component } from "../../component";
 import { assign, $push } from "../../util";
 import { createElementIfNeeded } from "../common";
 import { Fragment } from "../../constants";
+import config from "../../config";
 
 const pathFixRegex = /\/+$/;
 
@@ -43,13 +44,21 @@ export const RouterSubscription = {
     _routerSubscriptions.length = 0;
   },
 };
+const sessKey = "UI--ROUTE";
+function routeAction(url: string, action?: "pushState" | "replaceState") {
+  if (!config.inMemoryRouter) {
+    return window.history[action](null, "", url);
+  } else {
+    sessionStorage.setItem(sessKey, url);
+  }
+}
 
 export function loadURL(url: string) {
-  window.history.pushState(null, "", url);
+  routeAction(url, "pushState");
   RouterSubscription.emit(url, { type: "load", native: false });
 }
 export function redirect(url: string) {
-  window.history.replaceState(null, "", url);
+  routeAction(url, "replaceState");
   RouterSubscription.emit(url, { type: "redirect", native: false });
 }
 
@@ -63,6 +72,7 @@ interface RouterState {
 }
 interface RouterProps {
   fallbackComponent?: any;
+  inMemoryRouter?: boolean;
 }
 export class Router extends Component<RouterProps, RouterState> {
   state: RouterState;
@@ -70,8 +80,11 @@ export class Router extends Component<RouterProps, RouterState> {
     super(props);
     this.state = {};
     this._routeChangeHandler = this._routeChangeHandler.bind(this);
+    this.componentDidUpdate = this._setRouteMethod;
   }
-
+  _setRouteMethod() {
+    config.inMemoryRouter = !!this.props.inMemoryRouter;
+  }
   static __emitter() {
     RouterSubscription.emit(Router.path + Router.qs, {
       type: "popstate",
@@ -107,6 +120,7 @@ export class Router extends Component<RouterProps, RouterState> {
   }
 
   componentDidMount() {
+    this._setRouteMethod();
     RouterSubscription.subscribe(this._routeChangeHandler);
     window.addEventListener("popstate", Router.__emitter);
     this._routeChangeHandler(null);
@@ -123,7 +137,11 @@ export class Router extends Component<RouterProps, RouterState> {
     );
   }
   _routeChangeHandler(_e: PopStateEvent | string): void {
-    const renderPath = fixPath(Router.path);
+    const renderPath = fixPath(
+      config.inMemoryRouter
+        ? sessionStorage.getItem(sessKey) || "/"
+        : Router.path
+    );
     const children = this.props.children as VNode[];
 
     let child: VNode[] = [];

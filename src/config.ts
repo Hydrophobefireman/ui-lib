@@ -48,6 +48,7 @@ const config = {
   warnOnUnmountRender: false,
   RAF_TIMEOUT: 100,
   debounceEffect: null,
+  inMemoryRouter: false,
 };
 
 export default config;
