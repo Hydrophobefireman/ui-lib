@@ -4,7 +4,7 @@ import { Component } from "../../component";
 import { createElementIfNeeded } from "../common";
 import { objectWithoutKeys } from "../../util";
 
-type Renderable = ComponentType | VNode;
+type Renderable = ComponentType | VNode | string;
 type AsyncPromResponse = Promise<Renderable>;
 interface AsyncState {
   // promise?: Promise<VNode>;

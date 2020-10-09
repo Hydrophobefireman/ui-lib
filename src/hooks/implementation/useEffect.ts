@@ -20,7 +20,7 @@ function unmount() {
 }
 
 export function useEffect(
-  callback: () => unknown | (() => void),
+  callback: () => (() => unknown) | unknown,
   dependencies?: unknown[]
 ): void {
   const state = getHookStateAtCurrentRender();

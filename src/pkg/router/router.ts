@@ -243,5 +243,5 @@ export class A extends Component {
 
 export const Path = ({} as any) as ComponentConstructor<{
   match: string | RoutePath;
-  component: ComponentType | string;
+  component: ComponentType | string | VNode;
 }>;
