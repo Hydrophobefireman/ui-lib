@@ -19,7 +19,10 @@ function unmount() {
   (this as Component)._pendingEffects = null;
 }
 
-export function useEffect(callback: () => void, dependencies?: any[]): void {
+export function useEffect(
+  callback: () => unknown | (() => void),
+  dependencies?: unknown[]
+): void {
   const state = getHookStateAtCurrentRender();
 
   const candidate = state[0];
