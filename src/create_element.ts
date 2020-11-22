@@ -4,9 +4,9 @@ import {
   VNode,
   createElementPropType,
 } from "./types/index";
-import { EMPTY_ARRAY, EMPTY_OBJ, NULL_TYPE, Fragment } from "./constants";
-
+import { EMPTY_ARRAY, EMPTY_OBJ, Fragment, NULL_TYPE } from "./constants";
 import { flattenArray, objectWithoutKeys } from "./util";
+
 import { plugins } from "./config";
 
 export const skipProps: (keyof VNode)[] = ["key", "ref"];
@@ -26,7 +26,7 @@ export const skipProps: (keyof VNode)[] = ["key", "ref"];
 export function createElement<P = {}, R = any>(
   type: VNode<P>["type"],
   props?: createElementPropType<P>,
-  ...children: ComponentChildren[]
+  ...children: ComponentChildren | ComponentChildren[]
 ): VNode<P> | null;
 export function createElement<P = {}, R = any>(
   type: VNode<P>["type"],

@@ -1,6 +1,6 @@
 {
   "name": "@hydrophobefireman/ui-lib",
-  "version": "1.5.5",
+  "version": "1.6.0",
   "description": "",
   "main": "dist/index.m.js",
   "scripts": {
@@ -25,6 +25,7 @@
   "sideEffects": false,
   "homepage": "https://github.com/Hydrophobefireman/ui-lib#readme",
   "devDependencies": {
-    "microbundle": "^0.12.4"
+    "microbundle": "^0.12.4",
+    "typescript": "^4.1.2"
   }
 }

@@ -2,10 +2,9 @@ import { RenderedDom, VNode } from "./types/index";
 
 import { Component } from "./component";
 import { EMPTY_OBJ } from "./constants";
+import { RefType } from "./types/index";
 
-export interface RefType<T> {
-  current: T;
-}
+export type { RefType };
 
 export function setRef<T>(ref: ((value: T) => void) | RefType<T>, value: T) {
   if (!ref) return;

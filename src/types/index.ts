@@ -1,5 +1,7 @@
 import { Component } from "../component";
-
+export interface RefType<T> {
+  current: T;
+}
 export type RenderedDom = UIElement;
 export interface VNode<P = {}, R = any> {
   type?: string | ComponentType<P>;
@@ -8,7 +10,7 @@ export interface VNode<P = {}, R = any> {
   props: Props<P>;
   key: any;
   // ref
-  ref: ((val: R) => void) | { current: R };
+  ref: ((val: R) => void) | RefType<R>;
   // dom rendered can be `Element` or `Text`
   _dom: RenderedDom;
   // normalized props.children
@@ -32,12 +34,14 @@ export type ComponentProps<
 
 export type EventListenerDict = JSX.DOMEvents<EventTarget>;
 export type createElementPropType<P> = Props<P> | null;
-export type ComponentType<P = {}> =
-  | ComponentConstructor<P>
-  | FunctionComponent<P>;
+export interface ComponentType<P = {}>
+  extends ComponentConstructor<P>,
+    FunctionComponent<P> {
+  contextType: Context;
+}
 
 export interface ComponentConstructor<P = {}> {
-  new (props: Props<P>): Component<P>;
+  new (props: Props<P>, context: any): Component<P>;
   prototype: Component<P>;
 
   getDerivedStateFromProps?(
@@ -46,7 +50,7 @@ export interface ComponentConstructor<P = {}> {
   ): object | null;
 }
 export interface FunctionComponent<P = {}> {
-  (props: Props<P>): VNode<any> | null;
+  (props: Props<P>, context?: any): ComponentChild;
 }
 
 export type setStateArgType<P, S, K extends keyof S> =
@@ -64,13 +68,12 @@ export type Props<P> = Readonly<
 >;
 export type ComponentChild =
   | VNode<any>
-  | object
   | string
   | number
   | boolean
   | null
   | undefined;
-export type ComponentChildren = ComponentChild[] | ComponentChild;
+export type ComponentChildren = ComponentChild[];
 
 export interface UIElement extends HTMLElement {
   _events?: Partial<Record<keyof JSX.DOMEvents<any>, JSX.EventHandler<any>>>;
@@ -85,10 +88,39 @@ export type DiffMeta = {
   depth: number;
   batch: DOMOps[];
   isSvg: boolean;
+  context: { [id: string]: ContextProvider };
+  contextValue?: any;
+  provider?: ContextProvider;
   next?: UIElement;
 };
 
-export type HookInternal = { currentComponent: Component };
+export interface ConsumerCallback<T> {
+  (value: T): ComponentChild;
+}
+export interface ContextConsumer<T>
+  extends FunctionComponent<{ children: [ConsumerCallback<T>] }> {}
+
+export interface ContextProvider extends Component<{ value: any }> {
+  getChildContext(): { [id: string]: Context };
+  add(c: Component): void;
+}
+
+export interface ContextProviderConstructor
+  extends ComponentConstructor<{ value: any }> {
+  new (p: Props<{ value: any }>): ContextProvider;
+  prototype: ContextProvider;
+}
+
+export interface Context<T = unknown> {
+  $id: string;
+  def: T;
+  Consumer: ContextConsumer<T>;
+  Provider: ContextProviderConstructor;
+}
+
+export interface HookInternal {
+  currentComponent: Component;
+}
 
 export interface DOMOps {
   node: UIElement;

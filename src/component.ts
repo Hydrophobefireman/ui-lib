@@ -1,25 +1,27 @@
 import {
   ComponentChild,
+  ContextProvider,
   DOMOps,
   Props,
   UIElement,
   VNode,
   setStateArgType,
 } from "./types/index";
-
-import { assign } from "./util";
 import config, { plugins } from "./config";
+
+import { LifeCycleCallbacks } from "./constants";
+import { assign } from "./util";
 import { diff } from "./diff/index";
 import { onDiff } from "./lifeCycleCallbacks";
-import { LifeCycleCallbacks } from "./constants";
 
 const RENDER_QUEUE: Component[] = [];
 
 /** The pseudo-abstract component class */
 export class Component<P = {}, S = {}> {
-  constructor(props?: P) {
+  constructor(props: P, context?: any) {
     this.state = {} as any;
     this.props = props as Props<P>;
+    this.context = context;
     plugins.componentInstance(this, props);
   }
 
@@ -38,8 +40,11 @@ export class Component<P = {}, S = {}> {
   _oldState?: S;
   // before applying to `Component.state`, pass the next state for `componentWillUpdate`
   _nextState?: S;
+  // context of this component and its descendants
+  _sharedContext?: { [id: string]: ContextProvider };
+  context?: any;
 
-  render(props?: Props<P>, state?: Readonly<S>): ComponentChild {
+  render(props?: Props<P>, state?: Readonly<S>, context?: any): ComponentChild {
     return null;
   }
 
@@ -65,12 +70,18 @@ export class Component<P = {}, S = {}> {
     const batchQueue: DOMOps[] = [];
     const shouldForce = callback !== false;
     plugins.diffStart(this, shouldForce);
+
     diff(
       this._VNode,
       assign({}, this._VNode),
       this._VNode._parentDom,
       shouldForce,
-      { depth: this._depth, batch: batchQueue, isSvg: false }
+      {
+        depth: this._depth,
+        batch: batchQueue,
+        isSvg: false,
+        context: this._sharedContext || {},
+      }
     ) as UIElement;
     typeof callback === "function" && callback();
     onDiff(batchQueue);
@@ -89,18 +100,23 @@ export class Component<P = {}, S = {}> {
     nextProps: Readonly<P>,
     nextState: Readonly<S>
   ): boolean;
-  componentWillUpdate?(nextProps: Readonly<P>, nextState: Readonly<S>): void;
+  componentWillUpdate?(
+    nextProps: Readonly<P>,
+    nextState: Readonly<S>,
+    nextContext: any
+  ): void;
   // getSnapshotBeforeUpdate?(oldProps: Readonly<P>, oldState: Readonly<S>): any;
   componentDidUpdate?(
     previousProps: Readonly<P>,
-    previousState: Readonly<S>
+    previousState: Readonly<S>,
+    nextContext: any
   ): void;
   componentDidCatch?(error: any): void;
   _dirty?: boolean;
   _lastLifeCycleMethod?: LifeCycleCallbacks;
 }
 
-function enqueueRender(c: Component) {
+export function enqueueRender(c: Component) {
   c._dirty = true;
   if (RENDER_QUEUE.push(c) === 1) {
     config.scheduleRender(process);

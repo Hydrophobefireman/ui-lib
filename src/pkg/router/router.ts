@@ -1,16 +1,16 @@
+import { $push, assign } from "../../util";
 import {
+  ComponentConstructor,
+  ComponentType,
   Props,
   VNode,
-  ComponentType,
-  ComponentConstructor,
 } from "../../types/index";
-import { createElement } from "../../create_element";
 
 import { Component } from "../../component";
-import { assign, $push } from "../../util";
-import { createElementIfNeeded } from "../common";
 import { Fragment } from "../../constants";
 import config from "../../config";
+import { createElement } from "../../create_element";
+import { createElementIfNeeded } from "../common";
 
 const pathFixRegex = /\/+$/;
 

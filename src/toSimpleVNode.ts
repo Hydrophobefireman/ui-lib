@@ -1,5 +1,6 @@
 import {
   ComponentConstructor,
+  ComponentType,
   DiffMeta,
   FunctionComponent,
   Props,
@@ -7,21 +8,22 @@ import {
 } from "./types/index";
 import {
   EMPTY_OBJ,
+  Fragment,
   LIFECYCLE_DID_MOUNT,
   LIFECYCLE_DID_UPDATE,
   LIFECYCLE_WILL_MOUNT,
   LIFECYCLE_WILL_UPDATE,
-  Fragment,
 } from "./constants";
-import { coerceToVNode } from "./create_element";
 
 import { Component } from "./component";
 import { assign } from "./util";
+import { coerceToVNode } from "./create_element";
 import { diffReferences } from "./ref";
+import { isProvider } from "./context";
 import { plugins } from "./config";
 import { scheduleLifeCycleCallbacks } from "./lifeCycleCallbacks";
 
-export const isFn = (vnType: any) =>
+export const isFn = (vnType: any): vnType is ComponentType =>
   typeof vnType === "function" && vnType !== Fragment;
 
 export function toSimpleVNode(
@@ -34,6 +36,18 @@ export function toSimpleVNode(
   if (VNode != null && isFn((type = VNode.type))) {
     oldVNode = oldVNode || EMPTY_OBJ;
     let next: VNode;
+
+    const contextType = (type as ComponentType).contextType;
+
+    const provider = contextType && meta.context[contextType.$id];
+
+    const contextValue = provider
+      ? provider.props.value
+      : contextType && contextType.def;
+
+    meta.contextValue = contextValue;
+    meta.provider = provider;
+
     if (isClassComponent(type)) {
       /** class component, call lifecycle methods */
       next = renderClassComponent(VNode, oldVNode, forceUpdate, meta);
@@ -42,6 +56,15 @@ export function toSimpleVNode(
       next = renderFunctionalComponent(VNode, meta);
     }
     VNode._renders = next;
+    meta.provider = meta.contextValue = undefined;
+    const c = VNode._component;
+
+    if (c) {
+      if (isProvider(c)) {
+        const obj = c.getChildContext();
+        meta.context = assign({}, meta.context, obj);
+      }
+    }
     return next;
   } else {
     /** VNode is already simple */
@@ -52,60 +75,61 @@ export function toSimpleVNode(
 function renderClassComponent(
   VNode: VNode,
   oldVNode: VNode,
-  forceUpdate?: boolean,
-  meta?: DiffMeta
+  forceUpdate: boolean,
+  meta: DiffMeta
 ) {
   let nextLifeCycle: "componentDidMount" | "componentDidUpdate";
   const cls = VNode.type as ComponentConstructor;
-  let component = VNode._component;
-  const isExisting = component != null;
+  let c = VNode._component;
+  const isExisting = c != null;
   if (isExisting) {
     nextLifeCycle = LIFECYCLE_DID_UPDATE;
     /**existing component */
-    if (component.shouldComponentUpdate != null && !forceUpdate) {
-      const scu = component.shouldComponentUpdate(
-        VNode.props,
-        component._nextState || component.state
-      );
+    if (c.shouldComponentUpdate != null && !forceUpdate) {
+      const scu = c.shouldComponentUpdate(VNode.props, c._nextState || c.state);
       if (scu === false) {
         return EMPTY_OBJ;
       }
     }
   } else {
     nextLifeCycle = LIFECYCLE_DID_MOUNT;
-    component = new cls(VNode.props);
-    VNode._component = component;
-    component._depth = ++meta.depth;
+    c = new cls(VNode.props, meta.contextValue);
+    VNode._component = c;
+    c._depth = ++meta.depth;
   }
-  component._VNode = VNode;
-  const oldState = component._oldState;
+  setContext(c, meta);
+  c._VNode = VNode;
+  const oldState = c._oldState;
   const oldProps = oldVNode.props;
 
   scheduleLifeCycleCallbacks({
-    bind: component,
+    bind: c,
     name: isExisting ? LIFECYCLE_WILL_UPDATE : LIFECYCLE_WILL_MOUNT,
-    args: isExisting ? [VNode.props, component._nextState] : null,
+    args: isExisting ? [VNode.props, c._nextState, meta.contextValue] : null,
   });
 
-  component.state = applyCurrentState(component, cls, VNode);
-  component._oldState = null;
-  component._nextState = null;
-  component.props = VNode.props;
+  c.state = applyCurrentState(c, cls, VNode);
+  c._oldState = null;
+  c._nextState = null;
+  c.props = VNode.props;
 
   const nextVNode = coerceToVNode(
-    component.render(component.props, component.state)
+    c.render(c.props, c.state, meta.contextValue)
   );
 
   scheduleLifeCycleCallbacks({
-    bind: component,
+    bind: c,
     name: nextLifeCycle,
-    args: nextLifeCycle === LIFECYCLE_DID_UPDATE ? [oldProps, oldState] : [],
+    args:
+      nextLifeCycle === LIFECYCLE_DID_UPDATE
+        ? [oldProps, oldState, c.context]
+        : [],
   });
-  diffReferences(VNode, oldVNode, component);
+  diffReferences(VNode, oldVNode, c);
   return nextVNode;
 }
 
-function renderFunctionalComponent(VNode: VNode, meta?: DiffMeta) {
+function renderFunctionalComponent(VNode: VNode, meta: DiffMeta) {
   let nextVNode: VNode;
   const fn = VNode.type as FunctionComponent;
   let c: Component;
@@ -115,7 +139,7 @@ function renderFunctionalComponent(VNode: VNode, meta?: DiffMeta) {
      * to save its instance
      * (doesnt help now but will be useful while implementing hooks)
      */
-    c = new Component(VNode.props);
+    c = new Component(VNode.props, meta.contextValue);
 
     VNode._component = c;
     c.render = getRenderer;
@@ -125,10 +149,11 @@ function renderFunctionalComponent(VNode: VNode, meta?: DiffMeta) {
   } else {
     c = VNode._component;
   }
+  setContext(c, meta);
   c._VNode = VNode;
 
   plugins.hookSetup(c);
-  nextVNode = coerceToVNode(c.render(VNode.props));
+  nextVNode = coerceToVNode(c.render(VNode.props, null, meta.contextValue));
   // remove reference of this component
   plugins.hookSetup(null);
 
@@ -136,7 +161,7 @@ function renderFunctionalComponent(VNode: VNode, meta?: DiffMeta) {
 }
 
 function getRenderer(props: Props<any>) {
-  return this.constructor(props);
+  return this.constructor(props, this.context);
 }
 
 function $runGetDerivedStateFromProps(
@@ -169,7 +194,14 @@ function applyCurrentState(
   return nextState;
 }
 
-function isClassComponent(type: VNode["type"]): boolean {
+function isClassComponent(type: VNode["type"]): type is ComponentType {
   const proto = ((type as any) as ComponentConstructor).prototype;
   return !!(proto && proto.render);
+}
+
+function setContext(c: Component, meta: DiffMeta) {
+  c._sharedContext = meta.context;
+  c.context = meta.contextValue;
+  const provider = meta.provider;
+  provider && provider.add(c);
 }

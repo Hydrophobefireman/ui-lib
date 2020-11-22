@@ -25,3 +25,5 @@ export { createRef, RefType } from "./ref";
 export * from "./hooks/index";
 export * from "./types/index";
 export * from "./types/jsx";
+
+export { createContext } from "./context";

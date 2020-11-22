@@ -9,3 +9,5 @@ export { useEffect } from "./implementation/useEffect";
 export { useReducer } from "./implementation/useReducer";
 
 export { useState } from "./implementation/useState";
+
+export { useContext } from "./implementation/useContext";
