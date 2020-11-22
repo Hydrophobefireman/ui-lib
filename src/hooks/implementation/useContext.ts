@@ -9,7 +9,6 @@ export function useContext<T = any>(ctx: Context): T {
   const index = state[1];
   const provider =
     component._sharedContext && component._sharedContext[ctx.$id];
-  //   if(!getCurrentHookValueOrSetDefault())
   if (!provider) return ctx.def as T;
   const hooksData = component._hooksData;
   getCurrentHookValueOrSetDefault(hooksData, index, {
