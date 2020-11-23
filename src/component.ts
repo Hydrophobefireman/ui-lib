@@ -105,11 +105,11 @@ export class Component<P = {}, S = {}> {
     nextState: Readonly<S>,
     nextContext: any
   ): void;
-  // getSnapshotBeforeUpdate?(oldProps: Readonly<P>, oldState: Readonly<S>): any;
+  getSnapshotBeforeUpdate?(oldProps: Readonly<P>, oldState: Readonly<S>): any;
   componentDidUpdate?(
     previousProps: Readonly<P>,
     previousState: Readonly<S>,
-    nextContext: any
+    snapshot: any
   ): void;
   componentDidCatch?(error: any): void;
   _dirty?: boolean;

@@ -116,14 +116,14 @@ function renderClassComponent(
   const nextVNode = coerceToVNode(
     c.render(c.props, c.state, meta.contextValue)
   );
-
+  let snapshot = null;
+  if (isExisting && c.getSnapshotBeforeUpdate != null) {
+    snapshot = c.getSnapshotBeforeUpdate(oldProps, oldState);
+  }
   scheduleLifeCycleCallbacks({
     bind: c,
     name: nextLifeCycle,
-    args:
-      nextLifeCycle === LIFECYCLE_DID_UPDATE
-        ? [oldProps, oldState, c.context]
-        : [],
+    args: isExisting ? [oldProps, oldState, snapshot] : [],
   });
   diffReferences(VNode, oldVNode, c);
   return nextVNode;
