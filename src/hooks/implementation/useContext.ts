@@ -2,7 +2,7 @@ import { Context } from "../../index";
 import { getCurrentHookValueOrSetDefault } from "./util";
 import { getHookStateAtCurrentRender } from "./manage";
 
-export function useContext<T = any>(ctx: Context): T {
+export function useContext<T = any>(ctx: Context<T>): T {
   const state = getHookStateAtCurrentRender();
   const component = state[0];
 

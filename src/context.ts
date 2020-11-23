@@ -3,7 +3,6 @@ import type {
   ConsumerCallback,
   Context,
   ContextProvider,
-  ContextProviderConstructor,
   Props,
 } from "./types/index";
 

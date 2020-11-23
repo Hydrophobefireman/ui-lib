@@ -37,7 +37,7 @@ export type createElementPropType<P> = Props<P> | null;
 export interface ComponentType<P = {}>
   extends ComponentConstructor<P>,
     FunctionComponent<P> {
-  contextType: Context;
+  contextType?: Context;
 }
 
 export interface ComponentConstructor<P = {}> {
