@@ -50,7 +50,7 @@ export function createElement<P = {}, R = any>(
   let _children: any[];
   if (props.children != null) {
     _children = flattenArray([props.children]);
-  } else if ((children = EMPTY_ARRAY.slice.call(arguments, 2)).length) {
+  } else if ((children = createElementChildren(arguments)).length) {
     _children = flattenArray(children);
   }
   (props as any).children = _children;
@@ -118,4 +118,8 @@ export function getVNode<P, R>(
     _used: false,
     constructor: undefined,
   };
+}
+
+export function createElementChildren(args: IArguments) {
+  return EMPTY_ARRAY.slice.call(args, 2);
 }

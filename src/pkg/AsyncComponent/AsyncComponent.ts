@@ -20,6 +20,7 @@ interface AsyncProps {
   fallbackComponent?: Renderable | string;
   errorComponent?: Renderable | string;
 }
+const getPromise = (k: AsyncProps) => k.promise || k.componentPromise;
 export class AsyncComponent extends Component<AsyncProps, AsyncState> {
   state: AsyncState;
   props: AsyncProps;
@@ -27,20 +28,20 @@ export class AsyncComponent extends Component<AsyncProps, AsyncState> {
     this._init();
   }
   componentDidUpdate(prevProps: Props<AsyncProps>) {
-    const prevPromise =
-      prevProps && (prevProps.promise || prevProps.componentPromise);
-    const currPromise = this.props.promise || this.props.componentPromise;
+    const prevPromise = prevProps && getPromise(prevProps);
+    const currPromise = getPromise(this.props);
     if (prevPromise === currPromise) return;
 
     this._init();
   }
   _init(): void {
     this.setState({ inProgress: true });
-    const prom = this.props.promise || this.props.componentPromise;
+    const prom = getPromise(this.props);
 
     prom()
       .then((component: Renderable) => {
-        this.setState({ render: component, inProgress: false, error: false });
+        prom === getPromise(this.props) &&
+          this.setState({ render: component, inProgress: false, error: false });
       })
       .catch((x: Error) => this.setState({ error: true, inProgress: false }));
   }

@@ -16,7 +16,7 @@ export function createContext<T>(def: T): Context<T> {
 
   class Provider extends Component<{ value: any }> {
     _subs: Component[];
-    _o: { [id: string]: ThisType<Provider> };
+    _o: { [id: string]: Provider };
     constructor(props: Props<{ value: any }>, context: any) {
       super(props, context);
       this._subs = [];
