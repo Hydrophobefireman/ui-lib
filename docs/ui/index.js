@@ -539,6 +539,116 @@ function _clearPointers(pointersObj, el) {
   }
 }
 
+function _setRef(ref, value) {
+  if (!ref) return;
+  if (typeof ref == "function") ref(value);else ref.current = value;
+}
+function diffReferences(newVNode, oldVNode, domOrComponent) {
+  const newRef = newVNode.ref;
+  const oldRef = (oldVNode || EMPTY_OBJ).ref;
+
+  if (newRef && newRef !== oldRef) {
+    _setRef(newRef, domOrComponent);
+
+    oldRef && _setRef(oldVNode.ref, null);
+  }
+}
+function createRef() {
+  return {
+    current: null
+  };
+}
+
+function warnSetState() {
+  config.warnOnUnmountRender && console.warn("Component state changed after unmount", this);
+}
+
+function unmount(VNode, meta, recursionLevel) {
+  /** short circuit */
+  if (VNode == null || VNode === EMPTY_OBJ) return;
+  recursionLevel = VNode.type === Fragment || typeof VNode.props === "string" ? -1 : recursionLevel || 0;
+
+  _setRef(VNode.ref, null);
+
+  unmount(VNode._renders, meta, recursionLevel);
+  const component = VNode._component;
+
+  if (component != null) {
+    /** maybe disable setState for this component? */
+    component.setState = warnSetState;
+    component.forceUpdate = warnSetState;
+    /** todo check for side effects */
+
+    component._VNode = null;
+    scheduleLifeCycleCallbacks({
+      name: LIFECYCLE_WILL_UNMOUNT,
+      bind: component
+    });
+  }
+
+  const childArray = VNode._children;
+
+  _processNodeCleanup(VNode, meta, recursionLevel);
+
+  if (childArray) {
+    const cl = childArray.length;
+
+    for (let i = 0; i < cl; i++) {
+      const child = childArray[i];
+      unmount(child, meta, recursionLevel + 1);
+    }
+
+    childArray.length = 0;
+  }
+  /*#__NOINLINE__*/
+
+}
+
+function isSimplestVNode(VNode) {
+  return typeof VNode.type != "function";
+}
+
+function _processNodeCleanup(VNode, meta, recursionLevel) {
+  let dom;
+
+  if (isSimplestVNode(VNode)) {
+    dom = VNode._dom;
+
+    if (dom != null) {
+      clearListeners(VNode, dom, meta);
+      meta.batch.push({
+        node: dom,
+        action: recursionLevel > 0 ?
+        /** if the parent element is already being unmounted, all we need to do is
+        clear the child element's listeners
+        */
+        BATCH_MODE_CLEAR_POINTERS : BATCH_MODE_REMOVE_ELEMENT,
+        VNode
+      });
+    }
+  } else {
+    meta.batch.push({
+      action: BATCH_MODE_CLEAR_POINTERS,
+      VNode,
+      node: dom
+    });
+  }
+}
+
+function clearListeners(VNode, dom, meta) {
+  const props = VNode.props;
+
+  for (const prop in props) {
+    if (prop[0] === "o" && prop[1] === "n") {
+      meta.batch.push({
+        action: BATCH_MODE_REMOVE_ATTRIBUTE,
+        node: dom,
+        attr: prop
+      });
+    }
+  }
+}
+
 const mountCallbackQueue = [];
 const updateCallbackQueue = [];
 
@@ -565,23 +675,17 @@ function __executeCallback(cbObj) {
   const args = cbObj.args;
   const hasCatch = typeof component.componentDidCatch == "function";
 
-  const cb = () => func.apply(component, args);
-
-  if (HAS_PROMISE) {
-    defer(cb).catch(error => {
-      if (hasCatch) {
-        component.componentDidCatch(error);
-      } else {
-        throw error;
-      }
-    });
-  } else {
-    try {
-      cb();
-    } catch (e) {
-      if (hasCatch) return component.componentDidCatch(e);
-      throw e;
-    }
+  try {
+    func.apply(component, args);
+  } catch (e) {
+    const b = [];
+    const m = {
+      batch: b
+    };
+    if (hasCatch) return component.componentDidCatch(e);
+    unmount(component._VNode, m);
+    commitDOMOps(b);
+    console.error(e);
   }
 }
 
@@ -657,25 +761,6 @@ function process() {
       p.forceUpdate(false);
     }
   }
-}
-
-function setRef(ref, value) {
-  if (!ref) return;
-  if (typeof ref == "function") ref(value);else ref.current = value;
-}
-function diffReferences(newVNode, oldVNode, domOrComponent) {
-  const newRef = newVNode.ref;
-  const oldRef = (oldVNode || EMPTY_OBJ).ref;
-
-  if (newRef && newRef !== oldRef) {
-    setRef(newRef, domOrComponent);
-    oldRef && setRef(oldVNode.ref, null);
-  }
-}
-function createRef() {
-  return {
-    current: null
-  };
 }
 
 let contextId = 0;
@@ -944,94 +1029,6 @@ function getDom(VNode) {
   }
 
   return VNode._dom;
-}
-
-function warnSetState() {
-  config.warnOnUnmountRender && console.warn("Component state changed after unmount", this);
-}
-
-function unmount(VNode, meta, recursionLevel) {
-  /** short circuit */
-  if (VNode == null || VNode === EMPTY_OBJ) return;
-  recursionLevel = VNode.type === Fragment || typeof VNode.props === "string" ? -1 : recursionLevel || 0;
-  setRef(VNode.ref, null);
-  unmount(VNode._renders, meta, recursionLevel);
-  const component = VNode._component;
-
-  if (component != null) {
-    /** maybe disable setState for this component? */
-    component.setState = warnSetState;
-    component.forceUpdate = warnSetState;
-    /** todo check for side effects */
-
-    component._VNode = null;
-    scheduleLifeCycleCallbacks({
-      name: LIFECYCLE_WILL_UNMOUNT,
-      bind: component
-    });
-  }
-
-  const childArray = VNode._children;
-
-  _processNodeCleanup(VNode, meta, recursionLevel);
-
-  if (childArray) {
-    const cl = childArray.length;
-
-    for (let i = 0; i < cl; i++) {
-      const child = childArray[i];
-      unmount(child, meta, recursionLevel + 1);
-    }
-
-    childArray.length = 0;
-  }
-  /*#__NOINLINE__*/
-
-}
-
-function isSimplestVNode(VNode) {
-  return typeof VNode.type != "function";
-}
-
-function _processNodeCleanup(VNode, meta, recursionLevel) {
-  let dom;
-
-  if (isSimplestVNode(VNode)) {
-    dom = VNode._dom;
-
-    if (dom != null) {
-      clearListeners(VNode, dom, meta);
-      meta.batch.push({
-        node: dom,
-        action: recursionLevel > 0 ?
-        /** if the parent element is already being unmounted, all we need to do is
-        clear the child element's listeners
-        */
-        BATCH_MODE_CLEAR_POINTERS : BATCH_MODE_REMOVE_ELEMENT,
-        VNode
-      });
-    }
-  } else {
-    meta.batch.push({
-      action: BATCH_MODE_CLEAR_POINTERS,
-      VNode,
-      node: dom
-    });
-  }
-}
-
-function clearListeners(VNode, dom, meta) {
-  const props = VNode.props;
-
-  for (const prop in props) {
-    if (prop[0] === "o" && prop[1] === "n") {
-      meta.batch.push({
-        action: BATCH_MODE_REMOVE_ATTRIBUTE,
-        node: dom,
-        attr: prop
-      });
-    }
-  }
 }
 
 /**
@@ -1469,6 +1466,7 @@ function reqAnimFrame(cb) {
 let hookIndex = 0;
 let hookCandidate = null;
 const rafPendingCallbacks = [];
+const layoutPendingCallbacks = [];
 function runEffectCleanup(effect) {
   // only called if the effect itself returns a function
   const cl = effect.cleanUp;
@@ -1497,20 +1495,29 @@ function effectCbHandler(effect) {
   runHookEffectAndAssignCleanup(effect);
 }
 
-function scheduleEffects() {
-  rafPendingCallbacks.forEach(x => {
+function _runEffect(arr) {
+  arr.forEach(x => {
     for (const i in x) {
       const value = x[i];
       effectCbHandler(value);
     }
   });
-  rafPendingCallbacks.length = 0;
+}
+
+function scheduleUseEffectCallbacks() {
+  return _runEffect(rafPendingCallbacks);
+} //sync
+
+
+function scheduleLayoutEffectCallbacks() {
+  return _runEffect(layoutPendingCallbacks);
 }
 
 const effectScheduler = config.debounceEffect || (HAS_RAF ? reqAnimFrame : defer);
 
-function setEffectiveCallbacks() {
-  effectScheduler(scheduleEffects);
+function diffEnd() {
+  scheduleLayoutEffectCallbacks();
+  effectScheduler(scheduleUseEffectCallbacks);
 }
 
 function prepForNextHookCandidate(c) {
@@ -1526,7 +1533,7 @@ function getHookStateAtCurrentRender() {
 
 addPluginCallback({
   hookSetup: prepForNextHookCandidate,
-  diffEnd: setEffectiveCallbacks
+  diffEnd
 });
 
 function useMemo(memoFunc, dependencies) {
@@ -1564,13 +1571,18 @@ function unmount$1() {
   this._pendingEffects = null;
 }
 
-function useEffect(callback, dependencies) {
+function effect(callback, dependencies, arr) {
+  const which = arr === layoutPendingCallbacks ? "sync" : "async";
   const state = getHookStateAtCurrentRender();
   const candidate = state[0];
   const hookIndex = state[1];
   const hookData = candidate._hooksData;
   let currentHook = hookData[hookIndex] || {};
-  const pending = candidate._pendingEffects = candidate._pendingEffects || {};
+  const instanceEffects = candidate._pendingEffects = candidate._pendingEffects || {
+    sync: {},
+    async: {}
+  };
+  const pending = instanceEffects[which];
   const oldEffect = pending[hookIndex];
 
   if (!argsChanged(currentHook.args, dependencies)) {
@@ -1599,8 +1611,12 @@ function useEffect(callback, dependencies) {
     cleanUp
   }; // only push effect if we haven't already added it to the queue
 
-  $push(rafPendingCallbacks, pending);
+  $push(arr, pending);
   candidate.componentWillUnmount = unmount$1;
+}
+
+function useEffect(callback, dependencies) {
+  return effect(callback, dependencies, rafPendingCallbacks);
 }
 
 const obj = {};
@@ -1644,6 +1660,10 @@ function useContext(ctx) {
   return provider.props.value;
 }
 
+function useLayoutEffect(callback, dependencies) {
+  return effect(callback, dependencies, layoutPendingCallbacks);
+}
+
 export default Component;
-export { A, AsyncComponent, Component, Fragment, Path, Router, RouterSubscription, addPluginCallback, config, createContext, createElement, createRef, createRoutePath, createElement as h, loadURL, redirect, render, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState };
+export { A, AsyncComponent, Component, Fragment, Path, Router, RouterSubscription, addPluginCallback, config, createContext, createElement, createRef, createRoutePath, createElement as h, loadURL, redirect, render, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState };
 //# sourceMappingURL=ui-lib.modern.js.map

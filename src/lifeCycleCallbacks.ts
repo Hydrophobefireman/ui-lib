@@ -1,3 +1,4 @@
+import { DOMOps, DiffMeta } from "./types/internal";
 import { HAS_PROMISE, defer, plugins } from "./config";
 import {
   LIFECYCLE_DID_MOUNT,
@@ -6,8 +7,8 @@ import {
 } from "./constants";
 
 import { Component } from "./component";
-import { DOMOps } from "./types/index";
 import { commitDOMOps } from "./commit";
+import { unmount } from "./diff/unmount";
 
 type ProcessOptions = {
   name: LifeCycleCallbacks;
@@ -42,22 +43,16 @@ function __executeCallback(cbObj: ProcessOptions) {
 
   const args = cbObj.args;
   const hasCatch = typeof component.componentDidCatch == "function";
-  const cb = (): void => func.apply(component, args);
-  if (HAS_PROMISE) {
-    defer(cb).catch((error: Error) => {
-      if (hasCatch) {
-        component.componentDidCatch(error);
-      } else {
-        throw error;
-      }
-    });
-  } else {
-    try {
-      cb();
-    } catch (e) {
-      if (hasCatch) return component.componentDidCatch(e);
-      throw e;
-    }
+
+  try {
+    func.apply(component, args);
+  } catch (e) {
+    const b = [];
+    const m: DiffMeta = { batch: b } as any;
+    if (hasCatch) return component.componentDidCatch(e);
+    unmount(component._VNode, m);
+    commitDOMOps(b);
+    console.error(e);
   }
 }
 

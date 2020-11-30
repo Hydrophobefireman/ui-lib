@@ -26,4 +26,6 @@ export * from "./hooks/index";
 export * from "./types/index";
 export * from "./types/jsx";
 
+export { VNode } from "./types/internal";
+
 export { createContext } from "./context";

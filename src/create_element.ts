@@ -3,7 +3,7 @@ import {
   ComponentChildren,
   VNode,
   createElementPropType,
-} from "./types/index";
+} from "./types/internal";
 import { EMPTY_ARRAY, EMPTY_OBJ, Fragment, NULL_TYPE } from "./constants";
 import { flattenArray, objectWithoutKeys } from "./util";
 

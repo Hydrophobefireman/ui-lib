@@ -8,7 +8,14 @@
     <script type="module">
       const updater = (x) => x + 1;
       import * as UI from "../../ui/index.js";
-      import { h, render, useState, Fragment, useEffect } from "../../ui/index.js";
+      import {
+        h,
+        render,
+        useState,
+        Fragment,
+        useEffect,
+        useLayoutEffect,
+      } from "../../ui/index.js";
       window.UI = window.a = UI;
       function Button() {
         const [count, setCount] = useState(0);
@@ -49,6 +56,13 @@
       }
       function Effects() {
         const [time, setTime] = useState(new Date());
+        useLayoutEffect(() => {
+          console.log("sync");
+        });
+        useEffect(() => {
+          console.log("raf");
+        });
+
         useEffect(() => {
           let _;
           _ = setInterval(

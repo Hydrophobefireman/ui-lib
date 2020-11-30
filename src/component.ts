@@ -1,21 +1,27 @@
 import {
   ComponentChild,
-  ContextProvider,
   DOMOps,
   Props,
   UIElement,
   VNode,
   setStateArgType,
-} from "./types/index";
+} from "./types/internal";
 import config, { plugins } from "./config";
 
+import { ContextProvider } from "./types/index";
 import { LifeCycleCallbacks } from "./constants";
 import { assign } from "./util";
 import { diff } from "./diff/index";
 import { onDiff } from "./lifeCycleCallbacks";
 
 const RENDER_QUEUE: Component[] = [];
-
+interface Effects {
+  [index: number]: {
+    cb: () => any;
+    cleanUp?: () => any;
+    resolved?: boolean;
+  };
+}
 /** The pseudo-abstract component class */
 export class Component<P = {}, S = {}> {
   constructor(props: P, context?: any) {
@@ -26,7 +32,8 @@ export class Component<P = {}, S = {}> {
   }
 
   _pendingEffects?: {
-    [index: number]: { cb: () => any; cleanUp?: () => any; resolved?: boolean };
+    sync: Effects;
+    async: Effects;
   };
   // our hook data store
   _hooksData?: { args: any; hookState: any }[];

@@ -1,8 +1,8 @@
-import { DiffMeta, UIElement, VNode } from "../types/index";
-import { EMPTY_ARRAY, EMPTY_OBJ, NULL_TYPE, Fragment } from "../constants";
-import { createElement } from "../create_element";
+import { DiffMeta, UIElement, VNode } from "../types/internal";
+import { EMPTY_ARRAY, EMPTY_OBJ, Fragment, NULL_TYPE } from "../constants";
 
 import { assign } from "../util";
+import { createElement } from "../create_element";
 import { diff } from "./index";
 import { isFn } from "../toSimpleVNode";
 

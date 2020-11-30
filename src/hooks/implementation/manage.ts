@@ -22,13 +22,14 @@ function reqAnimFrame(cb: () => void) {
   raf = requestAnimationFrame(done);
 }
 
-type PendingEffects = Component["_pendingEffects"];
+export type PendingEffects = Component["_pendingEffects"];
 
 let hookIndex = 0;
 
 let hookCandidate: Component = null;
 
 export const rafPendingCallbacks: PendingEffects[] = [];
+export const layoutPendingCallbacks: PendingEffects[] = [];
 
 export function runEffectCleanup(effect: PendingEffects[0]) {
   // only called if the effect itself returns a function
@@ -55,20 +56,29 @@ export function effectCbHandler(effect: PendingEffects[0]) {
   effect.resolved || runEffectCleanup(effect);
   runHookEffectAndAssignCleanup(effect);
 }
-function scheduleEffects() {
-  rafPendingCallbacks.forEach((x) => {
+
+function _runEffect(arr: PendingEffects[]) {
+  arr.forEach((x) => {
     for (const i in x) {
       const value = x[i];
       effectCbHandler(value);
     }
   });
-  rafPendingCallbacks.length = 0;
+}
+function scheduleUseEffectCallbacks() {
+  return _runEffect(rafPendingCallbacks);
 }
 
+//sync
+function scheduleLayoutEffectCallbacks() {
+  return _runEffect(layoutPendingCallbacks);
+}
 const effectScheduler =
   config.debounceEffect || (HAS_RAF ? reqAnimFrame : defer);
-function setEffectiveCallbacks() {
-  effectScheduler(scheduleEffects);
+
+function diffEnd() {
+  scheduleLayoutEffectCallbacks();
+  effectScheduler(scheduleUseEffectCallbacks);
 }
 
 function prepForNextHookCandidate(c: Component) {
@@ -85,5 +95,5 @@ export function getHookStateAtCurrentRender(): [Component, number] {
 // todo manage sideEffects
 addPluginCallback({
   hookSetup: prepForNextHookCandidate,
-  diffEnd: setEffectiveCallbacks,
+  diffEnd,
 });

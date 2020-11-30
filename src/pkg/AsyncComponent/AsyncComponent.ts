@@ -1,10 +1,10 @@
-import { ComponentType, Props, VNode } from "../../types/index";
+import { IVNodeType, Props, VNode } from "../../types/internal";
 
 import { Component } from "../../component";
 import { createElementIfNeeded } from "../common";
 import { objectWithoutKeys } from "../../util";
 
-type Renderable = ComponentType | VNode | string;
+type Renderable<T = IVNodeType> = T;
 type AsyncPromResponse = Promise<Renderable>;
 interface AsyncState {
   // promise?: Promise<VNode>;
@@ -13,12 +13,12 @@ interface AsyncState {
   error?: boolean;
   render?: Renderable;
 }
-interface AsyncProps {
+interface AsyncProps<T = IVNodeType | VNode | string> {
   promise?: () => AsyncPromResponse;
   componentPromise?: () => AsyncPromResponse;
-  fallback?: Renderable;
-  fallbackComponent?: Renderable | string;
-  errorComponent?: Renderable | string;
+  fallback?: Renderable<T>;
+  fallbackComponent?: Renderable<T> | string;
+  errorComponent?: Renderable<T> | string;
 }
 const getPromise = (k: AsyncProps) => k.promise || k.componentPromise;
 export class AsyncComponent extends Component<AsyncProps, AsyncState> {

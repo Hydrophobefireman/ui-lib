@@ -1,10 +1,6 @@
 import { $push, assign } from "../../util";
-import {
-  ComponentConstructor,
-  ComponentType,
-  Props,
-  VNode,
-} from "../../types/index";
+import { ComponentConstructor, FunctionComponent } from "../../types/index";
+import { IVNodeType, Props, VNode } from "../../types/internal";
 
 import { Component } from "../../component";
 import { Fragment } from "../../constants";
@@ -19,10 +15,9 @@ function fixPath(path: string): string {
   return path.replace(pathFixRegex, "");
 }
 
-const _routerSubscriptions: Array<(
-  e: PopStateEvent | null,
-  options: {}
-) => any> = [];
+const _routerSubscriptions: Array<
+  (e: PopStateEvent | null, options: {}) => any
+> = [];
 
 interface Subscription {
   (e: PopStateEvent | string): any;
@@ -62,9 +57,12 @@ export function redirect(url: string) {
   RouterSubscription.emit(url, { type: "redirect", native: false });
 }
 
-interface PathProps {
-  match: RoutePath;
-  component: any;
+interface PathProps<
+  Match extends any = RoutePath,
+  Component extends any = IVNodeType
+> {
+  match: Match;
+  component: Component;
 }
 interface RouterState {
   renderPath?: string;
@@ -241,7 +239,7 @@ export class A extends Component {
   }
 }
 
-export const Path = ({} as any) as ComponentConstructor<{
-  match: string | RoutePath;
-  component: ComponentType | string | VNode;
-}>;
+export const Path = ({} as any) as ComponentConstructor<
+  PathProps<RoutePath | string, VNode | IVNodeType>,
+  any
+>;

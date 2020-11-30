@@ -1,5 +1,5 @@
 import { EMPTY_OBJ } from "./constants";
-import { VNode } from "./types/index";
+import { VNode } from "./types/internal";
 
 // function identity<T>(x: T): T {
 //   return x;
@@ -75,6 +75,3 @@ export const objectWithoutKeys: OmitFrom = (obj, keys) => {
 export function $push<T>(array: T[], x: T) {
   array.indexOf(x) === -1 && array.push(x);
 }
-
-
-

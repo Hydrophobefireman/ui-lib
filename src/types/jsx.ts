@@ -1,8 +1,10 @@
 // modified version of preact's jsx.d.ts
 /// <reference lib="dom" />
-import { VNode, ComponentChildren } from "./index";
+import { ComponentChildren, VNode } from "./internal";
+
 import { Component } from "../component";
 import { RefType } from "../ref";
+
 export interface PropAttrs {
   children?: ComponentChildren;
 }

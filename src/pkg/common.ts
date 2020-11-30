@@ -1,6 +1,6 @@
-import { VNode } from "../types/index";
-import { createElement } from "../create_element";
+import { VNode } from "../types/internal";
 import { cloneElement } from "../clone_element";
+import { createElement } from "../create_element";
 import { flattenArray } from "../util";
 
 const ignore = ["boolean", "string", "number"];

@@ -1,4 +1,4 @@
-import { Props, VNode } from "./types/index";
+import { Props, VNode } from "./types/internal";
 import { assign, objectWithoutKeys } from "./util";
 import { createElementChildren, getVNode, skipProps } from "./create_element";
 

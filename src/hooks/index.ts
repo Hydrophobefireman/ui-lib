@@ -11,3 +11,5 @@ export { useReducer } from "./implementation/useReducer";
 export { useState } from "./implementation/useState";
 
 export { useContext } from "./implementation/useContext";
+
+export { useLayoutEffect } from "./implementation/useLayoutEffect";

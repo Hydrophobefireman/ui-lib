@@ -1,6 +1,7 @@
-import { VNode, UIElement, Props } from "./types/index";
+import { Fragment, LifeCycleCallbacks } from "./constants";
+import { Props, UIElement, VNode } from "./types/internal";
+
 import { Component } from "./component";
-import { LifeCycleCallbacks, Fragment } from "./constants";
 
 export const HAS_PROMISE = typeof Promise !== "undefined";
 
