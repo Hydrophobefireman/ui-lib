@@ -1,6 +1,5 @@
+import type { Component, EffectsDictionary } from "../../component";
 import config, { HAS_RAF, addPluginCallback, defer } from "../../config";
-
-import { Component } from "../../component";
 
 /**
  * This ensures that we begin our render work  even if we don't get an animation frame for 100ms
@@ -22,16 +21,14 @@ function reqAnimFrame(cb: () => void) {
   raf = requestAnimationFrame(done);
 }
 
-export type PendingEffects = Component["_pendingEffects"];
-
 let hookIndex = 0;
 
 let hookCandidate: Component = null;
 
-export const rafPendingCallbacks: PendingEffects[] = [];
-export const layoutPendingCallbacks: PendingEffects[] = [];
+export const rafPendingCallbacks: EffectsDictionary[] = [];
+export const layoutPendingCallbacks: EffectsDictionary[] = [];
 
-export function runEffectCleanup(effect: PendingEffects[0]) {
+export function runEffectCleanup(effect: EffectsDictionary[0]) {
   // only called if the effect itself returns a function
   const cl = effect.cleanUp;
   if (typeof cl === "function") {
@@ -40,7 +37,7 @@ export function runEffectCleanup(effect: PendingEffects[0]) {
   }
 }
 
-export function runHookEffectAndAssignCleanup(effect: PendingEffects[0]) {
+export function runHookEffectAndAssignCleanup(effect: EffectsDictionary[0]) {
   let ret = effect.cb;
   if (ret && typeof (ret = ret()) === "function") {
     effect.cleanUp = ret;
@@ -48,7 +45,7 @@ export function runHookEffectAndAssignCleanup(effect: PendingEffects[0]) {
   // make sure we can't run this effect again
   effect.cb = null;
 }
-export function effectCbHandler(effect: PendingEffects[0]) {
+export function effectCbHandler(effect: EffectsDictionary[0]) {
   // we run this cleanup first to ensure any older effect has been successfully completed
   // an effect will be completed when both it's callback and it's cleanup (if provided have been finished)
   // only run cleanup on unresolved effects
@@ -57,7 +54,7 @@ export function effectCbHandler(effect: PendingEffects[0]) {
   runHookEffectAndAssignCleanup(effect);
 }
 
-function _runEffect(arr: PendingEffects[]) {
+function _runEffect(arr: EffectsDictionary[]) {
   arr.forEach((x) => {
     for (const i in x) {
       const value = x[i];

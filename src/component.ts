@@ -15,12 +15,16 @@ import { diff } from "./diff/index";
 import { onDiff } from "./lifeCycleCallbacks";
 
 const RENDER_QUEUE: Component[] = [];
-interface Effects {
+export interface EffectsDictionary {
   [index: number]: {
     cb: () => any;
     cleanUp?: () => any;
     resolved?: boolean;
   };
+}
+export interface PendingEffects {
+  sync: EffectsDictionary;
+  async: EffectsDictionary;
 }
 /** The pseudo-abstract component class */
 export class Component<P = {}, S = {}> {
@@ -31,10 +35,7 @@ export class Component<P = {}, S = {}> {
     plugins.componentInstance(this, props);
   }
 
-  _pendingEffects?: {
-    sync: Effects;
-    async: Effects;
-  };
+  _pendingEffects?: PendingEffects;
   // our hook data store
   _hooksData?: { args: any; hookState: any }[];
   // tracks component nesting
