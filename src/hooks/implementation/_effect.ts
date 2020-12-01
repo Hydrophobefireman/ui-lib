@@ -1,5 +1,5 @@
+import type { Component, EffectsDictionary } from "../../component";
 import {
-  PendingEffects,
   getHookStateAtCurrentRender,
   layoutPendingCallbacks,
   runEffectCleanup,
@@ -7,7 +7,6 @@ import {
 } from "./manage";
 
 import { $push } from "../../util";
-import { Component } from "../../component";
 import { EMPTY_OBJ } from "../../constants";
 import { argsChanged } from "./util";
 
@@ -21,7 +20,7 @@ function unmount() {
 export function effect(
   callback: () => (() => unknown) | unknown,
   dependencies: unknown[],
-  arr: PendingEffects[]
+  arr: EffectsDictionary[]
 ) {
   const which = arr === layoutPendingCallbacks ? "sync" : "async";
   const state = getHookStateAtCurrentRender();
