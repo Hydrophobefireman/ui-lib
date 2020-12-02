@@ -1,15 +1,15 @@
 import {
   BATCH_MODE_PLACE_NODE,
   BATCH_MODE_REMOVE_ATTRIBUTE,
-  BATCH_MODE_REMOVE_ATTRIBUTE_NS,
   BATCH_MODE_SET_ATTRIBUTE,
   BATCH_MODE_SET_STYLE,
-  BATCH_MODE_SET_SVG_ATTRIBUTE,
   EMPTY_OBJ,
-  IS_SVG_ATTR,
   NULL_TYPE,
+  IS_SVG_ATTR,
+  BATCH_MODE_REMOVE_ATTRIBUTE_NS,
+  BATCH_MODE_SET_SVG_ATTRIBUTE,
 } from "../constants";
-import { DiffMeta, Props, UIElement, VNode } from "../types/index";
+import { DiffMeta, Props,  UIElement, VNode } from "../types/index";
 
 import { IS_ARIA_PROP } from "../constants";
 import { plugins } from "../config";

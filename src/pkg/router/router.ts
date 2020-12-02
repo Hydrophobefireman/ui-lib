@@ -1,8 +1,8 @@
 import { $push, assign } from "../../util";
 import {
   ComponentConstructor,
+  ComponentType,
   Props,
-  Renderable,
   VNode,
 } from "../../types/index";
 
@@ -75,6 +75,7 @@ interface RouterProps {
   defaultRoute?: string;
 }
 export class Router extends Component<RouterProps, RouterState> {
+  _previous: string;
   state: RouterState;
   constructor(props: Props<RouterProps>) {
     super(props);
@@ -137,12 +138,17 @@ export class Router extends Component<RouterProps, RouterState> {
     );
   }
   _routeChangeHandler(_e: PopStateEvent | string): void {
+    const prev = this._previous;
+    const curr = Router.path;
+    this._previous = curr;
+    if (prev === curr) return;
+
     const renderPath = fixPath(
       config.inMemoryRouter
         ? config.memoryRouteStore.getItem(sessKey) ||
             this.props.defaultRoute ||
             "/"
-        : Router.path
+        : curr
     );
     const children = this.props.children as VNode[];
 
@@ -242,5 +248,5 @@ export class A extends Component {
 
 export const Path = ({} as any) as ComponentConstructor<{
   match: string | RoutePath;
-  component: Renderable<any>;
+  component: ComponentType | string | VNode;
 }>;

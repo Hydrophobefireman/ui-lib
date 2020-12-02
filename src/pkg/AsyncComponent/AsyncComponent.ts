@@ -1,10 +1,11 @@
-import { Props, Renderable } from "../../types/index";
+import { ComponentType, Props, VNode } from "../../types/index";
 
 import { Component } from "../../component";
 import { createElementIfNeeded } from "../common";
 import { objectWithoutKeys } from "../../util";
 
-type AsyncPromResponse<T = any> = Promise<Renderable<T>>;
+type Renderable = ComponentType | VNode | string;
+type AsyncPromResponse = Promise<Renderable>;
 interface AsyncState {
   // promise?: Promise<VNode>;
   // fallback: VNode;
@@ -12,21 +13,21 @@ interface AsyncState {
   error?: boolean;
   render?: Renderable;
 }
-interface AsyncProps<T> {
+interface AsyncProps {
   promise?: () => AsyncPromResponse;
   componentPromise?: () => AsyncPromResponse;
   fallback?: Renderable;
-  fallbackComponent?: Renderable<T>;
-  errorComponent?: Renderable<T>   ;
+  fallbackComponent?: Renderable | string;
+  errorComponent?: Renderable | string;
 }
-const getPromise = (k: AsyncProps<any>) => k.promise || k.componentPromise;
-export class AsyncComponent extends Component<AsyncProps<any>, AsyncState> {
+const getPromise = (k: AsyncProps) => k.promise || k.componentPromise;
+export class AsyncComponent extends Component<AsyncProps, AsyncState> {
   state: AsyncState;
-  props: AsyncProps<any>;
+  props: AsyncProps;
   componentDidMount() {
     this._init();
   }
-  componentDidUpdate(prevProps: Props<AsyncProps<any>>) {
+  componentDidUpdate(prevProps: Props<AsyncProps>) {
     const prevPromise = prevProps && getPromise(prevProps);
     const currPromise = getPromise(this.props);
     if (prevPromise === currPromise) return;

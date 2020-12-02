@@ -4,10 +4,10 @@ import {
   LIFECYCLE_DID_UPDATE,
   LifeCycleCallbacks,
 } from "./constants";
+import config, { defer, plugins } from "./config";
 
 import { Component } from "./component";
 import { commitDOMOps } from "./commit";
-import { plugins } from "./config";
 import { unmount } from "./diff/unmount";
 
 type ProcessOptions = {
@@ -19,10 +19,9 @@ const mountCallbackQueue: ProcessOptions[] = [];
 const updateCallbackQueue: ProcessOptions[] = [];
 
 function processLifeCycleQueue(obj: ProcessOptions[]): void {
-  let cbObj: ProcessOptions;
-  while ((cbObj = obj.pop())) {
-    __executeCallback(cbObj);
-  }
+  const clone = obj.splice(0);
+
+  clone.forEach(__executeCallback);
 }
 
 export function scheduleLifeCycleCallbacks(options: ProcessOptions): any {
@@ -43,22 +42,26 @@ function __executeCallback(cbObj: ProcessOptions) {
 
   const args = cbObj.args;
   const hasCatch = typeof component.componentDidCatch == "function";
-
+  const cb = () => func.apply(component, args);
   try {
-    func.apply(component, args);
+    cb();
   } catch (e) {
-    const b = [];
-    const m: DiffMeta = { batch: b } as any;
     if (hasCatch) return component.componentDidCatch(e);
-    unmount(component._VNode, m);
-    commitDOMOps(b);
-    console.error(e);
+    if (config.unmountOnError) {
+      const b = [];
+      const m: DiffMeta = { batch: b } as any;
+      unmount(component._VNode, m);
+      commitDOMOps(b);
+    }
+    throw e;
   }
 }
 
 export function onDiff(queue: DOMOps[]) {
   commitDOMOps(queue);
   plugins.diffEnd();
-  processLifeCycleQueue(mountCallbackQueue);
-  processLifeCycleQueue(updateCallbackQueue);
+  defer(() => {
+    processLifeCycleQueue(mountCallbackQueue);
+    processLifeCycleQueue(updateCallbackQueue);
+  });
 }
