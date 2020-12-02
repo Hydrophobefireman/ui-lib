@@ -1,5 +1,4 @@
-import { DOMOps, DiffMeta } from "./types/internal";
-import { HAS_PROMISE, defer, plugins } from "./config";
+import { DOMOps, DiffMeta } from "./types/index";
 import {
   LIFECYCLE_DID_MOUNT,
   LIFECYCLE_DID_UPDATE,
@@ -8,6 +7,7 @@ import {
 
 import { Component } from "./component";
 import { commitDOMOps } from "./commit";
+import { plugins } from "./config";
 import { unmount } from "./diff/unmount";
 
 type ProcessOptions = {

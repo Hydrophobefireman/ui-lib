@@ -1,12 +1,13 @@
-import { DiffMeta, UIElement, VNode } from "../types/internal";
+import { DiffMeta, RenderedDom, VNode } from "../types/index";
 import { EMPTY_OBJ, Fragment, NULL_TYPE } from "../constants";
+import { assign, isValidVNode } from "../util";
 import { diffChildren, getDom } from "./children";
 import { isFn, toSimpleVNode } from "../toSimpleVNode";
 
 import { diffDomNodes } from "./dom";
 import { diffReferences } from "../ref";
 import { flattenVNodeChildren } from "../create_element";
-import { isValidVNode } from "../util";
+import { isProvider } from "../context";
 import { unmount } from "./unmount";
 
 // import { processUpdatesQueue } from "../lifeCycleCallbacks";
@@ -25,7 +26,7 @@ export function diff(
   parentDom: HTMLElement,
   force: boolean,
   meta: DiffMeta
-): UIElement | UIElement[] {
+): RenderedDom | RenderedDom[] {
   if (newVNode == null || typeof newVNode === "boolean") {
     unmount(oldVNode, meta);
     return;
@@ -84,12 +85,12 @@ export function diff(
   if (oldType !== newType) {
     oldVNode = null;
   }
-  let dom: UIElement;
+  let dom: RenderedDom;
   if (newType === Fragment) {
     diffChildren(newVNode, oldVNode, parentDom, meta);
   } else {
     diffDomNodes(newVNode, oldVNode, parentDom, meta);
-    dom = newVNode._dom as UIElement;
+    dom = newVNode._dom as RenderedDom;
     meta.isSvg = newType != "foreignObject" && meta.isSvg;
     diffChildren(newVNode, oldVNode, dom, meta);
     diffReferences(newVNode, oldVNode, dom);

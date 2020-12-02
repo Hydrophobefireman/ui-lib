@@ -1,6 +1,10 @@
 import { $push, assign } from "../../util";
-import { ComponentConstructor, FunctionComponent } from "../../types/index";
-import { IVNodeType, Props, VNode } from "../../types/internal";
+import {
+  ComponentConstructor,
+  Props,
+  Renderable,
+  VNode,
+} from "../../types/index";
 
 import { Component } from "../../component";
 import { Fragment } from "../../constants";
@@ -57,12 +61,9 @@ export function redirect(url: string) {
   RouterSubscription.emit(url, { type: "redirect", native: false });
 }
 
-interface PathProps<
-  Match extends any = RoutePath,
-  Component extends any = IVNodeType
-> {
-  match: Match;
-  component: Component;
+interface PathProps {
+  match: RoutePath;
+  component: any;
 }
 interface RouterState {
   renderPath?: string;
@@ -239,7 +240,7 @@ export class A extends Component {
   }
 }
 
-export const Path = ({} as any) as ComponentConstructor<
-  PathProps<RoutePath | string, VNode | IVNodeType>,
-  any
->;
+export const Path = ({} as any) as ComponentConstructor<{
+  match: string | RoutePath;
+  component: Renderable<any>;
+}>;

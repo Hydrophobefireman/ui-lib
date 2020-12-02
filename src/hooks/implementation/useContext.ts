@@ -1,4 +1,4 @@
-import { Context } from "../../types/internal";
+import { Context } from "../../index";
 import { getCurrentHookValueOrSetDefault } from "./util";
 import { getHookStateAtCurrentRender } from "./manage";
 

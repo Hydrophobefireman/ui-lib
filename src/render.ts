@@ -1,5 +1,5 @@
 // import { clearDOM } from "./util";
-import { DOMOps, UIElement, VNode } from "./types/internal";
+import { DOMOps, VNode, VNodeHost } from "./types/index";
 
 import { Fragment } from "./constants";
 import { clearDOM } from "./util";
@@ -7,7 +7,7 @@ import { createElement } from "./create_element";
 import { diff } from "./diff/index";
 import { onDiff } from "./lifeCycleCallbacks";
 
-export function render(VNode: VNode, parentDom: UIElement) {
+export function render(VNode: VNode, parentDom: VNodeHost) {
   let old: VNode;
   const normalizedVNode = createElement(
     Fragment,

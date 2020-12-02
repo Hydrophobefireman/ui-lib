@@ -1,15 +1,15 @@
 import { $, diffStyle } from "./diff/dom";
 import {
-  BATCH_MODE_CLEAR_POINTERS,
   BATCH_MODE_PLACE_NODE,
-  BATCH_MODE_REMOVE_ATTRIBUTE_NS,
   BATCH_MODE_REMOVE_ELEMENT,
   BATCH_MODE_SET_ATTRIBUTE,
   BATCH_MODE_SET_STYLE,
+  BATCH_MODE_REMOVE_ATTRIBUTE_NS,
   BATCH_MODE_SET_SVG_ATTRIBUTE,
   IS_SVG_ATTR,
+  BATCH_MODE_CLEAR_POINTERS,
 } from "./constants";
-import { DOMOps, UIElement, VNode, WritableProps } from "./types/internal";
+import { DOMOps, UIElement, VNode, WritableProps } from "./types/index";
 
 export function commitDOMOps(queue: DOMOps[]) {
   const queueLen = queue.length;

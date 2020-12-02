@@ -1,14 +1,14 @@
 import { Component, enqueueRender } from "./component";
 import type {
   ConsumerCallback,
+  Context,
   ContextProvider,
-  FunctionComponent,
+  Props,
 } from "./types/index";
-import type { Context, Props } from "./types/internal";
 
 import { $push } from "./util";
 import { Fragment } from "./constants";
-import { createElement as h } from "./create_element";
+import { h } from "./index";
 
 let contextId = 0;
 export function createContext<T>(def: T): Context<T> {
@@ -53,12 +53,12 @@ export function createContext<T>(def: T): Context<T> {
     Provider: Provider as any,
     def,
   };
-  Consumer.contextType = context;
+  (Consumer as any).contextType = context;
   return context;
 }
 
-function createConsumer<T>(): FunctionComponent {
-  function Consumer(props: Props<{}, ConsumerCallback<T>>, context: T) {
+function createConsumer<T>() {
+  function Consumer(props: { children: [ConsumerCallback<T>] }, context: T) {
     const children = props.children;
     if (typeof children === "function") {
       return (children as ConsumerCallback<T>)(context);

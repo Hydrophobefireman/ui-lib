@@ -58,23 +58,14 @@
         const [time, setTime] = useState(new Date());
         useLayoutEffect(() => {
           console.log("sync");
+          return () => console.log("sync cleanup");
         });
         useEffect(() => {
-          console.log("raf");
+          console.log("async");
+          setTimeout(() => setTime(new Date()), 1000);
+          return () => console.log("async cleanup");
         });
 
-        useEffect(() => {
-          let _;
-          _ = setInterval(
-            () => console.log("timer") || setTime(new Date()),
-            1000
-          );
-          console.log("new effect", _);
-          return () => {
-            console.log("clear", _);
-            clearInterval(_);
-          };
-        }, []);
         return h("div", null, +time);
       }
       const App = function () {

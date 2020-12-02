@@ -1,16 +1,16 @@
 import {
-  BATCH_MODE_CLEAR_POINTERS,
-  BATCH_MODE_REMOVE_ATTRIBUTE,
   BATCH_MODE_REMOVE_ELEMENT,
   EMPTY_OBJ,
-  Fragment,
   LIFECYCLE_WILL_UNMOUNT,
+  BATCH_MODE_REMOVE_ATTRIBUTE,
+  BATCH_MODE_CLEAR_POINTERS,
+  Fragment,
 } from "../constants";
-import { DiffMeta, UIElement, VNode } from "../types/internal";
+import { DiffMeta, RenderedDom, VNode, UIElement } from "../types/index";
 
-import { _setRef } from "../ref";
-import config from "../config";
 import { scheduleLifeCycleCallbacks } from "../lifeCycleCallbacks";
+import { setRef } from "../ref";
+import config from "../config";
 
 function warnSetState() {
   config.warnOnUnmountRender &&
@@ -29,7 +29,7 @@ export function unmount(
       ? -1
       : recursionLevel || 0;
 
-  _setRef(VNode.ref, null);
+  setRef(VNode.ref, null);
   unmount(VNode._renders, meta, recursionLevel);
 
   const component = VNode._component;
@@ -69,7 +69,7 @@ function _processNodeCleanup(
   meta: DiffMeta,
   recursionLevel: number
 ) {
-  let dom: UIElement;
+  let dom: RenderedDom;
   if (isSimplestVNode(VNode)) {
     dom = VNode._dom;
     if (dom != null) {

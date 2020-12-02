@@ -1,4 +1,8 @@
-import type { Component, EffectsDictionary } from "../../component";
+import type {
+  Component,
+  EffectsDictionary,
+  PendingEffects,
+} from "../../component";
 import {
   getHookStateAtCurrentRender,
   layoutPendingCallbacks,
@@ -33,7 +37,7 @@ export function effect(
   let currentHook =
     hookData[hookIndex] || ({} as typeof candidate._hooksData[0]);
 
-  const instanceEffects: Component["_pendingEffects"] = (candidate._pendingEffects = candidate._pendingEffects || {
+  const instanceEffects: PendingEffects = (candidate._pendingEffects = candidate._pendingEffects || {
     sync: {},
     async: {},
   });

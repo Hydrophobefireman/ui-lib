@@ -1,5 +1,11 @@
-import { ComponentConstructor, FunctionComponent } from "./types/index";
-import { DiffMeta, IVNodeType, Props, VNode } from "./types/internal";
+import {
+  ComponentConstructor,
+  ComponentType,
+  DiffMeta,
+  FunctionComponent,
+  Props,
+  VNode,
+} from "./types/index";
 import {
   EMPTY_OBJ,
   Fragment,
@@ -17,7 +23,7 @@ import { isProvider } from "./context";
 import { plugins } from "./config";
 import { scheduleLifeCycleCallbacks } from "./lifeCycleCallbacks";
 
-export const isFn = (vnType: any): vnType is IVNodeType =>
+export const isFn = (vnType: any): vnType is ComponentType =>
   typeof vnType === "function" && vnType !== Fragment;
 
 export function toSimpleVNode(
@@ -31,7 +37,7 @@ export function toSimpleVNode(
     oldVNode = oldVNode || EMPTY_OBJ;
     let next: VNode;
 
-    const contextType = (type as IVNodeType).contextType;
+    const contextType = (type as ComponentType).contextType;
 
     const provider = contextType && meta.context[contextType.$id];
 
@@ -188,7 +194,7 @@ function applyCurrentState(
   return nextState;
 }
 
-function isClassComponent(type: VNode["type"]): type is IVNodeType {
+function isClassComponent(type: VNode["type"]): type is ComponentType {
   const proto = ((type as any) as ComponentConstructor).prototype;
   return !!(proto && proto.render);
 }

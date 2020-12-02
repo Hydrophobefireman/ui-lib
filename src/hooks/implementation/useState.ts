@@ -10,8 +10,7 @@ type Updater<T> = (arg: T | ((previous?: T) => T)) => void;
 type SetStateHookReturn<T> = [T, (arg: T | Updater<T>) => void];
 
 export function useState<T>(initialState: StateArg<T>): SetStateHookReturn<T> {
-  return useReducer(
-    consumeCallable as any,
-    initialState
-  ) as SetStateHookReturn<T>;
+  return useReducer(consumeCallable as any, initialState) as SetStateHookReturn<
+    T
+  >;
 }

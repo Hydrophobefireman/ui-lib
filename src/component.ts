@@ -5,7 +5,7 @@ import {
   UIElement,
   VNode,
   setStateArgType,
-} from "./types/internal";
+} from "./types/index";
 import config, { plugins } from "./config";
 
 import { ContextProvider } from "./types/index";
