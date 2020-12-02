@@ -1,6 +1,5 @@
 import {
   ComponentChild,
-  ContextProvider,
   DOMOps,
   Props,
   UIElement,
@@ -9,13 +8,24 @@ import {
 } from "./types/index";
 import config, { plugins } from "./config";
 
+import { ContextProvider } from "./types/index";
 import { LifeCycleCallbacks } from "./constants";
 import { assign } from "./util";
 import { diff } from "./diff/index";
 import { onDiff } from "./lifeCycleCallbacks";
 
 const RENDER_QUEUE: Component[] = [];
-
+export interface EffectsDictionary {
+  [index: number]: {
+    cb: () => any;
+    cleanUp?: () => any;
+    resolved?: boolean;
+  };
+}
+export interface PendingEffects {
+  sync: EffectsDictionary;
+  async: EffectsDictionary;
+}
 /** The pseudo-abstract component class */
 export class Component<P = {}, S = {}> {
   constructor(props: P, context?: any) {
@@ -25,9 +35,7 @@ export class Component<P = {}, S = {}> {
     plugins.componentInstance(this, props);
   }
 
-  _pendingEffects?: {
-    [index: number]: { cb: () => any; cleanUp?: () => any; resolved?: boolean };
-  };
+  _pendingEffects?: PendingEffects;
   // our hook data store
   _hooksData?: { args: any; hookState: any }[];
   // tracks component nesting
