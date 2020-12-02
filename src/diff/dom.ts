@@ -1,15 +1,15 @@
 import {
   BATCH_MODE_PLACE_NODE,
   BATCH_MODE_REMOVE_ATTRIBUTE,
+  BATCH_MODE_REMOVE_ATTRIBUTE_NS,
   BATCH_MODE_SET_ATTRIBUTE,
   BATCH_MODE_SET_STYLE,
-  EMPTY_OBJ,
-  NULL_TYPE,
-  IS_SVG_ATTR,
-  BATCH_MODE_REMOVE_ATTRIBUTE_NS,
   BATCH_MODE_SET_SVG_ATTRIBUTE,
+  EMPTY_OBJ,
+  IS_SVG_ATTR,
+  NULL_TYPE,
 } from "../constants";
-import { DiffMeta, Props, RenderedDom, UIElement, VNode } from "../types/index";
+import { DiffMeta, Props, UIElement, VNode } from "../types/index";
 
 import { IS_ARIA_PROP } from "../constants";
 import { plugins } from "../config";
@@ -30,14 +30,14 @@ export function diffDomNodes(
 
   const oldType = oldVNode.type;
 
-  let dom: RenderedDom;
+  let dom: UIElement;
 
   const oldDom = oldVNode._dom;
 
   if (newType !== oldType || oldDom == null) {
     dom = createDomFromVNode(newVNode, meta);
   } else {
-    dom = oldDom as RenderedDom;
+    dom = oldDom as UIElement;
   }
 
   dom._VNode = newVNode;

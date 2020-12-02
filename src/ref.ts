@@ -1,4 +1,4 @@
-import { RenderedDom, VNode } from "./types/index";
+import { UIElement, VNode } from "./types/index";
 
 import { Component } from "./component";
 import { EMPTY_OBJ } from "./constants";
@@ -15,7 +15,7 @@ export function setRef<T>(ref: ((value: T) => void) | RefType<T>, value: T) {
 export function diffReferences(
   newVNode: VNode,
   oldVNode: VNode,
-  domOrComponent: RenderedDom | Component
+  domOrComponent: UIElement | Component
 ) {
   const newRef = newVNode.ref;
   const oldRef = (oldVNode || EMPTY_OBJ).ref;
