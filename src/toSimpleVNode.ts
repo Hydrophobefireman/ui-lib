@@ -152,10 +152,10 @@ function renderFunctionalComponent(VNode: VNode, meta: DiffMeta) {
   setContext(c, meta);
   c._VNode = VNode;
 
-  plugins.hookSetup(c);
+  plugins._hookSetup(c);
   nextVNode = coerceToVNode(c.render(VNode.props, null, meta.contextValue));
   // remove reference of this component
-  plugins.hookSetup(null);
+  plugins._hookSetup(null);
 
   return nextVNode;
 }

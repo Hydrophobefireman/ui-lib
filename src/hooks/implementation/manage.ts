@@ -91,6 +91,6 @@ export function getHookStateAtCurrentRender(): [Component, number] {
 }
 // todo manage sideEffects
 addPluginCallback({
-  hookSetup: prepForNextHookCandidate,
+  _hookSetup: prepForNextHookCandidate,
   diffEnd,
 });

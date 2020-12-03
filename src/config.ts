@@ -13,7 +13,7 @@ export const HAS_RAF = typeof requestAnimationFrame === "function";
 
 export interface IPlugins {
   createElement(VNode: VNode): void;
-  hookSetup(c: Component): void;
+  _hookSetup(c: Component): void;
   diffEnd(): void;
   diffStart(thisVal: Component, force: boolean): void;
   lifeCycle(cb: LifeCycleCallbacks, component: Component): void;
@@ -22,7 +22,7 @@ export interface IPlugins {
 }
 export const plugins: IPlugins = {
   createElement: Fragment,
-  hookSetup: Fragment,
+  _hookSetup: Fragment,
   diffStart: Fragment,
   diffEnd: Fragment,
   lifeCycle: Fragment,

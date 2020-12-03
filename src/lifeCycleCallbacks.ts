@@ -60,8 +60,9 @@ function __executeCallback(cbObj: ProcessOptions) {
 export function onDiff(queue: DOMOps[]) {
   commitDOMOps(queue);
   plugins.diffEnd();
-  defer(() => {
-    processLifeCycleQueue(mountCallbackQueue);
-    processLifeCycleQueue(updateCallbackQueue);
-  });
+  // run syncrhonously
+  // defer(() => {
+  processLifeCycleQueue(mountCallbackQueue);
+  processLifeCycleQueue(updateCallbackQueue);
+  // });
 }
