@@ -14,12 +14,18 @@ import { $push } from "../../util";
 import { EMPTY_OBJ } from "../../constants";
 import { argsChanged } from "./util";
 
-function unmount() {
-  const pending = (this as Component)._pendingEffects;
+function _$unmount(pending: EffectsDictionary, $this: Component) {
   for (const effect in pending || EMPTY_OBJ) {
     runEffectCleanup(pending[effect]);
   }
-  (this as Component)._pendingEffects = null;
+  $this._pendingEffects = null;
+}
+function unmount(this: Component) {
+  const p = this._pendingEffects || EMPTY_OBJ;
+  const pending$sync = p.sync;
+  const pending$async = p.async;
+  _$unmount(pending$sync, this);
+  _$unmount(pending$async, this);
 }
 export function effect(
   callback: () => (() => unknown) | unknown,
@@ -66,7 +72,8 @@ export function effect(
   // what we have as the new effect.
 
   const cleanUp = oldEffect
-    ? ((runHookEffectAndAssignCleanup(oldEffect) as any) as false) ||
+    ? (oldEffect.resolved = false) ||
+      ((runHookEffectAndAssignCleanup(oldEffect) as any) as false) ||
       oldEffect.cleanUp
     : null;
 

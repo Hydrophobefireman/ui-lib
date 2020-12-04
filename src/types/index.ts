@@ -66,12 +66,14 @@ export type Props<P> = Readonly<
     Record<string, any> &
     P
 >;
-export type ComponentChild<
-  T = VNode<any> | string | number | boolean | null | undefined
-> = T;
-export type ComponentChildren<
-  T = VNode<any> | string | number | boolean | null | undefined
-> = ComponentChild<T>[];
+export type ComponentChild =
+  | VNode<any>
+  | string
+  | number
+  | boolean
+  | null
+  | undefined;
+export type ComponentChildren = ComponentChild[];
 
 export interface UIElement extends HTMLElement {
   _events?: Partial<Record<keyof JSX.DOMEvents<any>, JSX.EventHandler<any>>>;
@@ -144,3 +146,7 @@ type ReadonlyVNodeProps =
   | "ref"
   | "_children";
 export type WritableProps = Exclude<keyof VNode, ReadonlyVNodeProps>;
+
+export type Renderable<T extends any = ComponentType | VNode | string> =
+  | T
+  | (() => T);

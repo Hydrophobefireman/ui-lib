@@ -62,20 +62,20 @@ function _runEffect(arr: EffectsDictionary[]) {
     }
   });
 }
-function scheduleUseEffectCallbacks() {
+function useEffectCallbacks() {
   return _runEffect(rafPendingCallbacks);
 }
 
 //sync
-function scheduleLayoutEffectCallbacks() {
+function layoutEffectCallbacks() {
   return _runEffect(layoutPendingCallbacks);
 }
 const effectScheduler =
   config.debounceEffect || (HAS_RAF ? reqAnimFrame : defer);
 
 function diffEnd() {
-  scheduleLayoutEffectCallbacks();
-  effectScheduler(scheduleUseEffectCallbacks);
+  layoutEffectCallbacks();
+  effectScheduler(useEffectCallbacks);
 }
 
 function prepForNextHookCandidate(c: Component) {

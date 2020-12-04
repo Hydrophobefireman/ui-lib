@@ -1,4 +1,4 @@
-import { VNode } from "../types/index";
+import { ComponentChildren, VNode } from "../types/index";
 import { createElement } from "../create_element";
 import { cloneElement } from "../clone_element";
 import { flattenArray } from "../util";
@@ -10,9 +10,8 @@ export function createElementIfNeeded(x: any, props?: any): VNode {
   return createElement(x, props);
 }
 function recursivelyCloneVNode(x: VNode) {
-  x = cloneElement(x);
-  const children = x.props.children;
-  children &&
+  let children: ComponentChildren;
+  (children = (x = cloneElement(x)).props.children) &&
     ((x.props as any).children = flattenArray(
       [children],
       createElementIfNeeded

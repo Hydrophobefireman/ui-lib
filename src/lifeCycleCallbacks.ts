@@ -4,7 +4,7 @@ import {
   LIFECYCLE_DID_UPDATE,
   LifeCycleCallbacks,
 } from "./constants";
-import config, { defer, plugins } from "./config";
+import config, { plugins } from "./config";
 
 import { Component } from "./component";
 import { commitDOMOps } from "./commit";
