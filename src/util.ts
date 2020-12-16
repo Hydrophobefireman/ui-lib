@@ -1,4 +1,5 @@
-import { EMPTY_OBJ } from "./constants";
+import { EMPTY_ARRAY, EMPTY_OBJ } from "./constants";
+
 import { VNode } from "./types/index";
 
 // function identity<T>(x: T): T {
@@ -76,5 +77,6 @@ export function $push<T>(array: T[], x: T) {
   array.indexOf(x) === -1 && array.push(x);
 }
 
-
-
+export function createElementChildren(args: IArguments) {
+  return EMPTY_ARRAY.slice.call(args, 2);
+}

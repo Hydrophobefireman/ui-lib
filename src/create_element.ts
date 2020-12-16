@@ -4,9 +4,10 @@ import {
   VNode,
   createElementPropType,
 } from "./types/index";
-import { EMPTY_ARRAY, EMPTY_OBJ, Fragment, NULL_TYPE } from "./constants";
+import { EMPTY_OBJ, Fragment, NULL_TYPE } from "./constants";
 import { flattenArray, objectWithoutKeys } from "./util";
 
+import { createElementChildren } from "../dist/create_element";
 import { plugins } from "./config";
 
 export const skipProps: (keyof VNode)[] = ["key", "ref"];
@@ -117,9 +118,7 @@ export function getVNode<P, R>(
     _parentDom: null,
     _used: false,
     constructor: undefined,
+    //@ts-ignore
+    __proto__: null,
   };
-}
-
-export function createElementChildren(args: IArguments) {
-  return EMPTY_ARRAY.slice.call(args, 2);
 }

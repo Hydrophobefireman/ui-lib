@@ -43,6 +43,7 @@ export function runHookEffectAndAssignCleanup(effect: EffectsDictionary[0]) {
     effect.cleanUp = ret;
   }
   // make sure we can't run this effect again
+  effect.resolved = true;
   effect.cb = null;
 }
 export function effectCbHandler(effect: EffectsDictionary[0]) {

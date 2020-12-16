@@ -76,6 +76,7 @@ interface RouterProps {
 }
 export class Router extends Component<RouterProps, RouterState> {
   state: RouterState;
+  private _previous: string;
   constructor(props: Props<RouterProps>) {
     super(props);
     this.state = {};
@@ -137,6 +138,11 @@ export class Router extends Component<RouterProps, RouterState> {
     );
   }
   _routeChangeHandler(_e: PopStateEvent | string): void {
+    const prev = this._previous;
+    const curr = Router.path;
+    this._previous = curr;
+    if (prev === curr) return;
+
     const renderPath = fixPath(
       config.inMemoryRouter
         ? config.memoryRouteStore.getItem(sessKey) ||
