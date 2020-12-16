@@ -5,9 +5,14 @@ import {
   createElementPropType,
 } from "./types/index";
 import { EMPTY_OBJ, Fragment, NULL_TYPE } from "./constants";
-import { flattenArray, objectWithoutKeys } from "./util";
+import {
+  assign,
+  create,
+  createElementChildren,
+  flattenArray,
+  objectWithoutKeys,
+} from "./util";
 
-import { createElementChildren } from "../dist/create_element";
 import { plugins } from "./config";
 
 export const skipProps: (keyof VNode)[] = ["key", "ref"];
@@ -106,7 +111,7 @@ export function getVNode<P, R>(
   key?: any,
   ref?: any
 ): VNode<P, R> {
-  return {
+  return assign(create(null), {
     type,
     props,
     key,
@@ -118,7 +123,5 @@ export function getVNode<P, R>(
     _parentDom: null,
     _used: false,
     constructor: undefined,
-    //@ts-ignore
-    __proto__: null,
-  };
+  });
 }

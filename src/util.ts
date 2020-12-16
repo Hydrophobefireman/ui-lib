@@ -29,7 +29,7 @@ const hasOwnProp = EMPTY_OBJ.hasOwnProperty;
 const $Object = EMPTY_OBJ.constructor as ObjectConstructor;
 
 export const assign = ($Object.assign ||
-  function Object_assign(target: {}) {
+  function (target: {}) {
     for (let i = 1; i < arguments.length; i++) {
       const source = arguments[i];
       for (const key in source) {
@@ -80,3 +80,8 @@ export function $push<T>(array: T[], x: T) {
 export function createElementChildren(args: IArguments) {
   return EMPTY_ARRAY.slice.call(args, 2);
 }
+export const create =
+  $Object.create ||
+  (function () {
+    return {};
+  } as ObjectConstructor["create"]);
