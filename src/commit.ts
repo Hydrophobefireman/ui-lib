@@ -12,11 +12,17 @@ import {
 import { DOMOps, UIElement, VNode, WritableProps } from "./types/index";
 
 export function commitDOMOps(queue: DOMOps[]) {
-  const queueLen = queue.length;
-  for (let i = 0; i < queueLen; i++) {
+  const removals: DOMOps[] = [];
+  for (let i = 0; i < queue.length; i++) {
     const op = queue[i];
     const dom = op.node;
     const action = op.action;
+
+    if (action === BATCH_MODE_REMOVE_ELEMENT) {
+      removals.push(op);
+      continue;
+    }
+
     const refDom = op.refDom;
     const value = op.value;
     const VNode = op.VNode;
@@ -30,12 +36,9 @@ export function commitDOMOps(queue: DOMOps[]) {
         $(dom, attr, value);
         break;
       case BATCH_MODE_SET_STYLE:
-        diffStyle(dom as UIElement, value.newValue, value.oldValue);
+        diffStyle(dom, value.newValue, value.oldValue);
         break;
-      case BATCH_MODE_REMOVE_ELEMENT:
-        removeNode(dom);
-        removePointers(VNode, dom);
-        break;
+
       case BATCH_MODE_CLEAR_POINTERS:
         removePointers(VNode, dom);
         break;
@@ -58,8 +61,15 @@ export function commitDOMOps(queue: DOMOps[]) {
         break;
     }
   }
+
+  for (let i = 0; i < removals.length; i++) {
+    const op = removals[i];
+    const dom = op.node;
+    const VNode = op.VNode;
+    removeNode(dom);
+    removePointers(VNode, dom);
+  }
   // queue is immutable, we build a new one everytime
-  //   queue.length = 0;
 }
 
 function removeNode(dom: UIElement) {
