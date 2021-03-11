@@ -88,6 +88,10 @@ function prepForNextHookCandidate(c: Component) {
 }
 
 export function getHookStateAtCurrentRender(): [Component, number] {
+  if (hookCandidate == null)
+    throw new Error(
+      "Hook candidate not found, make sure you're running cooks inside a component"
+    );
   return [hookCandidate, hookIndex++];
 }
 // todo manage sideEffects

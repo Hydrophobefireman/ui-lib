@@ -1,6 +1,6 @@
 {
   "name": "@hydrophobefireman/ui-lib",
-  "version": "1.8.5",
+  "version": "1.8.6",
   "description": "",
   "main": "dist/ui-lib.modern.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "build:minify": "microbundle src/index.ts -o ./dist -f modern,umd --target web --raw true  --tsconfig tsconfig.json",
     "build:no-minify": "microbundle src/index.ts --compress false -o ./dist -f modern --target web --raw true  --tsconfig tsconfig.json",
     "dev": "microbundle watch src/index.ts -o ./dist -f modern --raw  true --target web --tsconfig tsconfig.json",
-    "output": "npm run microbundle-start && npm run postbuild",
+    "output": "yarn build:no-minify &&  yarn postbuild",
     "postbuild": "node build_scripts/postbuild.js ",
     "prebuild": "node build_scripts/prebuild.js"
   },

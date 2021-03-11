@@ -84,5 +84,17 @@ export function effect(
   // only push effect if we haven't already added it to the queue
   $push(arr, pending);
 
-  candidate.componentWillUnmount = unmount;
+  if (!(candidate as any).__attachedUnmount) {
+    (candidate as any).__attachedUnmount = true;
+    
+    const old = candidate.componentWillUnmount;
+    if (!old) {
+      candidate.componentWillUnmount = unmount;
+    } else {
+      candidate.componentWillUnmount = function () {
+        old.call(candidate);
+        unmount.call(candidate);
+      };
+    }
+  }
 }
