@@ -1,2 +1,1722 @@
-const t={},n=[],e=/^aria[\-A-Z]/,o=/^xlink:?/,r={},s=function(){};function i(t,n,e){if(!t)return n;for(let o=0;o<t.length;o++){const r=t[o];Array.isArray(r)?i(r,n,e):n.push(e?e(r):r)}return n}function c(t,n){return i(t,[],n)}const u=t.hasOwnProperty,l=t.constructor,a=l.assign||function(t){for(let n=1;n<arguments.length;n++){const e=arguments[n];for(const n in e)u.call(e,n)&&(t[n]=e[n])}return t},p=(t,n)=>{let e,o={};for(e in t)-1===n.indexOf(e)&&(o[e]=t[e]);return o};function f(t,n){-1===t.indexOf(n)&&t.push(n)}function d(t){return n.slice.call(t,2)}const h=l.create||function(){return{}},m="undefined"!=typeof Promise?Promise.prototype.then.bind(Promise.resolve()):t=>setTimeout(t),_="function"==typeof requestAnimationFrame,y={createElement:s,_hookSetup:s,diffStart:s,diffEnd:s,lifeCycle:s,domNodeCreated:s,componentInstance:s};function g(t){for(const n in t){const e=t[n];if(!e)throw new Error("invalid callback: "+e);let o=y[n];y[n]=function(){o.apply(0,arguments),e.apply(0,arguments)}}}const x={scheduleRender:_?t=>requestAnimationFrame(t):m,warnOnUnmountRender:!1,RAF_TIMEOUT:100,debounceEffect:null,inMemoryRouter:!1,memoryRouteStore:localStorage,unmountOnError:!0},v=["key","ref"];function S(n,e){if(null==n||"boolean"==typeof n)return null;let o;null==e&&(e=t);const r=e.ref,s=e.key;let i;null!=(e=p(e,v)).children?i=c([e.children]):(o=d(arguments)).length&&(i=c(o)),e.children=i;const u=k(n,e,s,r);return y.createElement(u),u}function b(t){return null==t||"boolean"==typeof t?S(r):"string"==typeof t||"number"==typeof t?k(null,String(t)):Array.isArray(t)?S(s,null,t):t._used?k(t.type,t.props,t.key):(t._used=!0,t)}function k(t,n,e,o){return a(h(null),{type:t,props:n,key:e,ref:o,_dom:null,_children:null,_component:null,_renders:null,_parentDom:null,_used:!1,constructor:void 0})}const C={value:1,checked:1},w={key:1,ref:1,children:1};function U(t,n,e){e=e||"";const o=t.style;if("string"==typeof(n=n||""))return void(o.cssText=n);const r="string"==typeof e;if(r)o.cssText="";else for(const t in e)null==n[t]&&(o[t]="");for(const t in n){const s=n[t];(r||s!==e[t])&&(o[t]=s)}}const E=t=>t.trim();function V(t,n,e,o){const r=Array.isArray;r(n)&&(n=E(n.join(" "))),r(e)&&(e=E(e.join(" "))),n!==e&&o.batch.push({node:t,action:1,attr:o.isSvg?"class":"className",value:n})}function N(t,n,o,r){if("o"===n[0]&&"n"===n[1])return function(t,n,e){n=n.substr(2).toLowerCase();const o=t._events;null==e?(t.removeEventListener(n,R),delete o[n]):(o[n]||t.addEventListener(n,R),o[n]=e)}(t,n,o);const s=null==o||!1===o&&!e.test(n);return!r&&n in t?t[n]=s?"":o:s?t.removeAttribute(n):t.setAttribute(n,o)}function R(t){return this._events[t.type].call(this,t)}function D(t){const n=[];for(let e=0;e<t.length;e++){const r=t[e],s=r.node,i=r.action;if(2===i){n.push(r);continue}const c=r.refDom,u=r.value,l=r.VNode;let a=r.attr;switch(i){case 4:u.insertBefore(s,c);break;case 1:N(s,a,u);break;case 3:U(s,u.newValue,u.oldValue);break;case 7:A(l,s);break;case 6:s.removeAttributeNS("http://www.w3.org/1999/xlink",a);break;case 5:a!==(a=a.replace(o,""))?s.setAttributeNS("http://www.w3.org/1999/xlink",a.toLowerCase(),u):N(s,a,u,!0)}}for(let t=0;t<n.length;t++){const e=n[t],o=e.node,r=e.VNode;P(o),A(r,o)}}function P(t){if(null==t)return;const n=t.parentNode;n&&n.removeChild(t)}function A(t,n){!function(t){T(M,t)}(n),function(t){T(O,t)}(t)}const M={_VNode:1,_events:1},O={_children:1,_component:1,_dom:1,_renders:1,_parentDom:1,_used:1,key:1,ref:1};function T(t,n){if(null!=n)for(const e in t)n[e]=null}function I(t,n){t&&("function"==typeof t?t(n):t.current=n)}function L(n,e,o){const r=n.ref,s=(e||t).ref;r&&r!==s&&(I(r,o),s&&I(e.ref,null))}function F(){return{current:null}}function $(){x.warnOnUnmountRender&&console.warn("Component state changed after unmount",this)}function W(n,e,o){if(null==n||n===t)return;o=n.type===s||"string"==typeof n.props?-1:o||0,I(n.ref,null),W(n._renders,e,o);const r=n._component;null!=r&&(r.setState=$,r.forceUpdate=$,r._VNode=null,K({name:"componentWillUnmount",bind:r}));const i=n._children;if(function(t,n,e){let o;!function(t){return"function"!=typeof t.type}(t)?n.batch.push({action:7,VNode:t,node:o}):(o=t._dom,null!=o&&(function(t,n,e){const o=t.props;for(const t in o)"o"===t[0]&&"n"===t[1]&&e.batch.push({action:1,node:n,attr:t})}(t,o,n),n.batch.push({node:o,action:e>0?7:2,VNode:t})))}(n,e,o),i){const t=i.length;for(let n=0;n<t;n++)W(i[n],e,o+1);i.length=0}}const q=[],H=[];function j(t){t.splice(0).forEach(B)}function K(t){const n=t.name;return"componentDidMount"===n?q.push(t):"componentDidUpdate"===n?H.push(t):void B(t)}function B(t){const n=t.name,e=t.bind,o=e[n];if(y.lifeCycle(n,e),e._lastLifeCycleMethod=n,!o)return;const r=t.args,s="function"==typeof e.componentDidCatch;try{o.apply(e,r)}catch(t){if(s)return e.componentDidCatch(t);if(x.unmountOnError){const t=[];W(e._VNode,{batch:t}),D(t)}throw t}}function G(t){D(t),y.diffEnd(),j(q),j(H)}const Z=[];class z{constructor(t,n){this.state={},this.props=t,this.context=n,y.componentInstance(this,t)}render(t,n,e){return null}setState(t){if(this._oldState=a({},this.state),this._nextState=a({},this._nextState||this.state),"function"==typeof t){const n=t(this._nextState,this.props);if(null==n)return;a(this._nextState,n)}else a(this._nextState,t);J(this)}forceUpdate(t,n){if(null==this._VNode)return;const e=null==n,o=n||[],r=!1!==t;y.diffStart(this,r),st(this._VNode,a({},this._VNode),this._VNode._parentDom,r,{depth:this._depth,batch:o,isSvg:!1,context:this._sharedContext||{}}),"function"==typeof t&&t(),e&&G(o)}}function J(t){t._dirty=!0,1===Z.push(t)&&x.scheduleRender(Q)}function Q(){let t;Z.sort((t,n)=>t._depth-n._depth);const n=[];for(;t=Z.pop();)t._dirty&&(t._dirty=!1,t.forceUpdate(!1,n));G(n)}let X=0;function Y(t){const n="$"+X++,e=function(t,n){const e=t.children;return"function"==typeof e?e(n):e[0](n)},o={$id:n,Consumer:e,Provider:class extends z{constructor(t,e){super(t,e),this._subs=[],this._o={[n]:this}}getChildContext(){return this._o}shouldComponentUpdate(t){return t.value!==this.props.value&&this._subs.some(t=>J(t))||!0}add(t){const n=this._subs;f(n,t);const e=t.componentWillUnmount;t.componentWillUnmount=()=>{n.splice(n.indexOf(t),1),e&&e.call(t)}}render(){return S(s,null,this.props.children)}},def:t};return e.contextType=o,o}const tt=t=>"function"==typeof t&&t!==s;function nt(t){return this.constructor(t,this.context)}function et(t,n){t._sharedContext=n.context,t.context=n.contextValue;const e=n.provider;e&&e.add(t)}function ot(e,o,i,c){if(e.type===r)return;const u=e._children||n,l=(o||t)._children||n;return u!==l?function(n,e,o,i,c){const u=n.type===s,l=e.length,p=o.length,f=Math.max(l,p),d=u?c.next||(rt(o[p-1])||t).nextSibling:null;for(let n=0;n<f;n++){const s=e[n]||(n<l?S(r):null);let u=o[n]||t,p=(rt(u)||t).nextSibling||d;st(s,u,i,!1,a({},c,{next:p}))}}(e,u,l,i,c):void 0}function rt(e){if(e&&e!==t){for(;tt(e.type);)e=e._renders;if(e.type===s){const t=e._children||n;return rt(t[t.length-1])}return e._dom}}function st(n,e,i,u,l){if(null==n||"boolean"==typeof n)return void W(e,l);if(!((p=n)&&void 0===p.constructor||(console.warn("component not of expected type =>",p),0)))return null;var p;if(e===n)return n._dom;let f=(e=e||t).type,d=n.type,h=tt(d);if(d===f&&h&&(n._component=e._component),n._parentDom=i,n._used=!0,d!==f){if(!l.next){const n=rt(e);l.next=(n||t).nextSibling}W(e,l),e=t}const m=n;if("string"!=typeof n.props&&d!==r&&(n=function(n,e,o,r){let s;if(null!=n&&tt(s=n.type)){let i;e=e||t;const c=s.contextType,u=c&&r.context[c.$id];r.contextValue=u?u.props.value:c&&c.def,r.provider=u,i=function(t){const n=t.prototype;return!(!n||!n.render)}(s)?function(n,e,o,r){let s;const i=n.type;let c=n._component;const u=null!=c;if(u){if(s="componentDidUpdate",null!=c.shouldComponentUpdate&&!o&&!1===c.shouldComponentUpdate(n.props,c._nextState||c.state))return t}else s="componentDidMount",c=new i(n.props,r.contextValue),n._component=c,c._depth=++r.depth;et(c,r),c._VNode=n;const l=c._oldState,p=e.props;K({bind:c,name:u?"componentWillUpdate":"componentWillMount",args:u?[n.props,c._nextState,r.contextValue]:null}),c.state=function(n,e,o){const r=a({},n.state||t,n._nextState||t),s=function(t,n,e){const o=t.getDerivedStateFromProps;return null!=o?a({},o(n,e)):null}(e,o.props,r);return s&&a(r,s),r}(c,i,n),c._oldState=null,c._nextState=null,c.props=n.props;const f=b(c.render(c.props,c.state,r.contextValue));let d=null;return u&&null!=c.getSnapshotBeforeUpdate&&(d=c.getSnapshotBeforeUpdate(p,l)),K({bind:c,name:s,args:u?[p,l,d]:[]}),L(n,e,c),f}(n,e,o,r):function(t,n){let e;const o=t.type;let r;return t._component?r=t._component:(r=new z(t.props,n.contextValue),t._component=r,r.render=nt,r.constructor=o,r.props=t.props,r._depth=++n.depth),et(r,n),r._VNode=t,y._hookSetup(r),e=b(r.render(t.props,null,n.contextValue)),y._hookSetup(null),e}(n,r),n._renders=i,r.provider=r.contextValue=void 0;const l=n._component;if(l&&"function"==typeof l.getChildContext){const t=l.getChildContext();r.context=a({},r.context,t)}return i}return n}(n,e,u,l),l.isSvg="svg"===n.type||l.isSvg),tt(e.type)&&(e=e._renders),n!==m){if(n===t)return;return st(n,e,i,u,l)}let _;return n._children=function(t){let n=t.props.children;if(t.type!==s){if(null==n)return[]}else n&&!n.length&&(n=null);return c([n],b)}(n),f=e.type,d=n.type,f!==d&&(e=null),d===s?ot(n,e,i,l):(function(n,e,s,i){const c=(e=e||t)===t;let u;const l=e._dom;u=n.type!==e.type||null==l?function(t,n){if("string"==typeof t.props)return document.createTextNode("");{const e=t.type;if(e===r)return document.createComment("$");let o;return o=n.isSvg?document.createElementNS("http://www.w3.org/2000/svg",e):document.createElement(e),o._events={},y.domNodeCreated(o,t),o}}(n,i):l,u._VNode=n,n._dom=u,function(n,e,s,i){if(e.type===r)return;if(s=s||t,"string"==typeof e.props)return function(t,n,e){return n===e||(t.nodeValue=n)}(n,e.props,s.props);const c=s.props,u=e.props;null!=c&&function(t,n,e,r){for(let s in n)if(!w[s]&&null==e[s]&&null!=n[s]){const n=s===(s=s.replace(o,""))?1:6;r.batch.push({node:t,action:n,attr:s})}}(n,c,u,i),function(t,n,e,o){for(let r in e){if(r in w)continue;let s=e[r],i=C[r]?t[r]:n[r];s!==i&&(r="class"===r?"className":r,"className"!==r?o.batch.push("style"!==r?{node:t,action:o.isSvg?5:1,attr:r,value:s}:{node:t,action:3,value:{newValue:s,oldValue:i}}):V(t,s,i,o))}}(n,c||t,u,i)}(u,n,c?null:e,i),c&&i.batch.push({node:u,action:4,refDom:i.next,value:s,VNode:n})}(n,e,i,l),_=n._dom,l.isSvg="foreignObject"!=d&&l.isSvg,ot(n,e,_,l),L(n,e,_)),_}function it(t,n){let e;const o=S(s,e,[t]);n.hasChildNodes()&&function(t){let n;for(;n=t.firstChild;)t.removeChild(n)}(n);const r=[];st(o,e,n,!1,{depth:0,batch:r,isSvg:void 0!==n.ownerSVGElement,context:{}}),G(r)}const ct=["boolean","string","number"];function ut(t,n){return null==t||ct.indexOf(typeof t)>-1?t:void 0===t.constructor?function(t){let n;return(n=(t=function(t,n){if(!t)return null;n=a({},t.props,n),arguments.length>2&&(n.children=d(arguments));let e=p(n,v);return k(t.type,e,n.key||t.key,n.ref||t.ref)}(t)).props.children)&&(t.props.children=c([n],ut)),t}(t):S(t,n)}const lt=t=>t.promise||t.componentPromise;class at extends z{componentDidMount(){this._init()}componentDidUpdate(t){(t&&lt(t))!==lt(this.props)&&this._init()}_init(){this.setState({inProgress:!0});const t=lt(this.props);t().then(n=>{t===lt(this.props)&&this.setState({render:n,inProgress:!1,error:!1})}).catch(t=>this.setState({error:!0,inProgress:!1}))}render(t,n){return n.inProgress?ut(t.fallback||t.fallbackComponent)||"Loading":n.error?ut(t.errorComponent)||"An Error Occured":ut(n.render,p(t,["fallback","fallbackComponent","promise","componentPromise"]))}}const pt=/\/+$/;function ft(t){return 1===t.length?t:t.replace(pt,"")}const dt=[],ht={subscribe(t){f(dt,t)},unsubscribe(t){dt.splice(dt.indexOf(t),1)},emit(t,n){dt.forEach(e=>e(t,n))},unsubscribeAll(){dt.length=0}};function mt(t,n){if(!x.inMemoryRouter)return window.history[n](null,"",t);x.memoryRouteStore.setItem("UI--ROUTE",t)}function _t(t){mt(t,"pushState"),ht.emit(t,{type:"load",native:!1})}function yt(t){mt(t,"replaceState"),ht.emit(t,{type:"redirect",native:!1})}class gt extends z{constructor(t){super(t),this.state={},this._routeChangeHandler=this._routeChangeHandler.bind(this),this.componentDidUpdate=this._setRouteMethod}_setRouteMethod(){x.inMemoryRouter=!!this.props.inMemoryRouter}static __emitter(){ht.emit(gt.path+gt.qs,{type:"popstate",native:!0})}static get path(){return location.pathname}static get qs(){return location.search}static get searchParams(){return new URLSearchParams(gt.qs)}static _getParams(t,n){const e={};for(const o in t)e[t[o]]=decodeURIComponent(n[o]);return e}static getCurrentParams(t){const n=(t=xt(t)).params,e=t.regex.exec(gt.path);return e?gt._getParams(n,e):{}}componentDidMount(){this._setRouteMethod(),ht.subscribe(this._routeChangeHandler),window.addEventListener("popstate",gt.__emitter),this._routeChangeHandler(null)}componentWillUnmount(){window.removeEventListener("popstate",gt.__emitter),ht.unsubscribe(this._routeChangeHandler)}_notFoundComponent(){return S("div",null,`The Requested URL "${gt.path}" was not found`)}_routeChangeHandler(t){const n=this._previous,e=gt.path;if(this._previous=e,n===e)return;const o=ft(x.inMemoryRouter?x.memoryRouteStore.getItem("UI--ROUTE")||this.props.defaultRoute||"/":gt.path);let r=[];this.props.children.forEach(t=>{const n=xt(t.props.match),e=n.regex.exec(o);if(e){const o=t.props,s=gt._getParams(n.params,e);r.push(ut(o.component,a({},t.props,{params:s})))}}),r.length||(r=S(this.props.fallbackComponent||this._notFoundComponent)),this.setState({child:r})}render(t,n){return S(s,null,n.child)}}function xt(t){if(!t)throw Error("Invalid value for match: "+t);if(null!=t.regex)return t;t=ft(t);const n={};let e=0;return{regex:(o=t.split("/").map(t=>":"===t[0]?(n[++e]=t.substr(1),"([^?\\/]+)"):t).join("/"),RegExp(`^${o}(/?)$`)),params:n};var o}function vt(t){if(t.altKey||t.ctrlKey||t.metaKey||t.shiftKey)return;t.stopImmediatePropagation&&t.stopImmediatePropagation(),t.stopPropagation&&t.stopPropagation(),t.preventDefault();const n=new URL(this.href,location.href);_t(n.pathname+n.search+n.hash)}function St(t,n,e){return t.call(e,n)}class bt extends z{constructor(t){super(t),this._onClick=t=>{const n=t.currentTarget;St(vt,t,n);const e=this.props.onClick;e&&St(e,t,n)}}render(t){return S("a",a({},t,{onClick:this._onClick}))}}const kt={};function Ct(t,n){return!t||n.some((n,e)=>n!==t[e])}function wt(t,n,e){return t[n]||(t[n]=Ut(0,e))}function Ut(t,n){return"function"==typeof n?n(t):n}let Et=0,Vt=null;const Nt=[],Rt=[];function Dt(t){const n=t.cleanUp;"function"==typeof n&&(n(),t.cleanUp=null)}function Pt(t){let n=t.cb;n&&"function"==typeof(n=n())&&(t.cleanUp=n),t.resolved=!0,t.cb=null}function At(t){t.resolved||Dt(t),Pt(t)}function Mt(t){t.forEach(t=>{for(const n in t)At(t[n])})}function Ot(){return Mt(Nt)}const Tt=x.debounceEffect||(_?function(t){const n=()=>{cancelAnimationFrame(e),clearTimeout(o),t()};let e,o;o=setTimeout(n,x.RAF_TIMEOUT),e=requestAnimationFrame(n)}:m);function It(){if(null==Vt)throw new Error("Hook candidate not found, make sure you're running cooks inside a component");return[Vt,Et++]}function Lt(t,n){const e=It(),o=e[1],r=e[0]._hooksData;let s=r[o]||{};return Ct(s.args,n)?(r[o]=null,s=wt(r,o,()=>({hookState:t()})),s.args=n,s.hookState):s.hookState}function Ft(t,n){return Lt(()=>t,n)}function $t(t){const n=It(),e=n[0],o=n[1],r=e._sharedContext&&e._sharedContext[t.$id];if(!r)return t.def;const s=e._hooksData;wt(s,o,{args:null,hookState:!1});const i=s[o];return i.hookState||(i.hookState=!0,r.add(e)),r.props.value}function Wt(n,e){for(const e in n||t)Dt(n[e]);e._pendingEffects=null}function qt(){const n=this._pendingEffects||t,e=n.async;Wt(n.sync,this),Wt(e,this)}function Ht(t,n,e){const o=e===Rt?"sync":"async",r=It(),s=r[0],i=r[1],c=s._hooksData;let u=c[i]||{};const l=(s._pendingEffects=s._pendingEffects||{sync:{},async:{}})[o],a=l[i];if(!Ct(u.args,n))return void(a&&(a.resolved=!0));c[i]=u,u.args=n;const p=a?(a.resolved=!1)||Pt(a)||a.cleanUp:null;if(l[i]={cb:t,cleanUp:p},f(e,l),!s.__attachedUnmount){s.__attachedUnmount=!0;const t=s.componentWillUnmount;s.componentWillUnmount=t?function(){t.call(s),qt.call(s)}:qt}}function jt(t,n){return Ht(t,n,Nt)}function Kt(t,n){return Ht(t,n,Rt)}g({_hookSetup:function(t){Vt=t,Et=0,t&&(t._hooksData||(t._hooksData=[]))},diffEnd:function(){Mt(Rt),Tt(Ot)}});const Bt={};function Gt(t,n,e){const o=It(),r=o[0],s=wt(r._hooksData,o[1],()=>({hookState:e?e(n):Ut(null,n)}));return[s.hookState,s.args||(s.args=n=>{const e=t(s.hookState,n);s.hookState=e,r.setState(Bt)})]}function Zt(t){return Lt(()=>({current:t}),[])}function zt(t){return Gt(Ut,t)}export default z;export{bt as A,at as AsyncComponent,z as Component,s as Fragment,kt as Path,gt as Router,ht as RouterSubscription,g as addPluginCallback,x as config,Y as createContext,S as createElement,F as createRef,xt as createRoutePath,S as h,_t as loadURL,yt as redirect,it as render,Ft as useCallback,$t as useContext,jt as useEffect,Kt as useLayoutEffect,Lt as useMemo,Gt as useReducer,Zt as useRef,zt as useState};
+const EMPTY_OBJ = {};
+const EMPTY_ARRAY = [];
+const IS_ARIA_PROP = /^aria[\-A-Z]/;
+const IS_SVG_ATTR = /^xlink:?/;
+const BATCH_MODE_SET_ATTRIBUTE = 1;
+const BATCH_MODE_REMOVE_ATTRIBUTE = BATCH_MODE_SET_ATTRIBUTE;
+const BATCH_MODE_REMOVE_ELEMENT = 2;
+const BATCH_MODE_SET_STYLE = 3;
+const BATCH_MODE_PLACE_NODE = 4;
+const BATCH_MODE_SET_SVG_ATTRIBUTE = 5;
+const BATCH_MODE_REMOVE_ATTRIBUTE_NS = 6;
+const BATCH_MODE_CLEAR_POINTERS = 7;
+/**
+ * Special constant to mark `null` elements
+ * @example
+ * function App() {
+ *  return <div>{someCondition && <div>It is True!</div> }</div>
+ * }
+ * @description
+ * in case `someCondition` is falsey, we will render a comment (`<!--$-->`) in the dom instead
+ * this makes it easier for us to detect changes and additions/removals in case of <Fragment>
+ * supporting which is the reason this "workaround" exists
+ */
+
+const NULL_TYPE = {};
+const LIFECYCLE_WILL_MOUNT = "componentWillMount";
+const LIFECYCLE_DID_MOUNT = "componentDidMount";
+const LIFECYCLE_WILL_UPDATE = "componentWillUpdate";
+const LIFECYCLE_DID_UPDATE = "componentDidUpdate";
+const LIFECYCLE_WILL_UNMOUNT = "componentWillUnmount";
+const Fragment = function Fragment() {};
+
+function flat(arr, flattenedArray, map) {
+  if (!arr) return flattenedArray;
+
+  for (let i = 0; i < arr.length; i++) {
+    const el = arr[i];
+
+    if (Array.isArray(el)) {
+      flat(el, flattenedArray, map);
+    } else {
+      flattenedArray.push(map ? map(el) : el);
+    }
+  }
+
+  return flattenedArray;
+}
+/** flattens array (to `Infinity`) */
+
+
+function flattenArray(array, map) {
+  const flattened = [];
+  return flat(array, flattened, map);
+}
+const hasOwnProp = EMPTY_OBJ.hasOwnProperty;
+const $Object = EMPTY_OBJ.constructor;
+const assign = $Object.assign || function (target) {
+  for (let i = 1; i < arguments.length; i++) {
+    const source = arguments[i];
+
+    for (const key in source) {
+      if (hasOwnProp.call(source, key)) {
+        target[key] = source[key];
+      }
+    }
+  }
+
+  return target;
+};
+function clearDOM(dom) {
+  let c;
+
+  while (c = dom.firstChild) {
+    dom.removeChild(c);
+  }
+}
+function isValidVNode(V, undef) {
+  if (!V || V.constructor !== undef) {
+    console.warn("component not of expected type =>", V);
+    return false;
+  }
+
+  return true;
+}
+const objectWithoutKeys = (obj, keys) => {
+  let ret = {};
+  let key;
+
+  for (key in obj) {
+    if (keys.indexOf(key) === -1) {
+      ret[key] = obj[key];
+    }
+  }
+
+  return ret;
+};
+function $push(array, x) {
+  array.indexOf(x) === -1 && array.push(x);
+}
+function createElementChildren(args) {
+  return EMPTY_ARRAY.slice.call(args, 2);
+}
+const create = $Object.create || function () {
+  return {};
+};
+
+const HAS_PROMISE = typeof Promise !== "undefined";
+const defer = HAS_PROMISE ? Promise.prototype.then.bind(Promise.resolve()) : f => setTimeout(f);
+const HAS_RAF = typeof requestAnimationFrame === "function";
+const plugins = {
+  createElement: Fragment,
+  _hookSetup: Fragment,
+  diffStart: Fragment,
+  diffEnd: Fragment,
+  lifeCycle: Fragment,
+  domNodeCreated: Fragment,
+  componentInstance: Fragment
+};
+function addPluginCallback(options) {
+  for (const type in options) {
+    const cb = options[type];
+    if (!cb) throw new Error("invalid callback: " + cb);
+    let oldType = plugins[type];
+
+    plugins[type] = function () {
+      oldType.apply(0, arguments);
+      cb.apply(0, arguments);
+    };
+  }
+}
+const config = {
+  scheduleRender: HAS_RAF ? cb => requestAnimationFrame(cb) : defer,
+  warnOnUnmountRender: false,
+  RAF_TIMEOUT: 100,
+  debounceEffect: null,
+  inMemoryRouter: false,
+  memoryRouteStore: localStorage,
+  unmountOnError: true
+};
+
+const skipProps = ["key", "ref"];
+function createElement(type, props) {
+  if (type == null || typeof type == "boolean") return null;
+
+  if (props == null) {
+    props = EMPTY_OBJ;
+  }
+
+  let children; // don't pass ref & key to the component
+
+  const ref = props.ref;
+  const key = props.key; // TODO remove any
+
+  props = objectWithoutKeys(props, skipProps); // children provided as the extra args are used
+  // mark props.children as empty_arr so we know the no child was passed
+
+  let _children;
+
+  if (props.children != null) {
+    _children = flattenArray([props.children]);
+  } else if ((children = createElementChildren(arguments)).length) {
+    _children = flattenArray(children);
+  }
+
+  props.children = _children;
+
+  const _vnode = getVNode(type, props, key, ref);
+
+  plugins.createElement(_vnode);
+  return _vnode;
+}
+function coerceToVNode(VNode) {
+  // don't render anything to the dom, just leave a comment
+  if (VNode == null || typeof VNode === "boolean") {
+    return createElement(NULL_TYPE);
+  }
+
+  if (typeof VNode === "string" || typeof VNode === "number") {
+    return getVNode(null, String(VNode));
+  } // a function returned an array instead of a fragment, normalize it
+
+
+  if (Array.isArray(VNode)) {
+    return createElement(Fragment, null, VNode);
+  } // VNode exists, clone
+
+
+  if (VNode._used) {
+    const vn = getVNode(VNode.type, VNode.props, VNode.key);
+    return vn;
+  }
+
+  VNode._used = true;
+  return VNode;
+}
+/** return a flat array of children and normalize them */
+
+function flattenVNodeChildren(VNode) {
+  let c = VNode.props.children; // even if we are creating an empty fragment
+  // we will still render a null child (`c`)
+  // as it will serve as a memory for where the fragment's
+  // future children should be
+
+  const nullChildren = c == null;
+
+  if (VNode.type !== Fragment) {
+    if (nullChildren) return [];
+  } else {
+    if (c && !c.length) c = null;
+  }
+
+  return flattenArray([c], coerceToVNode);
+}
+function getVNode(type, props, key, ref) {
+  return assign(create(null), {
+    type,
+    props,
+    key,
+    ref,
+    _dom: null,
+    _children: null,
+    _component: null,
+    _renders: null,
+    _parentDom: null,
+    _used: false,
+    constructor: undefined
+  });
+}
+
+function diffDomNodes(newVNode, oldVNode, parentDom, meta) {
+  oldVNode = oldVNode || EMPTY_OBJ; // oldVNode is being unmounted, append a new DOMNode
+
+  const shouldAppend = oldVNode === EMPTY_OBJ;
+  const newType = newVNode.type;
+  const oldType = oldVNode.type;
+  let dom;
+  const oldDom = oldVNode._dom;
+
+  if (newType !== oldType || oldDom == null) {
+    dom = createDomFromVNode(newVNode, meta);
+  } else {
+    dom = oldDom;
+  }
+
+  dom._VNode = newVNode; // copyPropsUpwards(newVNode, "_dom", dom);
+
+  newVNode._dom = dom;
+  diffAttributes(dom, newVNode, shouldAppend ? null : oldVNode, meta); // setComponent_base(newVNode, dom);
+
+  if (shouldAppend) {
+    meta.batch.push({
+      node: dom,
+      action: BATCH_MODE_PLACE_NODE,
+      refDom: meta.next,
+      value: parentDom,
+      VNode: newVNode
+    });
+  }
+}
+
+function createDomFromVNode(newVNode, meta) {
+  if (typeof newVNode.props === "string") {
+    return document.createTextNode("");
+  } else {
+    const type = newVNode.type;
+
+    if (type === NULL_TYPE) {
+      return document.createComment("$");
+    }
+
+    let dom;
+
+    if (meta.isSvg) {
+      dom = document.createElementNS("http://www.w3.org/2000/svg", type);
+    } else {
+      dom = document.createElement(type);
+    }
+
+    dom._events = {};
+    plugins.domNodeCreated(dom, newVNode);
+    return dom;
+  }
+}
+
+function diffAttributes(dom, newVNode, oldVNode, meta) {
+  if (newVNode.type === NULL_TYPE) return;
+  oldVNode = oldVNode || EMPTY_OBJ;
+  const isTextNode = typeof newVNode.props === "string";
+
+  if (isTextNode) {
+    return __diffTextNodes(dom, newVNode.props, oldVNode.props);
+  }
+
+  const prevAttrs = oldVNode.props;
+  const nextAttrs = newVNode.props;
+
+  if (prevAttrs != null) {
+    __removeOldAttributes(dom, prevAttrs, nextAttrs, meta);
+  }
+
+  __diffNewAttributes(dom, prevAttrs || EMPTY_OBJ, nextAttrs, meta);
+}
+
+const domSourceOfTruth = {
+  value: 1,
+  checked: 1
+};
+const UNSAFE_ATTRS = {
+  key: 1,
+  ref: 1,
+  children: 1
+};
+
+function __diffNewAttributes(dom, prev, next, meta) {
+  for (let attr in next) {
+    if (attr in UNSAFE_ATTRS) continue;
+    let newValue = next[attr];
+    let oldValue = domSourceOfTruth[attr] ? dom[attr] : prev[attr];
+    if (newValue === oldValue) continue;
+    attr = attr === "class" ? "className" : attr;
+
+    if (attr === "className") {
+      diffClass(dom, newValue, oldValue, meta);
+      continue;
+    } else if (attr === "style") {
+      meta.batch.push({
+        node: dom,
+        action: BATCH_MODE_SET_STYLE,
+        value: {
+          newValue,
+          oldValue
+        }
+      });
+      continue;
+    }
+
+    meta.batch.push({
+      node: dom,
+      action: meta.isSvg ? BATCH_MODE_SET_SVG_ATTRIBUTE : BATCH_MODE_SET_ATTRIBUTE,
+      attr,
+      value: newValue
+    });
+  }
+}
+
+function diffStyle(dom, newValue, oldValue) {
+  oldValue = oldValue || ""; // incase someone sets their style to null
+  // fastest way to remove previous props
+
+  newValue = newValue || "";
+  const st = dom.style;
+
+  if (typeof newValue === "string") {
+    st.cssText = newValue;
+    return;
+  }
+
+  const oldValueIsString = typeof oldValue === "string";
+
+  if (oldValueIsString) {
+    st.cssText = "";
+  } else {
+    for (const styleProp in oldValue) {
+      if (newValue[styleProp] == null) {
+        st[styleProp] = "";
+      }
+    }
+  }
+
+  for (const i in newValue) {
+    const prop = newValue[i];
+
+    if (oldValueIsString || prop !== oldValue[i]) {
+      if (i[0] == "-") {
+        st.setProperty(i, prop);
+      } else st[i] = prop;
+    }
+  }
+}
+
+const trim = k => k.trim();
+
+function diffClass(dom, newValue, oldValue, meta) {
+  const isArray = Array.isArray;
+
+  if (isArray(newValue)) {
+    newValue = trim(newValue.join(" "));
+  }
+
+  if (isArray(oldValue)) {
+    oldValue = trim(oldValue.join(" "));
+  }
+
+  if (newValue === oldValue) return;
+  meta.batch.push({
+    node: dom,
+    action: BATCH_MODE_SET_ATTRIBUTE,
+    attr: meta.isSvg ? "class" : "className",
+    value: newValue
+  });
+}
+
+function __removeOldAttributes(dom, prev, next, meta) {
+  for (let i in prev) {
+    if (!UNSAFE_ATTRS[i] && next[i] == null && prev[i] != null) {
+      const attributeRemovalMode = i === (i = i.replace(IS_SVG_ATTR, "")) ? BATCH_MODE_REMOVE_ATTRIBUTE : BATCH_MODE_REMOVE_ATTRIBUTE_NS;
+      meta.batch.push({
+        node: dom,
+        action: attributeRemovalMode,
+        attr: i
+      });
+    }
+  }
+}
+
+function __diffTextNodes(dom, newVal, oldVal) {
+  return newVal === oldVal || (dom.nodeValue = newVal);
+}
+/** dom helper */
+
+
+function $(dom, prop, value, isSvg) {
+  if (prop[0] === "o" && prop[1] === "n") {
+    return $event(dom, prop, value);
+  }
+
+  const shouldRemove = value == null || value === false && !IS_ARIA_PROP.test(prop);
+
+  if (!isSvg && prop in dom) {
+    return dom[prop] = shouldRemove ? "" : value;
+  } else {
+    if (shouldRemove) return dom.removeAttribute(prop);
+    return dom.setAttribute(prop, value);
+  }
+}
+
+function $event(dom, event, listener) {
+  event = event.substr(2).toLowerCase();
+  const eventDict = dom._events;
+
+  if (listener == null) {
+    dom.removeEventListener(event, eventListenerProxy);
+    delete eventDict[event];
+  } else {
+    eventDict[event] || dom.addEventListener(event, eventListenerProxy);
+    eventDict[event] = listener;
+  }
+}
+
+function eventListenerProxy(e) {
+  return this._events[e.type].call(this, e);
+}
+
+function commitDOMOps(queue) {
+  const removals = [];
+
+  for (let i = 0; i < queue.length; i++) {
+    const op = queue[i];
+    const dom = op.node;
+    const action = op.action;
+
+    if (action === BATCH_MODE_REMOVE_ELEMENT) {
+      removals.push(op);
+      continue;
+    }
+
+    const refDom = op.refDom;
+    const value = op.value;
+    const VNode = op.VNode;
+    let attr = op.attr;
+
+    switch (action) {
+      case BATCH_MODE_PLACE_NODE:
+        value.insertBefore(dom, refDom);
+        break;
+
+      case BATCH_MODE_SET_ATTRIBUTE:
+        // in case of removeAttribute, `op.attr===undefined`
+        $(dom, attr, value);
+        break;
+
+      case BATCH_MODE_SET_STYLE:
+        diffStyle(dom, value.newValue, value.oldValue);
+        break;
+
+      case BATCH_MODE_CLEAR_POINTERS:
+        removePointers(VNode, dom);
+        break;
+
+      case BATCH_MODE_REMOVE_ATTRIBUTE_NS:
+        dom.removeAttributeNS("http://www.w3.org/1999/xlink", attr);
+        break;
+
+      case BATCH_MODE_SET_SVG_ATTRIBUTE:
+        const isSVGSpecificAttr = attr !== (attr = attr.replace(IS_SVG_ATTR, ""));
+        isSVGSpecificAttr ? dom.setAttributeNS("http://www.w3.org/1999/xlink", attr.toLowerCase(), value) : $(dom, attr, value, true);
+        break;
+    }
+  }
+
+  for (let i = 0; i < removals.length; i++) {
+    const op = removals[i];
+    const dom = op.node;
+    const VNode = op.VNode;
+    removeNode(dom);
+    removePointers(VNode, dom);
+  } // queue is immutable, we build a new one everytime
+
+}
+
+function removeNode(dom) {
+  if (dom == null) return;
+  const p = dom.parentNode;
+
+  if (p) {
+    p.removeChild(dom);
+  }
+}
+
+function removePointers(VNode, dom) {
+  clearDomNodePointers(dom);
+  clearVNodePointers(VNode);
+}
+
+const DOM_POINTERS = {
+  _VNode: 1,
+  _events: 1
+};
+const VNode_POINTERS = {
+  _children: 1,
+  _component: 1,
+  _dom: 1,
+  _renders: 1,
+  _parentDom: 1,
+  _used: 1,
+  key: 1,
+  ref: 1
+};
+
+function clearDomNodePointers(dom) {
+  _clearPointers(DOM_POINTERS, dom);
+}
+
+function clearVNodePointers(VNode) {
+  _clearPointers(VNode_POINTERS, VNode);
+}
+
+function _clearPointers(pointersObj, el) {
+  if (el == null) return;
+
+  for (const i in pointersObj) {
+    el[i] = null;
+  }
+}
+
+function setRef(ref, value) {
+  if (!ref) return;
+  if (typeof ref == "function") ref(value);else ref.current = value;
+}
+function diffReferences(newVNode, oldVNode, domOrComponent) {
+  const newRef = newVNode.ref;
+  const oldRef = (oldVNode || EMPTY_OBJ).ref;
+
+  if (newRef && newRef !== oldRef) {
+    setRef(newRef, domOrComponent);
+    oldRef && setRef(oldVNode.ref, null);
+  }
+}
+function createRef() {
+  return {
+    current: null
+  };
+}
+
+function warnSetState() {
+  config.warnOnUnmountRender && console.warn("Component state changed after unmount", this);
+}
+
+function unmount$1(VNode, meta, recursionLevel) {
+  /** short circuit */
+  if (VNode == null || VNode === EMPTY_OBJ) return;
+  recursionLevel = VNode.type === Fragment || typeof VNode.props === "string" ? -1 : recursionLevel || 0;
+  setRef(VNode.ref, null);
+  unmount$1(VNode._renders, meta, recursionLevel);
+  const component = VNode._component;
+
+  if (component != null) {
+    /** maybe disable setState for this component? */
+    component.setState = warnSetState;
+    component.forceUpdate = warnSetState;
+    /** todo check for side effects */
+
+    component._VNode = null;
+    scheduleLifeCycleCallbacks({
+      name: LIFECYCLE_WILL_UNMOUNT,
+      bind: component
+    });
+  }
+
+  const childArray = VNode._children;
+
+  _processNodeCleanup(VNode, meta, recursionLevel);
+
+  if (childArray) {
+    const cl = childArray.length;
+
+    for (let i = 0; i < cl; i++) {
+      const child = childArray[i];
+      unmount$1(child, meta, recursionLevel + 1);
+    }
+
+    childArray.length = 0;
+  }
+  /*#__NOINLINE__*/
+
+}
+
+function isSimplestVNode(VNode) {
+  return typeof VNode.type != "function";
+}
+
+function _processNodeCleanup(VNode, meta, recursionLevel) {
+  let dom;
+
+  if (isSimplestVNode(VNode)) {
+    dom = VNode._dom;
+
+    if (dom != null) {
+      clearListeners(VNode, dom, meta);
+      meta.batch.push({
+        node: dom,
+        action: recursionLevel > 0 ?
+        /** if the parent element is already being unmounted, all we need to do is
+        clear the child element's listeners
+        */
+        BATCH_MODE_CLEAR_POINTERS : BATCH_MODE_REMOVE_ELEMENT,
+        VNode
+      });
+    }
+  } else {
+    meta.batch.push({
+      action: BATCH_MODE_CLEAR_POINTERS,
+      VNode,
+      node: dom
+    });
+  }
+}
+
+function clearListeners(VNode, dom, meta) {
+  const props = VNode.props;
+
+  for (const prop in props) {
+    if (prop[0] === "o" && prop[1] === "n") {
+      meta.batch.push({
+        action: BATCH_MODE_REMOVE_ATTRIBUTE,
+        node: dom,
+        attr: prop
+      });
+    }
+  }
+}
+
+const mountCallbackQueue = [];
+const updateCallbackQueue = [];
+
+function processLifeCycleQueue(obj) {
+  const clone = obj.splice(0);
+  clone.forEach(__executeCallback);
+}
+
+function scheduleLifeCycleCallbacks(options) {
+  const name = options.name;
+  if (name === LIFECYCLE_DID_MOUNT) return mountCallbackQueue.push(options);else if (name === LIFECYCLE_DID_UPDATE) return updateCallbackQueue.push(options);else __executeCallback(options);
+}
+
+function __executeCallback(cbObj) {
+  const fName = cbObj.name;
+  const component = cbObj.bind;
+  const func = component[fName];
+  plugins.lifeCycle(fName, component);
+  component._lastLifeCycleMethod = fName;
+  if (!func) return;
+  const args = cbObj.args;
+  const hasCatch = typeof component.componentDidCatch == "function";
+
+  const cb = () => func.apply(component, args);
+
+  try {
+    cb();
+  } catch (e) {
+    if (hasCatch) return component.componentDidCatch(e);
+
+    if (config.unmountOnError) {
+      const b = [];
+      const m = {
+        batch: b
+      };
+      unmount$1(component._VNode, m);
+      commitDOMOps(b);
+    }
+
+    throw e;
+  }
+}
+
+function onDiff(queue) {
+  commitDOMOps(queue);
+  plugins.diffEnd(); // run syncrhonously
+  // defer(() => {
+
+  processLifeCycleQueue(mountCallbackQueue);
+  processLifeCycleQueue(updateCallbackQueue); // });
+}
+
+const RENDER_QUEUE = [];
+/** The pseudo-abstract component class */
+
+class Component {
+  constructor(props, context) {
+    this.state = {};
+    this.props = props;
+    this.context = context;
+    plugins.componentInstance(this, props);
+  }
+
+  render(props, state, context) {
+    return null;
+  }
+
+  setState(nextState) {
+    //clone states
+    this._oldState = assign({}, this.state);
+    this._nextState = assign({}, this._nextState || this.state);
+
+    if (typeof nextState === "function") {
+      const next = nextState(this._nextState, this.props);
+      if (next == null) return;
+      assign(this._nextState, next);
+    } else {
+      assign(this._nextState, nextState);
+    }
+
+    enqueueRender(this);
+  }
+
+  forceUpdate(callback, _updateQueue) {
+    if (this._VNode == null) return; // isolatedForceUpdate (when the user calls it)
+    // in other cases, we batch it among with other components as well, this fixes
+    // a few race condition bugs that were caused by deferring the update
+    // and runs them synchronously instead
+
+    const isIsolatedForceUpdate = _updateQueue == null;
+    const batchQueue = _updateQueue || [];
+    const shouldForce = callback !== false;
+    plugins.diffStart(this, shouldForce);
+    diff(this._VNode, assign({}, this._VNode), this._VNode._parentDom, shouldForce, {
+      depth: this._depth,
+      batch: batchQueue,
+      isSvg: false,
+      context: this._sharedContext || {}
+    });
+    typeof callback === "function" && callback();
+    isIsolatedForceUpdate && onDiff(batchQueue);
+  }
+
+}
+function enqueueRender(c) {
+  c._dirty = true;
+
+  if (RENDER_QUEUE.push(c) === 1) {
+    config.scheduleRender(process);
+  }
+}
+
+function process() {
+  let p;
+  RENDER_QUEUE.sort((x, y) => x._depth - y._depth);
+  const queue = [];
+
+  while (p = RENDER_QUEUE.pop()) {
+    if (p._dirty) {
+      p._dirty = false;
+      p.forceUpdate(false, queue);
+    }
+  }
+
+  onDiff(queue);
+}
+
+let contextId = 0;
+function createContext(def) {
+  const $id = "$" + contextId++;
+
+  class Provider extends Component {
+    constructor(props, context) {
+      super(props, context);
+      this._subs = [];
+      this._o = {
+        [$id]: this
+      };
+    }
+
+    getChildContext() {
+      return this._o;
+    }
+
+    shouldComponentUpdate(p) {
+      return p.value !== this.props.value && this._subs.some(x => enqueueRender(x)) || true;
+    }
+
+    add(c) {
+      const s = this._subs;
+      $push(s, c);
+      const old = c.componentWillUnmount;
+
+      c.componentWillUnmount = () => {
+        s.splice(s.indexOf(c), 1);
+        old && old.call(c);
+      };
+    }
+
+    render() {
+      return createElement(Fragment, null, this.props.children);
+    }
+
+  }
+
+  const Consumer = createConsumer();
+  const context = {
+    $id,
+    Consumer,
+    Provider: Provider,
+    def
+  };
+  Consumer.contextType = context;
+  return context;
+}
+
+function createConsumer() {
+  function Consumer(props, context) {
+    const children = props.children;
+
+    if (typeof children === "function") {
+      return children(context);
+    }
+
+    return children[0](context);
+  }
+
+  return Consumer;
+}
+
+function isProvider(p) {
+  return typeof p.getChildContext === "function";
+}
+
+const isFn = vnType => typeof vnType === "function" && vnType !== Fragment;
+function toSimpleVNode(VNode, oldVNode, forceUpdate, meta) {
+  let type;
+
+  if (VNode != null && isFn(type = VNode.type)) {
+    oldVNode = oldVNode || EMPTY_OBJ;
+    let next;
+    const contextType = type.contextType;
+    const provider = contextType && meta.context[contextType.$id];
+    const contextValue = provider ? provider.props.value : contextType && contextType.def;
+    meta.contextValue = contextValue;
+    meta.provider = provider;
+
+    if (isClassComponent(type)) {
+      /** class component, call lifecycle methods */
+      next = renderClassComponent(VNode, oldVNode, forceUpdate, meta);
+    } else {
+      /** run hooks */
+      next = renderFunctionalComponent(VNode, meta);
+    }
+
+    VNode._renders = next;
+    meta.provider = meta.contextValue = undefined;
+    const c = VNode._component;
+
+    if (c) {
+      if (isProvider(c)) {
+        const obj = c.getChildContext();
+        meta.context = assign({}, meta.context, obj);
+      }
+    }
+
+    return next;
+  } else {
+    /** VNode is already simple */
+    return VNode;
+  }
+}
+
+function renderClassComponent(VNode, oldVNode, forceUpdate, meta) {
+  let nextLifeCycle;
+  const cls = VNode.type;
+  let c = VNode._component;
+  const isExisting = c != null;
+
+  if (isExisting) {
+    nextLifeCycle = LIFECYCLE_DID_UPDATE;
+    /**existing component */
+
+    if (c.shouldComponentUpdate != null && !forceUpdate) {
+      const scu = c.shouldComponentUpdate(VNode.props, c._nextState || c.state);
+
+      if (scu === false) {
+        return EMPTY_OBJ;
+      }
+    }
+  } else {
+    nextLifeCycle = LIFECYCLE_DID_MOUNT;
+    c = new cls(VNode.props, meta.contextValue);
+    VNode._component = c;
+    c._depth = ++meta.depth;
+  }
+
+  setContext(c, meta);
+  c._VNode = VNode;
+  const oldState = c._oldState;
+  const oldProps = oldVNode.props;
+  scheduleLifeCycleCallbacks({
+    bind: c,
+    name: isExisting ? LIFECYCLE_WILL_UPDATE : LIFECYCLE_WILL_MOUNT,
+    args: isExisting ? [VNode.props, c._nextState, meta.contextValue] : null
+  });
+  c.state = applyCurrentState(c, cls, VNode);
+  c._oldState = null;
+  c._nextState = null;
+  c.props = VNode.props;
+  const nextVNode = coerceToVNode(c.render(c.props, c.state, meta.contextValue));
+  let snapshot = null;
+
+  if (isExisting && c.getSnapshotBeforeUpdate != null) {
+    snapshot = c.getSnapshotBeforeUpdate(oldProps, oldState);
+  }
+
+  scheduleLifeCycleCallbacks({
+    bind: c,
+    name: nextLifeCycle,
+    args: isExisting ? [oldProps, oldState, snapshot] : []
+  });
+  diffReferences(VNode, oldVNode, c);
+  return nextVNode;
+}
+
+function renderFunctionalComponent(VNode, meta) {
+  let nextVNode;
+  const fn = VNode.type;
+  let c;
+
+  if (!VNode._component) {
+    /** New Functional component, convert it into a fake component
+     * to save its instance
+     * (doesnt help now but will be useful while implementing hooks)
+     */
+    c = new Component(VNode.props, meta.contextValue);
+    VNode._component = c;
+    c.render = getRenderer;
+    c.constructor = fn;
+    c.props = VNode.props;
+    c._depth = ++meta.depth;
+  } else {
+    c = VNode._component;
+  }
+
+  setContext(c, meta);
+  c._VNode = VNode;
+
+  plugins._hookSetup(c);
+
+  nextVNode = coerceToVNode(c.render(VNode.props, null, meta.contextValue)); // remove reference of this component
+
+  plugins._hookSetup(null);
+
+  return nextVNode;
+}
+
+function getRenderer(props) {
+  return this.constructor(props, this.context);
+}
+
+function $runGetDerivedStateFromProps(componentClass, props, state) {
+  const get = componentClass.getDerivedStateFromProps;
+
+  if (get != null) {
+    return assign({}, get(props, state));
+  }
+
+  return null;
+}
+
+function applyCurrentState(component, cls, VNode) {
+  const componentStateBeforeRender = component.state || EMPTY_OBJ;
+  const nextState = assign({}, componentStateBeforeRender, component._nextState || EMPTY_OBJ);
+  const ns = $runGetDerivedStateFromProps(cls, VNode.props, nextState);
+
+  if (ns) {
+    assign(nextState, ns);
+  }
+
+  return nextState;
+}
+
+function isClassComponent(type) {
+  const proto = type.prototype;
+  return !!(proto && proto.render);
+}
+
+function setContext(c, meta) {
+  c._sharedContext = meta.context;
+  c.context = meta.contextValue;
+  const provider = meta.provider;
+  provider && provider.add(c);
+}
+
+function diffChildren(newVNode, oldVNode, parentDom, meta) {
+  if (newVNode.type === NULL_TYPE) return;
+  const newChildren = newVNode._children || EMPTY_ARRAY;
+  const oldChildren = (oldVNode || EMPTY_OBJ)._children || EMPTY_ARRAY;
+  if (newChildren === oldChildren) return;
+  return diffEachChild(newVNode, newChildren, oldChildren, parentDom, meta);
+}
+
+function diffEachChild(newParentVNode, newChildren, oldChildren, parentDom, meta) {
+  const isFragment = newParentVNode.type === Fragment;
+  const newChildrenLen = newChildren.length;
+  const oldChildrenLen = oldChildren.length;
+  const larger = Math.max(newChildrenLen, oldChildrenLen);
+  const lastSibling = isFragment ? meta.next || (getDom(oldChildren[oldChildrenLen - 1]) || EMPTY_OBJ).nextSibling : null;
+
+  for (let i = 0; i < larger; i++) {
+    const newChild = newChildren[i] || (i < newChildrenLen ? createElement(NULL_TYPE) : null);
+    const unkeyedOldChild = oldChildren[i];
+    let oldChild = unkeyedOldChild || EMPTY_OBJ;
+    let next = (getDom(oldChild) || EMPTY_OBJ).nextSibling || lastSibling;
+    const nextMeta = assign({}, meta, {
+      next
+    });
+    diff(newChild, oldChild, parentDom, false, nextMeta);
+  }
+}
+
+function getDom(VNode) {
+  if (!VNode || VNode === EMPTY_OBJ) return;
+
+  while (isFn(VNode.type)) {
+    VNode = VNode._renders;
+  }
+
+  if (VNode.type === Fragment) {
+    const children = VNode._children || EMPTY_ARRAY;
+    return getDom(children[children.length - 1]);
+  }
+
+  return VNode._dom;
+}
+
+/**
+ *
+ * @param newVNode current state of dom represented as virtual nodes
+ * @param oldVNode last state of dom represented as virtual nodes
+ * @param parentDom parent dom element to append child on
+ * @param force true if Component#forceUpdate()  was called
+ * @param meta random data useful for tagging vnodes
+ */
+
+function diff(newVNode, oldVNode, parentDom, force, meta) {
+  if (newVNode == null || typeof newVNode === "boolean") {
+    unmount$1(oldVNode, meta);
+    return;
+  }
+
+  if (!isValidVNode(newVNode)) {
+    return null;
+  }
+
+  if (oldVNode === newVNode) {
+    return newVNode._dom;
+  }
+
+  oldVNode = oldVNode || EMPTY_OBJ;
+  let oldType = oldVNode.type;
+  let newType = newVNode.type;
+  let isComplex = isFn(newType);
+
+  if (newType === oldType && isComplex) {
+    newVNode._component = oldVNode._component;
+  }
+
+  newVNode._parentDom = parentDom;
+  newVNode._used = true;
+
+  if (newType !== oldType) {
+    // type differs, either different dom nodes or different function/class components
+    if (!meta.next) {
+      const next = getDom(oldVNode);
+      meta.next = (next || EMPTY_OBJ).nextSibling;
+    }
+
+    unmount$1(oldVNode, meta);
+    oldVNode = EMPTY_OBJ;
+  }
+
+  const tmp = newVNode;
+
+  if (typeof newVNode.props !== "string" && newType !== NULL_TYPE) {
+    /** if we have a function/class Component, get the next rendered VNode */
+    newVNode = toSimpleVNode(newVNode, oldVNode, force, meta);
+    meta.isSvg = newVNode.type === "svg" || meta.isSvg;
+  }
+
+  if (isFn(oldVNode.type)) {
+    // also get the next rendered VNode from the old VNode
+    oldVNode = oldVNode._renders;
+  }
+
+  if (newVNode !== tmp) {
+    /** SCU returned False */
+    if (newVNode === EMPTY_OBJ) return; // we received a new VNode from calling Component.render, start a new diff
+
+    return diff(newVNode, oldVNode, parentDom, force, meta);
+  }
+  /** normalize VNode.props.children */
+
+
+  newVNode._children = flattenVNodeChildren(newVNode);
+  oldType = oldVNode.type;
+  newType = newVNode.type;
+
+  if (oldType !== newType) {
+    oldVNode = null;
+  }
+
+  let dom;
+
+  if (newType === Fragment) {
+    diffChildren(newVNode, oldVNode, parentDom, meta);
+  } else {
+    diffDomNodes(newVNode, oldVNode, parentDom, meta);
+    dom = newVNode._dom;
+    meta.isSvg = newType != "foreignObject" && meta.isSvg;
+    diffChildren(newVNode, oldVNode, dom, meta);
+    diffReferences(newVNode, oldVNode, dom);
+  }
+
+  return dom;
+}
+
+function render(VNode, parentDom) {
+  let old;
+  const normalizedVNode = createElement(Fragment, old
+  /** shorthand for null  */
+  , [VNode]);
+
+  if (parentDom.hasChildNodes()) {
+    // hydrate is unstable right now, just clear the dom and start afresh
+    clearDOM(parentDom);
+  }
+
+  const batchQueue = [];
+  diff(normalizedVNode, old, parentDom, false, {
+    depth: 0,
+    batch: batchQueue,
+    isSvg: parentDom.ownerSVGElement !== undefined,
+    context: {}
+  }); // parentDom._hosts = normalizedVNode;
+
+  onDiff(batchQueue);
+}
+/**@todo fix hydrate */
+
+function cloneElement(VNode, props) {
+  if (!VNode) return null;
+  props = assign({}, VNode.props, props);
+  if (arguments.length > 2) props.children = createElementChildren(arguments);
+  let normalizedProps = objectWithoutKeys(props, skipProps);
+  return getVNode(VNode.type, normalizedProps, props.key || VNode.key, props.ref || VNode.ref);
+}
+
+const ignore = ["boolean", "string", "number"];
+function createElementIfNeeded(x, props) {
+  if (x == null || ignore.indexOf(typeof x) > -1) return x;
+  if (x.constructor === undefined) return recursivelyCloneVNode(x);
+  return createElement(x, props);
+}
+
+function recursivelyCloneVNode(x) {
+  let children;
+  (children = (x = cloneElement(x)).props.children) && (x.props.children = flattenArray([children], createElementIfNeeded));
+  return x;
+}
+
+const getPromise = k => k.promise || k.componentPromise;
+
+class AsyncComponent extends Component {
+  componentDidMount() {
+    this._init();
+  }
+
+  componentDidUpdate(prevProps) {
+    const prevPromise = prevProps && getPromise(prevProps);
+    const currPromise = getPromise(this.props);
+    if (prevPromise === currPromise) return;
+
+    this._init();
+  }
+
+  _init() {
+    this.setState({
+      inProgress: true
+    });
+    const prom = getPromise(this.props);
+    prom().then(component => {
+      prom === getPromise(this.props) && this.setState({
+        render: component,
+        inProgress: false,
+        error: false
+      });
+    }).catch(x => this.setState({
+      error: true,
+      inProgress: false
+    }));
+  }
+
+  render(props, state) {
+    if (state.inProgress) return createElementIfNeeded(props.fallback || props.fallbackComponent) || "Loading";
+    if (state.error) return createElementIfNeeded(props.errorComponent) || "An Error Occured";
+    return createElementIfNeeded(state.render, objectWithoutKeys(props, ["fallback", "fallbackComponent", "promise", "componentPromise"]));
+  }
+
+}
+
+const pathFixRegex = /\/+$/;
+
+function fixPath(path) {
+  if (path.length === 1) return path;
+  return path.replace(pathFixRegex, "");
+}
+
+const _routerSubscriptions = [];
+const RouterSubscription = {
+  subscribe(fun) {
+    $push(_routerSubscriptions, fun);
+  },
+
+  unsubscribe(fun) {
+    _routerSubscriptions.splice(_routerSubscriptions.indexOf(fun), 1);
+  },
+
+  emit(e, options) {
+    _routerSubscriptions.forEach(subscription => subscription(e, options));
+  },
+
+  unsubscribeAll() {
+    _routerSubscriptions.length = 0;
+  }
+
+};
+const sessKey = "UI--ROUTE";
+
+function routeAction(url, action) {
+  if (!config.inMemoryRouter) {
+    return window.history[action](null, "", url);
+  } else {
+    config.memoryRouteStore.setItem(sessKey, url);
+  }
+}
+
+function loadURL(url) {
+  routeAction(url, "pushState");
+  RouterSubscription.emit(url, {
+    type: "load",
+    native: false
+  });
+}
+function redirect(url) {
+  routeAction(url, "replaceState");
+  RouterSubscription.emit(url, {
+    type: "redirect",
+    native: false
+  });
+}
+class Router extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {};
+    this._routeChangeHandler = this._routeChangeHandler.bind(this);
+    this.componentDidUpdate = this._setRouteMethod;
+  }
+
+  _setRouteMethod() {
+    config.inMemoryRouter = !!this.props.inMemoryRouter;
+  }
+
+  static __emitter() {
+    RouterSubscription.emit(Router.path + Router.qs, {
+      type: "popstate",
+      native: true
+    });
+  }
+
+  static get path() {
+    return location.pathname;
+  }
+
+  static get qs() {
+    return location.search;
+  }
+
+  static get searchParams() {
+    return new URLSearchParams(Router.qs);
+  }
+
+  static _getParams(pathParams, test) {
+    const params = {};
+
+    for (const i in pathParams) {
+      params[pathParams[i]] = decodeURIComponent(test[i]);
+    }
+
+    return params;
+  }
+
+  static getCurrentParams(regexPath) {
+    regexPath = createRoutePath(regexPath);
+    const pathParams = regexPath.params;
+    const test = regexPath.regex.exec(Router.path);
+    return test ? Router._getParams(pathParams, test) : {};
+  }
+
+  componentDidMount() {
+    this._setRouteMethod();
+
+    RouterSubscription.subscribe(this._routeChangeHandler);
+    window.addEventListener("popstate", Router.__emitter);
+
+    this._routeChangeHandler(null);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("popstate", Router.__emitter);
+    RouterSubscription.unsubscribe(this._routeChangeHandler);
+  }
+
+  _notFoundComponent() {
+    return createElement("div", null, `The Requested URL "${Router.path}" was not found`);
+  }
+
+  _routeChangeHandler(_e) {
+    const prev = this._previous;
+    const curr = Router.path;
+    this._previous = curr;
+    if (prev === curr) return;
+    const renderPath = fixPath(config.inMemoryRouter ? config.memoryRouteStore.getItem(sessKey) || this.props.defaultRoute || "/" : Router.path);
+    const children = this.props.children;
+    let child = [];
+    children.forEach(x => {
+      const childProps = x.props;
+      const pathinfo = createRoutePath(childProps.match);
+      const test = pathinfo.regex.exec(renderPath);
+
+      if (test) {
+        const _childProps = x.props;
+
+        const params = Router._getParams(pathinfo.params, test);
+
+        child.push(createElementIfNeeded(_childProps.component, assign({}, x.props, {
+          params
+        })));
+      }
+    });
+
+    if (!child.length) {
+      child = createElement(this.props.fallbackComponent || this._notFoundComponent);
+    }
+
+    this.setState({
+      child
+    });
+  }
+
+  render(_, state) {
+    const child = state.child;
+    return createElement(Fragment, null, child);
+  }
+
+}
+
+function _absolutePath(route) {
+  return RegExp(`^${route}(/?)$`);
+}
+
+function createRoutePath(pathString) {
+  if (!pathString) throw Error("Invalid value for match: " + pathString);
+  if (pathString.regex != null) return pathString;
+  pathString = fixPath(pathString);
+  const params = {};
+  let i = 0;
+  const pathRegex = pathString.split("/").map(partialPath => {
+    if (partialPath[0] === ":") {
+      // param matcher
+      params[++i] = partialPath.substr(1); // matches will start at 1
+
+      return "([^?\\/]+)"; //match all non whitespace lazily
+    }
+
+    return partialPath;
+  }).join("/");
+  return {
+    regex: _absolutePath(pathRegex),
+    params
+  };
+}
+
+function onLinkClick(e) {
+  if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) {
+    return;
+  }
+
+  if (e.stopImmediatePropagation) {
+    e.stopImmediatePropagation();
+  }
+
+  if (e.stopPropagation) {
+    e.stopPropagation();
+  }
+
+  e.preventDefault();
+  const el = new URL(this.href, location.href);
+  const href = el.pathname + el.search + el.hash;
+  loadURL(href);
+}
+
+function _call(func, arg, ref) {
+  return func.call(ref, arg);
+}
+
+class A extends Component {
+  constructor(props) {
+    super(props);
+
+    this._onClick = e => {
+      const current = e.currentTarget;
+
+      _call(onLinkClick, e, current);
+
+      const userOnClick = this.props.onClick;
+      userOnClick && _call(userOnClick, e, current);
+    };
+  }
+
+  render(props) {
+    return createElement("a", assign({}, props, {
+      onClick: this._onClick
+    }));
+  }
+
+}
+const Path = {};
+
+function argsChanged(oldArgs, newArgs) {
+  return !oldArgs || newArgs.some((arg, index) => arg !== oldArgs[index]);
+}
+function getCurrentHookValueOrSetDefault(hookData, currentHookIndex, defaultValues) {
+  return hookData[currentHookIndex] || (hookData[currentHookIndex] = consumeCallable(0, defaultValues));
+}
+function consumeCallable(arg, maybeCallable) {
+  return typeof maybeCallable === "function" ? maybeCallable(arg) : maybeCallable;
+}
+
+/**
+ * This ensures that we begin our render work  even if we don't get an animation frame for 100ms
+ * this could happen in cases like we're in an inactive tab
+ * but we need to render the component and it's children
+ * as we might delay some side effects
+ * however if the user wishes to have the rendering stop until the tab is active
+ * they can set `config.scheduleRender` to `requestAnimationFrame`
+ */
+
+function reqAnimFrame(cb) {
+  const done = () => {
+    cancelAnimationFrame(raf);
+    clearTimeout(timeout);
+    cb();
+  };
+
+  let raf;
+  let timeout;
+  timeout = setTimeout(done, config.RAF_TIMEOUT);
+  raf = requestAnimationFrame(done);
+}
+
+let hookIndex = 0;
+let hookCandidate = null;
+const rafPendingCallbacks = [];
+const layoutPendingCallbacks = [];
+function runEffectCleanup(effect) {
+  // only called if the effect itself returns a function
+  const cl = effect.cleanUp;
+
+  if (typeof cl === "function") {
+    cl();
+    effect.cleanUp = null;
+  }
+}
+function runHookEffectAndAssignCleanup(effect) {
+  let ret = effect.cb;
+
+  if (ret && typeof (ret = ret()) === "function") {
+    effect.cleanUp = ret;
+  } // make sure we can't run this effect again
+
+
+  effect.resolved = true;
+  effect.cb = null;
+}
+function effectCbHandler(effect) {
+  // we run this cleanup first to ensure any older effect has been successfully completed
+  // an effect will be completed when both it's callback and it's cleanup (if provided have been finished)
+  // only run cleanup on unresolved effects
+  // i.e effects that have their dependency arrays updated
+  effect.resolved || runEffectCleanup(effect);
+  runHookEffectAndAssignCleanup(effect);
+}
+
+function _runEffect(arr) {
+  arr.forEach(x => {
+    for (const i in x) {
+      const value = x[i];
+      effectCbHandler(value);
+    }
+  });
+}
+
+function useEffectCallbacks() {
+  return _runEffect(rafPendingCallbacks);
+} //sync
+
+
+function layoutEffectCallbacks() {
+  return _runEffect(layoutPendingCallbacks);
+}
+
+const effectScheduler = config.debounceEffect || (HAS_RAF ? reqAnimFrame : defer);
+
+function diffEnd() {
+  layoutEffectCallbacks();
+  effectScheduler(useEffectCallbacks);
+}
+
+function prepForNextHookCandidate(c) {
+  hookCandidate = c;
+  hookIndex = 0; // initialize hooks data if this is the first render
+
+  c && (c._hooksData || (c._hooksData = []));
+}
+
+function getHookStateAtCurrentRender() {
+  if (hookCandidate == null) throw new Error("Hook candidate not found, make sure you're running cooks inside a component");
+  return [hookCandidate, hookIndex++];
+} // todo manage sideEffects
+
+addPluginCallback({
+  _hookSetup: prepForNextHookCandidate,
+  diffEnd
+});
+
+function useMemo(memoFunc, dependencies) {
+  const state = getHookStateAtCurrentRender();
+  const candidate = state[0];
+  const hookIndex = state[1];
+  const hookData = candidate._hooksData;
+  let currentHook = hookData[hookIndex] || {};
+  if (!argsChanged(currentHook.args, dependencies)) return currentHook.hookState;
+  hookData[hookIndex] = null;
+  currentHook = getCurrentHookValueOrSetDefault(hookData, hookIndex, () => ({
+    hookState: memoFunc()
+  }));
+  currentHook.args = dependencies;
+  return currentHook.hookState;
+}
+
+function useCallback(fn, dependencies) {
+  return useMemo(() => fn, dependencies);
+}
+
+function useContext(ctx) {
+  const state = getHookStateAtCurrentRender();
+  const component = state[0];
+  const index = state[1];
+  const provider = component._sharedContext && component._sharedContext[ctx.$id];
+  if (!provider) return ctx.def;
+  const hooksData = component._hooksData;
+  getCurrentHookValueOrSetDefault(hooksData, index, {
+    args: null,
+    hookState: false
+  });
+  const data = hooksData[index];
+
+  if (!data.hookState) {
+    data.hookState = true;
+    provider.add(component);
+  }
+
+  return provider.props.value;
+}
+
+function _$unmount(pending, $this) {
+  for (const effect in pending || EMPTY_OBJ) {
+    runEffectCleanup(pending[effect]);
+  }
+
+  $this._pendingEffects = null;
+}
+
+function unmount() {
+  const p = this._pendingEffects || EMPTY_OBJ;
+  const pending$sync = p.sync;
+  const pending$async = p.async;
+
+  _$unmount(pending$sync, this);
+
+  _$unmount(pending$async, this);
+}
+
+function effect(callback, dependencies, arr) {
+  const which = arr === layoutPendingCallbacks ? "sync" : "async";
+  const state = getHookStateAtCurrentRender();
+  const candidate = state[0];
+  const hookIndex = state[1];
+  const hookData = candidate._hooksData;
+  let currentHook = hookData[hookIndex] || {};
+  const instanceEffects = candidate._pendingEffects = candidate._pendingEffects || {
+    sync: {},
+    async: {}
+  };
+  const pending = instanceEffects[which];
+  const oldEffect = pending[hookIndex];
+
+  if (!argsChanged(currentHook.args, dependencies)) {
+    // mark the effect as resolved
+    // no cleanup will be performed (except on unmount)
+    if (oldEffect) oldEffect.resolved = true;
+    return;
+  }
+
+  hookData[hookIndex] = currentHook;
+  currentHook.args = dependencies; // TODO
+  // in case we have an unused effect (callback not called yet)
+  // attempt to defer the old effect as well, maybe wrap them together in a separate effect
+  // as in this case we could end up blocking the render iff -
+  // - previous callback hasn't been called yet
+  // - previous callback is an expensive function
+  // the cleanup does not matter as we will call it right before we call the new effect
+  // however it is important that we call the effect right here for now as in the rare event
+  // where the callback hasn't been called, we could end up with no cleanup either
+  // another approach could be to leave the uncalled function and it's cleanup and start with
+  // what we have as the new effect.
+
+  const cleanUp = oldEffect ? (oldEffect.resolved = false) || runHookEffectAndAssignCleanup(oldEffect) || oldEffect.cleanUp : null;
+  pending[hookIndex] = {
+    cb: callback,
+    cleanUp
+  }; // only push effect if we haven't already added it to the queue
+
+  $push(arr, pending);
+
+  if (!candidate.__attachedUnmount) {
+    candidate.__attachedUnmount = true;
+    const old = candidate.componentWillUnmount;
+
+    if (!old) {
+      candidate.componentWillUnmount = unmount;
+    } else {
+      candidate.componentWillUnmount = function () {
+        old.call(candidate);
+        unmount.call(candidate);
+      };
+    }
+  }
+}
+
+function useEffect(callback, dependencies) {
+  return effect(callback, dependencies, rafPendingCallbacks);
+}
+
+function useLayoutEffect(callback, dependencies) {
+  return effect(callback, dependencies, layoutPendingCallbacks);
+}
+
+const obj = {};
+function useReducer(reducer, initialValue, setup) {
+  const state = getHookStateAtCurrentRender();
+  const candidate = state[0];
+  const currentHookIndex = state[1];
+  const hookData = candidate._hooksData;
+  const currentHook = getCurrentHookValueOrSetDefault(hookData, currentHookIndex, () => ({
+    hookState: setup ? setup(initialValue) : consumeCallable(null, initialValue)
+  }));
+  return [currentHook.hookState, currentHook.args || (currentHook.args = action => {
+    const next = reducer(currentHook.hookState, action);
+    currentHook.hookState = next;
+    candidate.setState(obj);
+  })];
+}
+
+function useRef(initialValue) {
+  return useMemo(() => ({
+    current: initialValue
+  }), []);
+}
+
+function useState(initialState) {
+  return useReducer(consumeCallable, initialState);
+}
+
+export default Component;
+export { A, AsyncComponent, Component, Fragment, Path, Router, RouterSubscription, addPluginCallback, config, createContext, createElement, createRef, createRoutePath, createElement as h, loadURL, redirect, render, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState };
 //# sourceMappingURL=ui-lib.modern.js.map

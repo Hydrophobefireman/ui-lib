@@ -97,8 +97,12 @@ export type DiffMeta = {
 export interface ConsumerCallback<T> {
   (value: T): ComponentChild;
 }
-export interface ContextConsumer<T>
-  extends FunctionComponent<{ children: [ConsumerCallback<T>] }> {}
+export interface ContextConsumer<T> {
+  (
+    props: { children?: ConsumerCallback<T> | [ConsumerCallback<T>] },
+    context: T
+  ): ComponentChild;
+}
 
 export interface ContextProvider extends Component<{ value: any }> {
   getChildContext(): { [id: string]: Context };

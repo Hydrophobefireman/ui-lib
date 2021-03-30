@@ -58,12 +58,12 @@ export function createContext<T>(def: T): Context<T> {
 }
 
 function createConsumer<T>() {
-  function Consumer(props: { children: [ConsumerCallback<T>] }, context: T) {
+  function Consumer(props: { children?: ConsumerCallback<T> }, context?: T) {
     const children = props.children;
     if (typeof children === "function") {
-      return (children as ConsumerCallback<T>)(context);
+      return children(context);
     }
-    return children[0](context);
+    return (children as any)[0](context);
   }
 
   return Consumer;

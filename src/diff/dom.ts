@@ -9,7 +9,7 @@ import {
   BATCH_MODE_REMOVE_ATTRIBUTE_NS,
   BATCH_MODE_SET_SVG_ATTRIBUTE,
 } from "../constants";
-import { DiffMeta, Props,  UIElement, VNode } from "../types/index";
+import { DiffMeta, Props, UIElement, VNode } from "../types/index";
 
 import { IS_ARIA_PROP } from "../constants";
 import { plugins } from "../config";
@@ -187,7 +187,9 @@ export function diffStyle(
     const prop = newValue[i];
 
     if (oldValueIsString || prop !== oldValue[i]) {
-      st[i] = prop;
+      if (i[0] == "-") {
+        st.setProperty(i, prop);
+      } else st[i] = prop;
     }
   }
 }
