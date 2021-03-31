@@ -48,7 +48,11 @@ function routeAction(url: string, action?: "pushState" | "replaceState") {
   if (!config.inMemoryRouter) {
     return window.history[action](null, "", url);
   } else {
-    config.memoryRouteStore.setItem(sessKey, url);
+    const u = new URL(url, window.location.href);
+    config.memoryRouteStore.setItem(
+      sessKey,
+      JSON.stringify({ path: u.pathname, qs: u.search })
+    );
   }
 }
 
@@ -72,7 +76,6 @@ interface RouterState {
 interface RouterProps {
   fallbackComponent?: any;
   inMemoryRouter?: boolean;
-  defaultRoute?: string;
 }
 export class Router extends Component<RouterProps, RouterState> {
   state: RouterState;
@@ -93,11 +96,21 @@ export class Router extends Component<RouterProps, RouterState> {
     });
   }
   static get path(): string {
-    return location.pathname;
+    if (config.inMemoryRouter) {
+      const str = config.memoryRouteStore.getItem(sessKey);
+      if (!str) return "/";
+      return JSON.parse(str).path || "/";
+    }
+    return window.location.pathname;
   }
 
   static get qs() {
-    return location.search;
+    if (config.inMemoryRouter) {
+      const str = config.memoryRouteStore.getItem(sessKey);
+      if (!str) return "?";
+      return JSON.parse(str).qs || "?";
+    }
+    return window.location.search;
   }
   static get searchParams(): URLSearchParams {
     return new URLSearchParams(Router.qs);
@@ -143,13 +156,7 @@ export class Router extends Component<RouterProps, RouterState> {
     this._previous = curr;
     if (prev === curr) return;
 
-    const renderPath = fixPath(
-      config.inMemoryRouter
-        ? config.memoryRouteStore.getItem(sessKey) ||
-            this.props.defaultRoute ||
-            "/"
-        : Router.path
-    );
+    const renderPath = fixPath(Router.path);
     const children = this.props.children as VNode[];
 
     let child: VNode[] = [];
