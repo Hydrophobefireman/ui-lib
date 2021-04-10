@@ -104,22 +104,20 @@ export interface ContextConsumer<T> {
   ): ComponentChild;
 }
 
-export interface ContextProvider extends Component<{ value: any }> {
+export interface ContextProvider<T = any> extends Component<{ value: T }> {
   getChildContext(): { [id: string]: Context };
   add(c: Component): void;
 }
-
-export interface ContextProviderConstructor
-  extends ComponentConstructor<{ value: any }> {
-  new (p: Props<{ value: any }>): ContextProvider;
-  prototype: ContextProvider;
+export interface ContextProviderConstructor<P = {}> {
+  new (props: P, context: any): ContextProvider<P>;
+  prototype: ContextProvider<P>;
 }
 
 export interface Context<T = unknown> {
   $id: string;
   def: T;
   Consumer: ContextConsumer<T>;
-  Provider: ContextProviderConstructor;
+  Provider: ContextProviderConstructor<{ value: T }>;
 }
 
 export interface HookInternal {

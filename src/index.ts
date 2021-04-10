@@ -10,15 +10,13 @@ export { default as config, addPluginCallback } from "./config";
 
 /** @TODO create separate packages */
 export { AsyncComponent } from "./pkg/AsyncComponent/AsyncComponent";
-export {
-  Router,
-  loadURL,
-  redirect,
-  RouterSubscription,
-  A,
-  createRoutePath,
-  Path,
-} from "./pkg/router/router";
+export { Router, Path } from "./pkg/router/router";
+
+export { loadURL, redirect, createRoutePath } from "./pkg/router/util";
+export { A } from "./pkg/router/A";
+export { RouterSubscription } from "./pkg/router/subscriptions";
+
+export { useRoute } from "./pkg/router/router-hooks";
 
 export { createRef, RefType } from "./ref";
 
