@@ -3,6 +3,7 @@ import {
   ComponentChildren,
   VNode,
   createElementPropType,
+  Renderable,
 } from "./types/index";
 import { EMPTY_OBJ, Fragment, NULL_TYPE } from "./constants";
 import {
@@ -30,12 +31,12 @@ export const skipProps: (keyof VNode)[] = ["key", "ref"];
  * it supports the new auto import introduced in babel and normalizes the children argument
  */
 export function createElement<P = {}, R = any>(
-  type: VNode<P>["type"],
+  type: Renderable<any>,
   props?: createElementPropType<P>,
   ...children: ComponentChildren | ComponentChildren[]
 ): VNode<P> | null;
 export function createElement<P = {}, R = any>(
-  type: VNode<P>["type"],
+  type: Renderable<any>,
   props?: createElementPropType<P> | null
 ): VNode<P> | null {
   if (type == null || typeof type == "boolean") return null;

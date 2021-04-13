@@ -1,5 +1,6 @@
 import { useContext } from "../../hooks/index";
-import { RouteContext } from "./router-context";
+import { RouteParamContext } from "./router";
+
 export function useRoute() {
-  return useContext(RouteContext);
+  return useContext(RouteParamContext);
 }

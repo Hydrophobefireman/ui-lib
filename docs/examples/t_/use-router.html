@@ -31,7 +31,7 @@
         addPluginCallback,
         render,
         Path,
-        useRoute,
+        useParams,
       } from "../../ui/index.js";
       const p = Router.path;
       function App() {
@@ -46,16 +46,16 @@
           }),
           h(Path, {
             match: "/test/:num",
-            component: function (p) {
-              const o = useRoute();
-              console.log(o);
-              const { params } = o;
-              const { num } = params;
-              const val = parseInt(num) * 2;
-              return h(A, { href: "/test/" + val }, val);
-            },
+            component: h(Fragment, null, [h(() => console.log("ok")), h(func)]),
           })
         );
+      }
+      function func(p) {
+        const params = useParams("/test/:num");
+        console.log({ ...params });
+        const { num } = params;
+        const val = parseInt(num) * 2;
+        return h(A, { href: "/test/" + val }, "Go to ", val);
       }
       render(h(App), document.getElementById("app"));
     </script>

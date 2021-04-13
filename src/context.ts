@@ -11,13 +11,17 @@ import { Fragment } from "./constants";
 import { h } from "./index";
 
 let contextId = 0;
+interface ProviderProps<T> {
+  value: T;
+  deopt?: boolean;
+}
 export function createContext<T>(def: T): Context<T> {
   const $id = "$" + contextId++;
 
-  class Provider extends Component<{ value: any }> {
+  class Provider extends Component<ProviderProps<T>> {
     _subs: Component[];
     _o: { [id: string]: Provider };
-    constructor(props: Props<{ value: any }>, context: any) {
+    constructor(props: ProviderProps<T>, context: any) {
       super(props, context);
       this._subs = [];
       this._o = { [$id]: this };
@@ -25,12 +29,11 @@ export function createContext<T>(def: T): Context<T> {
     getChildContext() {
       return this._o;
     }
-    shouldComponentUpdate(p: Props<{}>) {
-      return (
-        (p.value !== this.props.value &&
-          this._subs.some((x) => enqueueRender(x))) ||
-        true
-      );
+    shouldComponentUpdate(p: ProviderProps<T>) {
+      this.props.deopt &&
+        p.value !== this.props.value &&
+        this._subs.some((x) => enqueueRender(x));
+      return true;
     }
     add(c: Component) {
       const s = this._subs;

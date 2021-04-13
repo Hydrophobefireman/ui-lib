@@ -12,8 +12,15 @@ import { createElement } from "../../create_element";
 import { createElementIfNeeded } from "./../common";
 
 import { RouterSubscription } from "./subscriptions";
-import { createRoutePath, fixPath, RoutePath, sessKey } from "./util";
-import { RouteContext } from "./router-context";
+import { fixPath, RoutePath, sessKey, createRoutePath } from "./util";
+import { createContext } from "../../context";
+
+export const RouteParamContext = createContext<{
+  params: { [k: string]: string };
+  search: URLSearchParams;
+  path: string;
+}>(null);
+
 interface PathProps {
   match: RoutePath;
   component: any;
@@ -111,7 +118,6 @@ export class Router extends Component<RouterProps, RouterState> {
     const children = this.props.children as VNode[];
     let child: VNode;
     let params: any;
-
     for (let i = 0; i < children.length; i++) {
       const x = children[i];
       const childProps = x.props as PathProps;
@@ -127,7 +133,7 @@ export class Router extends Component<RouterProps, RouterState> {
         break;
       }
     }
-    
+
     if (!child) {
       (child as any) = createElement(
         this.props.fallbackComponent || this._notFoundComponent
@@ -139,14 +145,15 @@ export class Router extends Component<RouterProps, RouterState> {
   render(_: Router["props"], state: Router["state"]): VNode {
     const child = state.child;
     return createElement(
-      RouteContext.Provider as any,
+      RouteParamContext.Provider,
       {
+        //@ts-ignore
         value: {
-          path: Router.path,
-          query: Router.searchParams,
           params: state.params,
+          path: Router.path,
+          search: Router.searchParams,
         },
-      } as any,
+      },
       child
     );
   }
