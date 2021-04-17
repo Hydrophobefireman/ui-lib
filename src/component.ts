@@ -73,15 +73,14 @@ export class Component<P = {}, S = {}> {
     enqueueRender(this);
   }
 
-  forceUpdate(callback?: (() => void) | false, _updateQueue?: DOMOps[]): void {
+  forceUpdate(callback?: (() => void) | false, queuedUpdatate?: boolean): void {
     if (this._VNode == null) return;
     // isolatedForceUpdate (when the user calls it)
     // in other cases, we batch it among with other components as well, this fixes
     // a few race condition bugs that were caused by deferring the update
     // and runs them synchronously instead
-    const isIsolatedForceUpdate = _updateQueue == null;
-    const batchQueue: DOMOps[] = _updateQueue || ([] as DOMOps[]);
     const shouldForce = callback !== false;
+    const isIsolatedForceUpdate = queuedUpdatate !== true;
     plugins.diffStart(this, shouldForce);
 
     diff(
@@ -91,13 +90,12 @@ export class Component<P = {}, S = {}> {
       shouldForce,
       {
         depth: this._depth,
-        batch: batchQueue,
         isSvg: false,
         context: this._sharedContext || {},
       }
     ) as UIElement;
     typeof callback === "function" && callback();
-    isIsolatedForceUpdate && onDiff(batchQueue);
+    isIsolatedForceUpdate && onDiff();
   }
 
   _VNode?: VNode<P>;
@@ -139,12 +137,11 @@ export function enqueueRender(c: Component) {
 function process() {
   let p: Component;
   RENDER_QUEUE.sort((x, y) => x._depth - y._depth);
-  const queue: DOMOps[] = [];
   while ((p = RENDER_QUEUE.pop())) {
     if (p._dirty) {
       p._dirty = false;
-      p.forceUpdate(false, queue);
+      p.forceUpdate(false, true);
     }
   }
-  onDiff(queue);
+  onDiff();
 }

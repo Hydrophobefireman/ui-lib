@@ -1,4 +1,3 @@
-import { DOMOps, DiffMeta } from "./types/index";
 import {
   LIFECYCLE_DID_MOUNT,
   LIFECYCLE_DID_UPDATE,
@@ -7,7 +6,7 @@ import {
 import config, { plugins } from "./config";
 
 import { Component } from "./component";
-import { commitDOMOps } from "./commit";
+
 import { unmount } from "./diff/unmount";
 
 type ProcessOptions = {
@@ -48,17 +47,13 @@ function __executeCallback(cbObj: ProcessOptions) {
   } catch (e) {
     if (hasCatch) return component.componentDidCatch(e);
     if (config.unmountOnError) {
-      const b = [];
-      const m: DiffMeta = { batch: b } as any;
-      unmount(component._VNode, m);
-      commitDOMOps(b);
+      unmount(component._VNode);
     }
     throw e;
   }
 }
 
-export function onDiff(queue: DOMOps[]) {
-  commitDOMOps(queue);
+export function onDiff() {
   plugins.diffEnd();
   // run syncrhonously
   // defer(() => {

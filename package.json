@@ -1,6 +1,6 @@
 {
   "name": "@hydrophobefireman/ui-lib",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "description": "",
   "main": "dist/ui-lib.modern.js",
   "scripts": {

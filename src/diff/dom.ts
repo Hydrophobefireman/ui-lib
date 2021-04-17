@@ -13,6 +13,7 @@ import { DiffMeta, Props, UIElement, VNode } from "../types/index";
 
 import { IS_ARIA_PROP } from "../constants";
 import { plugins } from "../config";
+import { domOp } from "../commit";
 
 export function diffDomNodes(
   newVNode: VNode,
@@ -48,7 +49,7 @@ export function diffDomNodes(
   // setComponent_base(newVNode, dom);
 
   if (shouldAppend) {
-    meta.batch.push({
+    domOp({
       node: dom,
       action: BATCH_MODE_PLACE_NODE,
       refDom: meta.next,
@@ -135,14 +136,14 @@ function __diffNewAttributes(
       diffClass(dom, newValue, oldValue, meta);
       continue;
     } else if (attr === "style") {
-      meta.batch.push({
+      domOp({
         node: dom,
         action: BATCH_MODE_SET_STYLE,
         value: { newValue, oldValue },
       });
       continue;
     }
-    meta.batch.push({
+    domOp({
       node: dom,
       action: meta.isSvg
         ? BATCH_MODE_SET_SVG_ATTRIBUTE
@@ -212,7 +213,7 @@ function diffClass(
   }
 
   if (newValue === oldValue) return;
-  meta.batch.push({
+  domOp({
     node: dom,
     action: BATCH_MODE_SET_ATTRIBUTE,
     attr: meta.isSvg ? "class" : "className",
@@ -232,7 +233,7 @@ export function __removeOldAttributes(
         i === (i = i.replace(IS_SVG_ATTR, ""))
           ? BATCH_MODE_REMOVE_ATTRIBUTE
           : BATCH_MODE_REMOVE_ATTRIBUTE_NS;
-      meta.batch.push({
+      domOp({
         node: dom,
         action: attributeRemovalMode,
         attr: i,

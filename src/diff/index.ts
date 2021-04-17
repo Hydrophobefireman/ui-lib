@@ -27,7 +27,7 @@ export function diff(
   meta: DiffMeta
 ): UIElement | UIElement[] {
   if (newVNode == null || typeof newVNode === "boolean") {
-    unmount(oldVNode, meta);
+    unmount(oldVNode);
     return;
   }
 
@@ -55,7 +55,7 @@ export function diff(
       const next = getDom(oldVNode);
       meta.next = (next || EMPTY_OBJ).nextSibling;
     }
-    unmount(oldVNode, meta);
+    unmount(oldVNode);
     oldVNode = EMPTY_OBJ;
   }
   const tmp = newVNode;

@@ -1,14 +1,9 @@
 import { Component, enqueueRender } from "./component";
-import type {
-  ConsumerCallback,
-  Context,
-  ContextProvider,
-  Props,
-} from "./types/index";
+import type { ConsumerCallback, Context, ContextProvider } from "./types/index";
 
 import { $push } from "./util";
 import { Fragment } from "./constants";
-import { h } from "./index";
+import { createElement as h } from "./create_element";
 
 let contextId = 0;
 interface ProviderProps<T> {

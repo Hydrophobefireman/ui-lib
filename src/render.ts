@@ -19,15 +19,13 @@ export function render(VNode: VNode, parentDom: VNodeHost) {
     // hydrate is unstable right now, just clear the dom and start afresh
     clearDOM(parentDom);
   }
-  const batchQueue: DOMOps[] = [];
   diff(normalizedVNode, old, parentDom, false, {
     depth: 0,
-    batch: batchQueue,
     isSvg: ((parentDom as unknown) as SVGElement).ownerSVGElement !== undefined,
     context: {},
   });
   // parentDom._hosts = normalizedVNode;
-  onDiff(batchQueue);
+  onDiff();
 }
 
 /**@todo fix hydrate */

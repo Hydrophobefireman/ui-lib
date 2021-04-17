@@ -6,22 +6,19 @@ import {
   Fragment,
   LIFECYCLE_WILL_UNMOUNT,
 } from "../constants";
-import { DiffMeta, UIElement, VNode } from "../types/index";
+import { UIElement, VNode } from "../types/index";
 
 import config from "../config";
 import { scheduleLifeCycleCallbacks } from "../lifeCycleCallbacks";
 import { setRef } from "../ref";
+import { domOp } from "../commit";
 
 function warnSetState() {
   config.warnOnUnmountRender &&
     console.warn("Component state changed after unmount", this);
 }
 
-export function unmount(
-  VNode: VNode,
-  meta: DiffMeta,
-  recursionLevel?: number
-): void {
+export function unmount(VNode: VNode, recursionLevel?: number): void {
   /** short circuit */
   if (VNode == null || VNode === EMPTY_OBJ) return;
   recursionLevel =
@@ -30,7 +27,7 @@ export function unmount(
       : recursionLevel || 0;
 
   setRef(VNode.ref, null);
-  unmount(VNode._renders, meta, recursionLevel);
+  unmount(VNode._renders, recursionLevel);
 
   const component = VNode._component;
   if (component != null) {
@@ -48,13 +45,13 @@ export function unmount(
 
   const childArray = VNode._children;
 
-  _processNodeCleanup(VNode, meta, recursionLevel);
+  _processNodeCleanup(VNode, recursionLevel);
 
   if (childArray) {
     const cl = childArray.length;
     for (let i = 0; i < cl; i++) {
       const child: VNode = childArray[i];
-      unmount(child, meta, recursionLevel + 1);
+      unmount(child, recursionLevel + 1);
     }
     childArray.length = 0;
   }
@@ -64,17 +61,13 @@ export function unmount(
 function isSimplestVNode(VNode: VNode) {
   return typeof VNode.type != "function";
 }
-function _processNodeCleanup(
-  VNode: VNode,
-  meta: DiffMeta,
-  recursionLevel: number
-) {
+function _processNodeCleanup(VNode: VNode, recursionLevel: number) {
   let dom: UIElement;
   if (isSimplestVNode(VNode)) {
     dom = VNode._dom;
     if (dom != null) {
-      clearListeners(VNode, dom, meta);
-      meta.batch.push({
+      clearListeners(VNode, dom);
+      domOp({
         node: dom,
         action:
           recursionLevel > 0
@@ -87,15 +80,15 @@ function _processNodeCleanup(
       });
     }
   } else {
-    meta.batch.push({ action: BATCH_MODE_CLEAR_POINTERS, VNode, node: dom });
+    domOp({ action: BATCH_MODE_CLEAR_POINTERS, VNode, node: dom });
   }
 }
 
-function clearListeners(VNode: VNode, dom: UIElement, meta: DiffMeta) {
+function clearListeners(VNode: VNode, dom: UIElement) {
   const props = VNode.props;
   for (const prop in props) {
     if (prop[0] === "o" && prop[1] === "n") {
-      meta.batch.push({
+      domOp({
         action: BATCH_MODE_REMOVE_ATTRIBUTE,
         node: dom,
         attr: prop,

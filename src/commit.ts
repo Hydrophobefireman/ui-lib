@@ -11,64 +11,50 @@ import {
 } from "./constants";
 import { DOMOps, UIElement, VNode, WritableProps } from "./types/index";
 
-export function commitDOMOps(queue: DOMOps[]) {
-  const removals: DOMOps[] = [];
-  for (let i = 0; i < queue.length; i++) {
-    const op = queue[i];
-    const dom = op.node;
-    const action = op.action;
+export function domOp(op: DOMOps) {
+  const dom = op.node;
+  const action = op.action;
 
-    if (action === BATCH_MODE_REMOVE_ELEMENT) {
-      removals.push(op);
-      continue;
-    }
+  const refDom = op.refDom;
+  const value = op.value;
+  const VNode = op.VNode;
+  let attr = op.attr;
+  switch (action) {
+    case BATCH_MODE_PLACE_NODE:
+      (value as Node).insertBefore(dom, refDom);
+      break;
+    case BATCH_MODE_SET_ATTRIBUTE:
+      // in case of removeAttribute, `op.attr===undefined`
+      $(dom, attr, value);
+      break;
+    case BATCH_MODE_SET_STYLE:
+      diffStyle(dom, value.newValue, value.oldValue);
+      break;
+    case BATCH_MODE_REMOVE_ELEMENT:
+      removeNode(dom);
+      removePointers(VNode, dom);
+      break;
+    case BATCH_MODE_CLEAR_POINTERS:
+      removePointers(VNode, dom);
+      break;
+    case BATCH_MODE_REMOVE_ATTRIBUTE_NS:
+      dom.removeAttributeNS("http://www.w3.org/1999/xlink", attr);
+      break;
+    case BATCH_MODE_SET_SVG_ATTRIBUTE:
+      const isSVGSpecificAttr = attr !== (attr = attr.replace(IS_SVG_ATTR, ""));
 
-    const refDom = op.refDom;
-    const value = op.value;
-    const VNode = op.VNode;
-    let attr = op.attr;
-    switch (action) {
-      case BATCH_MODE_PLACE_NODE:
-        (value as Node).insertBefore(dom, refDom);
-        break;
-      case BATCH_MODE_SET_ATTRIBUTE:
-        // in case of removeAttribute, `op.attr===undefined`
-        $(dom, attr, value);
-        break;
-      case BATCH_MODE_SET_STYLE:
-        diffStyle(dom, value.newValue, value.oldValue);
-        break;
-
-      case BATCH_MODE_CLEAR_POINTERS:
-        removePointers(VNode, dom);
-        break;
-      case BATCH_MODE_REMOVE_ATTRIBUTE_NS:
-        dom.removeAttributeNS("http://www.w3.org/1999/xlink", attr);
-        break;
-      case BATCH_MODE_SET_SVG_ATTRIBUTE:
-        const isSVGSpecificAttr =
-          attr !== (attr = attr.replace(IS_SVG_ATTR, ""));
-
-        isSVGSpecificAttr
-          ? dom.setAttributeNS(
-              "http://www.w3.org/1999/xlink",
-              attr.toLowerCase(),
-              value
-            )
-          : $(dom, attr, value, true);
-        break;
-      default:
-        break;
-    }
+      isSVGSpecificAttr
+        ? dom.setAttributeNS(
+            "http://www.w3.org/1999/xlink",
+            attr.toLowerCase(),
+            value
+          )
+        : $(dom, attr, value, true);
+      break;
+    default:
+      break;
   }
 
-  for (let i = 0; i < removals.length; i++) {
-    const op = removals[i];
-    const dom = op.node;
-    const VNode = op.VNode;
-    removeNode(dom);
-    removePointers(VNode, dom);
-  }
   // queue is immutable, we build a new one everytime
 }
 

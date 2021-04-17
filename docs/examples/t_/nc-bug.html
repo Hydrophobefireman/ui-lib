@@ -1,0 +1,65 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+      * {
+        font-family: Ubuntu;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+      }
+
+      a {
+        color: #2f6daa;
+        text-decoration: none;
+      }
+    </style>
+    <title>Test</title>
+  </head>
+  <body>
+    <div id="app"></div>
+
+    <script type="module">
+      const arr = () => Array.from({ length: 5 }).map((_, i) => i);
+      import Component, { h, render, useState } from "../../ui/index.js";
+      function P() {
+        const [r, setR] = useState();
+        return h(App, { r: () => setR({}) });
+      }
+      function App({ r }) {
+        const [a, setA] = useState(null);
+        const [b, setB] = useState(null);
+        const [list, setList] = useState(arr);
+
+        const reRender = () => {
+          setA({});
+          setB({});
+          setList(arr());
+          r();
+        };
+
+        function NewComponentOnReRenders() {
+          return h(
+            "button",
+            {
+              onClick: reRender,
+            },
+            "re render"
+          );
+        }
+        return h(
+          "div",
+          null,
+          h(NewComponentOnReRenders, null),
+          h(
+            "div",
+            null,
+            list.map((i) => h("div", null, i))
+          ),
+          h(NewComponentOnReRenders, null)
+        );
+      }
+      render(h(P), document.getElementById("app"));
+    </script>
+  </body>
+</html>

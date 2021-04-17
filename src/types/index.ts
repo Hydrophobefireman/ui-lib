@@ -86,7 +86,6 @@ export interface VNodeHost extends HTMLElement {
 }
 export type DiffMeta = {
   depth: number;
-  batch: DOMOps[];
   isSvg: boolean;
   context: { [id: string]: ContextProvider };
   contextValue?: any;
