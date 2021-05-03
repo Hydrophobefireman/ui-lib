@@ -11,13 +11,14 @@ interface AsyncState {
   inProgress?: boolean;
   error?: boolean;
   render?: UIElement;
+  stack?:Error;
 }
 interface AsyncProps<T> {
   promise?: () => AsyncPromResponse;
   componentPromise?: () => AsyncPromResponse;
   fallback?: UIElement;
   fallbackComponent?: UIElement<T>;
-  errorComponent?: UIElement<T>   ;
+  errorComponent?: UIElement<T>;
 }
 const getPromise = (k: AsyncProps<any>) => k.promise || k.componentPromise;
 export class AsyncComponent extends Component<AsyncProps<any>, AsyncState> {
@@ -42,7 +43,10 @@ export class AsyncComponent extends Component<AsyncProps<any>, AsyncState> {
         prom === getPromise(this.props) &&
           this.setState({ render: component, inProgress: false, error: false });
       })
-      .catch((x: Error) => this.setState({ error: true, inProgress: false }));
+      .catch((x: Error) => {
+        console.error("AsyncComponent:", x);
+        this.setState({ error: true, inProgress: false, stack: x });
+      });
   }
   render(props: AsyncComponent["props"], state: AsyncComponent["state"]) {
     if (state.inProgress)
@@ -51,7 +55,11 @@ export class AsyncComponent extends Component<AsyncProps<any>, AsyncState> {
         "Loading"
       );
     if (state.error)
-      return createElementIfNeeded(props.errorComponent) || "An Error Occured";
+      return (
+        createElementIfNeeded(props.errorComponent, {
+          stack: this.state.stack,
+        }) || "An Error Occured"
+      );
     return createElementIfNeeded(
       state.render,
       objectWithoutKeys(props, [
