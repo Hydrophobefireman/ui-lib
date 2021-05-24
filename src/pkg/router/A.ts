@@ -1,7 +1,8 @@
-import { Component } from "../../component";
-import { createElement } from "../../create_element";
 import { Props, VNode } from "../../index";
+
+import { Component } from "../../component";
 import { assign } from "../../util";
+import { createElement } from "../../create_element";
 import { loadURL } from "./util";
 
 function onLinkClick(e: MouseEvent) {
@@ -23,11 +24,23 @@ function onLinkClick(e: MouseEvent) {
 function _call(func: EventListener, arg: MouseEvent, ref: HTMLAnchorElement) {
   return func.call(ref, arg);
 }
+type AnchorProps = Props<{
+  preserveScroll?: boolean;
+  behavior: "auto" | "smooth";
+}>;
 export class A extends Component {
+  props: AnchorProps;
   _onClick: (e: MouseEvent) => void;
-  constructor(props: Props<{}>) {
+  constructor(props: AnchorProps) {
     super(props);
     this._onClick = (e: MouseEvent): void => {
+      if (!this.props.preserveScroll) {
+        window.scroll({
+          left: 0,
+          top: 0,
+          behavior: this.props.behavior || "auto",
+        });
+      }
       const current = e.currentTarget as HTMLAnchorElement;
       _call(onLinkClick, e, current);
       const userOnClick = this.props.onClick;
