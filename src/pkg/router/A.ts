@@ -26,7 +26,6 @@ function _call(func: EventListener, arg: MouseEvent, ref: HTMLAnchorElement) {
 }
 type AnchorProps = Props<{
   preserveScroll?: boolean;
-  behavior: "auto" | "smooth";
 }>;
 export class A extends Component {
   props: AnchorProps;
@@ -35,11 +34,7 @@ export class A extends Component {
     super(props);
     this._onClick = (e: MouseEvent): void => {
       if (!this.props.preserveScroll) {
-        window.scroll({
-          left: 0,
-          top: 0,
-          behavior: this.props.behavior || "auto",
-        });
+        window.scroll(0, 0);
       }
       const current = e.currentTarget as HTMLAnchorElement;
       _call(onLinkClick, e, current);
