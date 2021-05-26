@@ -5,9 +5,12 @@ import { assign } from "../../util";
 import { createElement } from "../../create_element";
 import { loadURL } from "./util";
 
-function onLinkClick(e: MouseEvent) {
+function onLinkClick(e: MouseEvent, preserveScroll: boolean) {
   if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) {
     return;
+  }
+  if (!preserveScroll) {
+    window.scroll(0, 0);
   }
   if (e.stopImmediatePropagation) {
     e.stopImmediatePropagation();
@@ -21,8 +24,13 @@ function onLinkClick(e: MouseEvent) {
   loadURL(href);
 }
 
-function _call(func: EventListener, arg: MouseEvent, ref: HTMLAnchorElement) {
-  return func.call(ref, arg);
+function _call(
+  func: Function,
+  arg: MouseEvent,
+  preserveScroll: boolean,
+  ref: HTMLAnchorElement
+) {
+  return func.call(ref, arg, preserveScroll);
 }
 type AnchorProps = Props<{
   preserveScroll?: boolean;
@@ -33,13 +41,11 @@ export class A extends Component {
   constructor(props: AnchorProps) {
     super(props);
     this._onClick = (e: MouseEvent): void => {
-      if (!this.props.preserveScroll) {
-        window.scroll(0, 0);
-      }
+      const ps = this.props.preserveScroll;
       const current = e.currentTarget as HTMLAnchorElement;
-      _call(onLinkClick, e, current);
+      _call(onLinkClick, e, ps, current);
       const userOnClick = this.props.onClick;
-      userOnClick && _call(userOnClick, e, current);
+      userOnClick && _call(userOnClick, e, ps, current);
     };
   }
 
