@@ -6,8 +6,8 @@
     "incremental": true,
     "target": "ESNext",
     "moduleResolution": "node",
-    "rootDir": ".",
+    "rootDir": "./src",
     "skipLibCheck": true
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "jsx-runtime.d.ts"]
 }
