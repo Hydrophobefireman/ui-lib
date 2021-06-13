@@ -36,7 +36,7 @@ type AnchorProps = Props<{
   preserveScroll?: boolean;
 }>;
 export class A extends Component {
-  props: AnchorProps;
+  declare props: AnchorProps;
   _onClick: (e: MouseEvent) => void;
   constructor(props: AnchorProps) {
     super(props);

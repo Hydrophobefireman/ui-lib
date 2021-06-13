@@ -1,25 +1,25 @@
-import { assign } from "../../util";
 import {
   ComponentConstructor,
   Props,
   Renderable,
   VNode,
 } from "../../types/index";
+import { RoutePath, createRoutePath, fixPath, sessKey } from "./util";
 
 import { Component } from "../../component";
+import { RouterSubscription } from "./subscriptions";
+import { assign } from "../../util";
 import config from "../../config";
+import { createContext } from "../../context";
 import { createElement } from "../../create_element";
 import { createElementIfNeeded } from "./../common";
 
-import { RouterSubscription } from "./subscriptions";
-import { fixPath, RoutePath, sessKey, createRoutePath } from "./util";
-import { createContext } from "../../context";
-
-export const RouteParamContext = createContext<{
-  params: { [k: string]: string };
-  search: URLSearchParams;
-  path: string;
-}>(null);
+export const RouteParamContext =
+  createContext<{
+    params: { [k: string]: string };
+    search: URLSearchParams;
+    path: string;
+  }>(null);
 
 interface PathProps {
   match: RoutePath;
@@ -36,7 +36,7 @@ interface RouterProps {
 }
 
 export class Router extends Component<RouterProps, RouterState> {
-  state: RouterState;
+  declare state: RouterState;
   private _previous: string;
   constructor(props: Props<RouterProps>) {
     super(props);
@@ -159,7 +159,7 @@ export class Router extends Component<RouterProps, RouterState> {
   }
 }
 
-export const Path = ({} as any) as ComponentConstructor<{
+export const Path = {} as any as ComponentConstructor<{
   match: string | RoutePath;
   component: Renderable<any>;
 }>;

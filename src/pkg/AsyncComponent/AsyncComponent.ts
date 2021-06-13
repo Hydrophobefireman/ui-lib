@@ -11,7 +11,7 @@ interface AsyncState {
   inProgress?: boolean;
   error?: boolean;
   render?: UIElement;
-  stack?:Error;
+  stack?: Error;
 }
 interface AsyncProps<T> {
   promise?: () => AsyncPromResponse;
@@ -22,8 +22,8 @@ interface AsyncProps<T> {
 }
 const getPromise = (k: AsyncProps<any>) => k.promise || k.componentPromise;
 export class AsyncComponent extends Component<AsyncProps<any>, AsyncState> {
-  state: AsyncState;
-  props: AsyncProps<any>;
+  declare state: AsyncState;
+  declare props: AsyncProps<any>;
   componentDidMount() {
     this._init();
   }
