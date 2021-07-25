@@ -1,7 +1,6 @@
+import { Component } from "./component";
 import { Fragment, LifeCycleCallbacks } from "./constants";
 import { Props, UIElement, VNode } from "./types/index";
-
-import { Component } from "./component";
 
 export const HAS_PROMISE = typeof Promise !== "undefined";
 
@@ -42,10 +41,20 @@ export function addPluginCallback(options: Partial<IPlugins>): void {
   }
 }
 
+export function reqAnimFrame(cb: () => void) {
+  const done: FrameRequestCallback = (e) => {
+    cancelAnimationFrame(raf);
+    clearTimeout(timeout);
+    cb();
+  };
+  let raf: number;
+  let timeout: NodeJS.Timeout;
+  timeout = setTimeout(done, config.RAF_TIMEOUT);
+  raf = requestAnimationFrame(done);
+}
+
 const config = {
-  scheduleRender: HAS_RAF
-    ? (cb: FrameRequestCallback) => requestAnimationFrame(cb)
-    : defer,
+  scheduleRender: HAS_RAF ? reqAnimFrame : defer,
   warnOnUnmountRender: false,
   RAF_TIMEOUT: 100,
   debounceEffect: null,

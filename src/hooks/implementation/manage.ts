@@ -1,25 +1,10 @@
 import type { Component, EffectsDictionary } from "../../component";
-import config, { HAS_RAF, addPluginCallback, defer } from "../../config";
-
-/**
- * This ensures that we begin our render work  even if we don't get an animation frame for 100ms
- * this could happen in cases like we're in an inactive tab
- * but we need to render the component and it's children
- * as we might delay some side effects
- * however if the user wishes to have the rendering stop until the tab is active
- * they can set `config.scheduleRender` to `requestAnimationFrame`
- */
-function reqAnimFrame(cb: () => void) {
-  const done = () => {
-    cancelAnimationFrame(raf);
-    clearTimeout(timeout);
-    cb();
-  };
-  let raf: number;
-  let timeout: NodeJS.Timeout;
-  timeout = setTimeout(done, config.RAF_TIMEOUT);
-  raf = requestAnimationFrame(done);
-}
+import config, {
+  HAS_RAF,
+  addPluginCallback,
+  defer,
+  reqAnimFrame,
+} from "../../config";
 
 let hookIndex = 0;
 
@@ -71,12 +56,12 @@ function useEffectCallbacks() {
 function layoutEffectCallbacks() {
   return _runEffect(layoutPendingCallbacks);
 }
-const effectScheduler =
-  config.debounceEffect || (HAS_RAF ? reqAnimFrame : defer);
+const effectScheduler = HAS_RAF ? reqAnimFrame : defer;
 
 function diffEnd() {
+  const scheduler = config.debounceEffect || effectScheduler;
   layoutEffectCallbacks();
-  effectScheduler(useEffectCallbacks);
+  scheduler(useEffectCallbacks);
 }
 
 function prepForNextHookCandidate(c: Component) {
