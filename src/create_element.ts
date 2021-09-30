@@ -1,11 +1,12 @@
+import { plugins } from "./config";
+import { EMPTY_OBJ, Fragment, NULL_TYPE } from "./constants";
 import {
   ComponentChild,
   ComponentChildren,
+  Renderable,
   VNode,
   createElementPropType,
-  Renderable,
 } from "./types/index";
-import { EMPTY_OBJ, Fragment, NULL_TYPE } from "./constants";
 import {
   assign,
   create,
@@ -13,8 +14,6 @@ import {
   flattenArray,
   objectWithoutKeys,
 } from "./util";
-
-import { plugins } from "./config";
 
 export const skipProps: (keyof VNode)[] = ["key", "ref"];
 
@@ -96,7 +95,8 @@ export function flattenVNodeChildren<P>(VNode: VNode<P>): VNode[] {
   // even if we are creating an empty fragment
   // we will still render a null child (`c`)
   // as it will serve as a memory for where the fragment's
-  // future children should be
+  // future children OR any component that unmounts this fragment.
+
   const nullChildren = c == null;
   if (VNode.type !== Fragment) {
     if (nullChildren) return [];

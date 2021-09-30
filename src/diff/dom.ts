@@ -1,19 +1,18 @@
+import { domOp } from "../commit";
+import { plugins } from "../config";
 import {
   BATCH_MODE_PLACE_NODE,
   BATCH_MODE_REMOVE_ATTRIBUTE,
+  BATCH_MODE_REMOVE_ATTRIBUTE_NS,
   BATCH_MODE_SET_ATTRIBUTE,
   BATCH_MODE_SET_STYLE,
-  EMPTY_OBJ,
-  NULL_TYPE,
-  IS_SVG_ATTR,
-  BATCH_MODE_REMOVE_ATTRIBUTE_NS,
   BATCH_MODE_SET_SVG_ATTRIBUTE,
+  EMPTY_OBJ,
+  IS_SVG_ATTR,
+  NULL_TYPE,
 } from "../constants";
-import { DiffMeta, Props, UIElement, VNode } from "../types/index";
-
 import { IS_ARIA_PROP } from "../constants";
-import { plugins } from "../config";
-import { domOp } from "../commit";
+import { DiffMeta, Props, UIElement, VNode } from "../types/index";
 
 export function diffDomNodes(
   newVNode: VNode,
@@ -61,19 +60,19 @@ export function diffDomNodes(
 
 function createDomFromVNode(newVNode: VNode, meta: DiffMeta): UIElement {
   if (typeof newVNode.props === "string") {
-    return (document.createTextNode("") as unknown) as UIElement;
+    return document.createTextNode("") as unknown as UIElement;
   } else {
     const type = newVNode.type;
     if (type === NULL_TYPE) {
-      return (document.createComment("$") as unknown) as UIElement;
+      return document.createComment("$") as unknown as UIElement;
     }
     let dom: UIElement;
 
     if (meta.isSvg) {
-      dom = (document.createElementNS(
+      dom = document.createElementNS(
         "http://www.w3.org/2000/svg",
         type as string
-      ) as unknown) as UIElement;
+      ) as unknown as UIElement;
     } else {
       dom = document.createElement(type as string) as UIElement;
     }
@@ -97,8 +96,8 @@ function diffAttributes(
   if (isTextNode) {
     return __diffTextNodes(
       dom,
-      (newVNode.props as unknown) as string,
-      (oldVNode.props as unknown) as string
+      newVNode.props as unknown as string,
+      oldVNode.props as unknown as string
     );
   }
 
@@ -107,7 +106,7 @@ function diffAttributes(
   const nextAttrs = newVNode.props;
 
   if (prevAttrs != null) {
-    __removeOldAttributes(dom, prevAttrs, nextAttrs, meta);
+    __removeOldAttributes(dom, prevAttrs, nextAttrs);
   }
 
   __diffNewAttributes(dom, prevAttrs || EMPTY_OBJ, nextAttrs, meta);
@@ -224,8 +223,7 @@ function diffClass(
 export function __removeOldAttributes(
   dom: UIElement,
   prev: Props<any>,
-  next: Props<any>,
-  meta: DiffMeta
+  next: Props<any>
 ) {
   for (let i in prev) {
     if (!UNSAFE_ATTRS[i] && next[i] == null && prev[i] != null) {

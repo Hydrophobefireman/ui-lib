@@ -1,5 +1,4 @@
 import { EMPTY_ARRAY, EMPTY_OBJ } from "./constants";
-
 import { VNode } from "./types/index";
 
 // function identity<T>(x: T): T {
@@ -85,6 +84,15 @@ export const create =
   (function () {
     return {};
   } as ObjectConstructor["create"]);
+
+const selfClosingTags /* #__PURE__ */ =
+  /* #__PURE__ */ "area base br col embed hr img input keygen link meta param source track wbr".split(
+    " "
+  );
+
+export function isSelfClosingElement(e: any) {
+  return typeof e === "string" && selfClosingTags.indexOf(e) > -1;
+}
 
 // export function isShallowEqual(a: any, b: any) {
 //   if (a == b) {

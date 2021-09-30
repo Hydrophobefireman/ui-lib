@@ -67,7 +67,7 @@
           document.title = "Hello " + (get(state) || "");
         });
       }
-      render([h(App), h(Title)], document.getElementById("mount"));
+      render(h(()=>[h(App), h(Title)]), document.getElementById("mount"));
     </script>
   </body>
 </html>

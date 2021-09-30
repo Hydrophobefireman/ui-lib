@@ -88,3 +88,5 @@ typings/
 .rts2_cache_cjs/
 dist/
 tsconfig.tsbuildinfo
+
+.vercel
