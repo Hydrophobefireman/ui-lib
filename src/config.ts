@@ -48,8 +48,7 @@ export function reqAnimFrame(cb: () => void) {
     cb();
   };
   let raf: number;
-  let timeout: NodeJS.Timeout;
-  timeout = setTimeout(done, config.RAF_TIMEOUT);
+  let timeout = setTimeout(done, config.RAF_TIMEOUT);
   raf = requestAnimationFrame(done);
 }
 
