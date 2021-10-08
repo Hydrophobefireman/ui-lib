@@ -4,7 +4,7 @@ import { objectWithoutKeys } from "./util";
 
 type RefObj<R> = ((val: R) => void) | RefType<R>;
 export interface ForwardFn<P = {}, T = any> {
-  (props: P, ref: RefObj<T>): ComponentChild;
+  (props: P, ref: RefObj<T>): JSX.Element;
 }
 export function forwardRef<P = Props<{ ref?: any }>, R = any>(C: ForwardFn) {
   function ForwardRef(props: P) {
