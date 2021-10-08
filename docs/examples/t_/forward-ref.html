@@ -1,0 +1,43 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <button id="render">Render</button>
+    <script type="module">
+      const updater = (x) => x + 1;
+      import * as UI from "../../ui/index.js";
+      import {
+        h,
+        render,
+        useState,
+        Fragment,
+        useEffect,
+        Component,
+        createRef,
+        useRef,
+        forwardRef,
+      } from "../../ui/index.js";
+
+      const Div = forwardRef(function Div(props, ref) {
+        console.log("ok");
+        return h("div", { ...props, ref });
+      });
+      console.log(Div);
+      function App() {
+        const r = useRef();
+        useEffect(() => {
+          console.log(r, r.current);
+        }, []);
+        return h(Div, { ref: r }, Math.random());
+      }
+      const x = h(App);
+      console.log(x);
+      const renderComponent = () => render(x, document.getElementById("app"));
+      document.getElementById("render").onclick = renderComponent;
+      renderComponent();
+    </script>
+  </body>
+</html>

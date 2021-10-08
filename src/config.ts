@@ -1,6 +1,6 @@
 import { Component } from "./component";
 import { Fragment, LifeCycleCallbacks } from "./constants";
-import { Props, UIElement, VNode } from "./types/index";
+import { Props, RefType, UIElement, VNode } from "./types/index";
 
 export const HAS_PROMISE = typeof Promise !== "undefined";
 
@@ -11,7 +11,7 @@ export const defer: <T>(cb: () => T) => Promise<T> = HAS_PROMISE
 export const HAS_RAF = typeof requestAnimationFrame === "function";
 
 export interface IPlugins {
-  createElement(VNode: VNode): void;
+  createElement(VNode: VNode, ref: any, key: any): void;
   _hookSetup(c: Component): void;
   diffEnd(): void;
   diffStart(thisVal: Component, force: boolean): void;

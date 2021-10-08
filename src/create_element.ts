@@ -59,10 +59,12 @@ export function createElement<P = {}, R = any>(
   } else if ((children = createElementChildren(arguments)).length) {
     _children = flattenArray(children);
   }
+
   (props as any).children = _children;
-  const _vnode = getVNode<P, R>(type, props, key, ref);
-  plugins.createElement(_vnode);
-  return _vnode;
+  const vnode = getVNode<P, R>(type, props, key, ref);
+  plugins.createElement(vnode, ref, key);
+
+  return vnode;
 }
 
 export function coerceToVNode(VNode: ComponentChild | VNode): VNode {
