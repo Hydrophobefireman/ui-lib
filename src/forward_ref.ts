@@ -1,10 +1,10 @@
 import { addPluginCallback } from "./config";
-import { ComponentChild, Props, RefType } from "./types";
+import { Props, RefType } from "./types";
 import { objectWithoutKeys } from "./util";
 
 type RefObj<R> = ((val: R) => void) | RefType<R>;
 export interface ForwardFn<P = {}, T = any> {
-  (props: P, ref: RefObj<T>): JSX.Element;
+  (props: P, ref: RefObj<T>): JSX.Element | null | undefined | boolean;
 }
 export function forwardRef<P = Props<{ ref?: any }>, R = any>(C: ForwardFn) {
   function ForwardRef(props: P) {
@@ -19,7 +19,7 @@ export function forwardRef<P = Props<{ ref?: any }>, R = any>(C: ForwardFn) {
 
 addPluginCallback({
   createElement(VNode, ref) {
-    if (VNode && VNode.type && (VNode.type as any).__REF_FORWARDEDeeloca) {
+    if (VNode && VNode.type && (VNode.type as any).__REF_FORWARDED) {
       (VNode.props as any).ref = ref;
       VNode.ref = null;
     }
