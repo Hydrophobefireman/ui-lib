@@ -1,4 +1,4 @@
-import Component, { h } from "../../../ui/index.js";
+import Component, {h} from "../../../ui/index.js";
 
 class AnimBox extends Component {
   //   shouldComponentUpdate(nextProps, nextState) {
@@ -9,13 +9,13 @@ class AnimBox extends Component {
     const time = data.time;
     const style = {
       borderRadius: `${(time % 10).toString()}px`,
-      background: `rgba(0,0,0,${(0.5 + (time % 10) / 10).toString()})`
+      background: `rgba(0,0,0,${(0.5 + (time % 10) / 10).toString()})`,
     };
 
     return h("div", {
       class: "AnimBox",
       "data-id": data.id,
-      style: style
+      style: style,
     });
   }
 }
@@ -33,7 +33,7 @@ export class Anim extends Component {
       children.push(
         h(AnimBox, {
           key: item.id,
-          data: item
+          data: item,
         })
       );
     }
@@ -41,7 +41,7 @@ export class Anim extends Component {
     return h(
       "div",
       {
-        class: "Anim"
+        class: "Anim",
       },
       children
     );

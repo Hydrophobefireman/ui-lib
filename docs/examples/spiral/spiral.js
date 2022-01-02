@@ -1,4 +1,4 @@
-import { Component, render, h, config } from "../../ui/index.js";
+import {Component, render, h, config} from "../../ui/index.js";
 function _defineProperty(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
@@ -20,7 +20,7 @@ const LOOPS = 6;
 class Main extends Component {
   constructor(...args) {
     super(...args);
-    _defineProperty(this, "state", { x: 0, y: 0, big: false, counter: 0 });
+    _defineProperty(this, "state", {x: 0, y: 0, big: false, counter: 0});
     this.increment = () => {
       this.state.counter++; // avoids an object allocation
       this.setState();
@@ -50,17 +50,17 @@ class Main extends Component {
     this.increment();
   }
 
-  setMouse({ pageX: x, pageY: y }) {
-    this.setState({ x, y });
+  setMouse({pageX: x, pageY: y}) {
+    this.setState({x, y});
     return false;
   }
 
   setBig(big) {
-    this.setState({ big });
+    this.setState({big});
   }
 
   // builds and returns a brand new DOM (every time)
-  render(props, { x, y, big, counter }) {
+  render(props, {x, y, big, counter}) {
     let max =
         COUNT +
         Math.round(Math.sin((counter / 90) * 2 * Math.PI) * COUNT * 0.5),
@@ -82,8 +82,8 @@ class Main extends Component {
 
     return h(
       "div",
-      { id: "main" },
-      h(Cursor, { label: true, x: x, y: y, big: big }),
+      {id: "main"},
+      h(Cursor, {label: true, x: x, y: y, big: big}),
       cursors
     );
   }
@@ -98,9 +98,9 @@ class Cursor extends Component {
   }
 
   // first argument is "props", the attributes passed to <Cursor ...>
-  render({ x, y, label, color, big }) {
+  render({x, y, label, color, big}) {
     let inner = null;
-    if (label) inner = h("span", { class: "label" }, x, ",", y);
+    if (label) inner = h("span", {class: "label"}, x, ",", y);
     return h(
       "div",
       {

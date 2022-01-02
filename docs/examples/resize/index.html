@@ -9,14 +9,14 @@
       import Component, {
         render,
         createElement as h,
-        Fragment
+        Fragment,
       } from "../../ui/index.js";
       class Obs extends Component {
         constructor() {
           super();
-          this.state = { h: window.innerHeight, w: window.innerWidth };
+          this.state = {h: window.innerHeight, w: window.innerWidth};
           this.handleResize = () =>
-            this.setState({ h: window.innerHeight, w: window.innerWidth });
+            this.setState({h: window.innerHeight, w: window.innerWidth});
         }
 
         componentDidMount() {
@@ -25,7 +25,7 @@
         componentWillUnmount() {
           window.removeEventListener("resize", this.handleResize);
         }
-        render({}, { h: height, w }) {
+        render({}, {h: height, w}) {
           return h(
             Fragment,
             null,

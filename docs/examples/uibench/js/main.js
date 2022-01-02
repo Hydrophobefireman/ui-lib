@@ -1,7 +1,7 @@
-import Component, { h } from "../../../ui/index.js";
-import { Table } from "./table.js";
-import { Anim } from "./anim.js";
-import { Tree } from "./tree.js";
+import Component, {h} from "../../../ui/index.js";
+import {Table} from "./table.js";
+import {Anim} from "./anim.js";
+import {Tree} from "./tree.js";
 export class Main extends Component {
   shouldComponentUpdate(nextProps, nextState) {
     return this.props.data !== nextProps.data;
@@ -14,22 +14,22 @@ export class Main extends Component {
 
     if (location === "table") {
       section = h(Table, {
-        data: data.table
+        data: data.table,
       });
     } else if (location === "anim") {
       section = h(Anim, {
-        data: data.anim
+        data: data.anim,
       });
     } else if (location === "tree") {
       section = h(Tree, {
-        data: data.tree
+        data: data.tree,
       });
     }
 
     return h(
       "div",
       {
-        class: "Main"
+        class: "Main",
       },
       section
     );

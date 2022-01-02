@@ -1,13 +1,13 @@
-import Component, { h } from "../../../ui/index.js";
+import Component, {h} from "../../../ui/index.js";
 class TableCell extends Component {
   constructor(props) {
     super(props);
     this.onClick = this.onClick.bind(this);
   }
 
-//   shouldComponentUpdate(nextProps, nextState) {
-//     return this.props.text !== nextProps.text;
-//   }
+  //   shouldComponentUpdate(nextProps, nextState) {
+  //     return this.props.text !== nextProps.text;
+  //   }
 
   onClick(e) {
     console.log(`Clicked${this.props.text}`);
@@ -19,7 +19,7 @@ class TableCell extends Component {
       "td",
       {
         class: "TableCell",
-        onClick: this.onClick
+        onClick: this.onClick,
       },
       props.text
     );
@@ -27,9 +27,9 @@ class TableCell extends Component {
 }
 
 class TableRow extends Component {
-//   shouldComponentUpdate(nextProps, nextState) {
-//     return this.props.data !== nextProps.data;
-//   }
+  //   shouldComponentUpdate(nextProps, nextState) {
+  //     return this.props.data !== nextProps.data;
+  //   }
 
   render(props) {
     const data = props.data;
@@ -43,15 +43,15 @@ class TableRow extends Component {
     const children = [
       h(TableCell, {
         key: "-1",
-        text: `#${data.id}`
-      })
+        text: `#${data.id}`,
+      }),
     ];
 
     for (let i = 0; i < cells.length; i++) {
       children.push(
         h(TableCell, {
           key: i,
-          text: cells[i]
+          text: cells[i],
         })
       );
     }
@@ -60,7 +60,7 @@ class TableRow extends Component {
       "tr",
       {
         class: classes,
-        "data-id": data.id
+        "data-id": data.id,
       },
       children
     );
@@ -68,9 +68,9 @@ class TableRow extends Component {
 }
 
 export class Table extends Component {
-//   shouldComponentUpdate(nextProps, nextState) {
-//     return this.props.data !== nextProps.data;
-//   }
+  //   shouldComponentUpdate(nextProps, nextState) {
+  //     return this.props.data !== nextProps.data;
+  //   }
 
   render(props) {
     const items = props.data.items;
@@ -81,7 +81,7 @@ export class Table extends Component {
       children.push(
         h(TableRow, {
           key: item.id,
-          data: item
+          data: item,
         })
       );
     }
@@ -89,7 +89,7 @@ export class Table extends Component {
     return h(
       "table",
       {
-        class: "Table"
+        class: "Table",
       },
       h("tbody", null, children)
     );

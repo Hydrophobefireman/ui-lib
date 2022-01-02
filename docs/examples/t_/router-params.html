@@ -19,7 +19,7 @@
   <body>
     <div id="app"></div>
     <script type="module">
-      import Component, { h, Router, render, Path, A } from "../../ui/index.js";
+      import Component, {h, Router, render, Path, A} from "../../ui/index.js";
       const App = function () {
         return h(
           "div",
@@ -32,7 +32,7 @@
               component: (props) => "Current path: " + props.params.name,
             })
           ),
-          [0, 1, 2].map((x) => h("div", null, h(A, { href: x }, x)))
+          [0, 1, 2].map((x) => h("div", null, h(A, {href: x}, x)))
         );
       };
       render(h(App), document.getElementById("app"));

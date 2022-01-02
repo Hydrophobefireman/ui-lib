@@ -41,7 +41,7 @@
           h(Path, {
             match: p,
             component: function () {
-              return h(A, { href: "/test/1" }, "start");
+              return h(A, {href: "/test/1"}, "start");
             },
           }),
           h(Path, {
@@ -52,10 +52,10 @@
       }
       function func(p) {
         const params = useParams("/test/:num");
-        console.log({ ...params });
-        const { num } = params;
+        console.log({...params});
+        const {num} = params;
         const val = parseInt(num) * 2;
-        return h(A, { href: "/test/" + val }, "Go to ", val);
+        return h(A, {href: "/test/" + val}, "Go to ", val);
       }
       render(h(App), document.getElementById("app"));
     </script>

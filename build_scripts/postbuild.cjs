@@ -1,5 +1,5 @@
-const { copyFileSync } = require("fs");
-const { join } = require("path");
+const {copyFileSync} = require("fs");
+const {join} = require("path");
 const base = join(__dirname, "..");
 
 const source = join(base, "dist", "ui-lib.modern.js");

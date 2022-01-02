@@ -17,15 +17,15 @@ import Component, {
   createElement as h,
   createRef,
 } from "../../ui/index.js";
-const { memoize } = (globalThis || self).decko;
-let { pow, sqrt, sin, cos, atan2 } = Math;
+const {memoize} = (globalThis || self).decko;
+let {pow, sqrt, sin, cos, atan2} = Math;
 
 class Main extends Component {
   constructor(...args) {
     super(...args);
-    _defineProperty(this, "state", { text: "", lines: [] });
+    _defineProperty(this, "state", {text: "", lines: []});
     this.ref = createRef();
-    
+
     _defineProperty(
       this,
       "updatePosition",
@@ -79,20 +79,20 @@ class Main extends Component {
     addEventListener(evt, this.handleMouseMove);
   }
   componentDidUpdate() {
-    let { text } = this.state;
+    let {text} = this.state;
     if (text !== this.lastText) {
       this.lastText = text;
       this.updatePosition();
     }
   }
-  render({}, { over, x, y, text, animated }) {
+  render({}, {over, x, y, text, animated}) {
     let lines = this.textToLines(text);
     return h(
       "div",
-      { class: animated ? "animated" : "", ref: this.ref },
+      {class: animated ? "animated" : "", ref: this.ref},
       h(
         "div",
-        { class: "input" },
+        {class: "input"},
         h(
           "p",
           null,
@@ -101,24 +101,22 @@ class Main extends Component {
         ),
         h(
           "textarea",
-          { onInput: (e) => this.setState({ text: e.target.value }) },
+          {onInput: (e) => this.setState({text: e.target.value})},
           text
         )
       ),
 
       h(
         "div",
-        { class: "logo" },
-        lines.map(({ text, color }, index) =>
-          h(Line, { index, text, x, y, color })
-        )
+        {class: "logo"},
+        lines.map(({text, color}, index) => h(Line, {index, text, x, y, color}))
       )
     );
   }
 }
 
 /** Represents a line, which is a sequence of characters */
-const Line = ({ x = 0, y = 0, index, text, color: background }) => {
+const Line = ({x = 0, y = 0, index, text, color: background}) => {
   let letters = text.split("").map((letter, i) => {
     let left = i * 40,
       top = index * 40,
@@ -135,7 +133,7 @@ const Line = ({ x = 0, y = 0, index, text, color: background }) => {
     }px, 0)`;
     return h(
       "span",
-      { style: { background, transform, left: `${left}px`, top: `${top}px` } },
+      {style: {background, transform, left: `${left}px`, top: `${top}px`}},
       letter
     );
   });

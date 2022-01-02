@@ -35,7 +35,7 @@
       const f = Fragment;
       addPluginCallback("domNodeCreated", console.log);
       class UL extends Component {
-        render({ todos = [], show }) {
+        render({todos = [], show}) {
           const c = h(
             "ul",
             null,
@@ -47,7 +47,7 @@
       export default class Foo extends Component {
         constructor(p) {
           super(p);
-          this.state = { todos: [], navigateTo: "page1", text: "", show: true };
+          this.state = {todos: [], navigateTo: "page1", text: "", show: true};
 
           this.setText = (e) => {
             this.setState({
@@ -56,7 +56,7 @@
           };
 
           this.addTodo = () => {
-            let { todos, text } = this.state;
+            let {todos, text} = this.state;
             if (!text) {
               return;
             }
@@ -72,13 +72,13 @@
         componentWillMount() {
           console.log("willMount");
           RouterSubscription.subscribe((e) =>
-            this.setState({ navigateTo: e !== base ? base : "page1" })
+            this.setState({navigateTo: e !== base ? base : "page1"})
           );
         }
         componentDidMount() {
           console.log("mounted");
         }
-        render({}, { todos = [], text, navigateTo }) {
+        render({}, {todos = [], text, navigateTo}) {
           return h(
             f,
             null,
@@ -88,7 +88,7 @@
               h(
                 "button",
                 {
-                  onClick: () => this.setState((p) => ({ show: !p.show })),
+                  onClick: () => this.setState((p) => ({show: !p.show})),
                 },
                 "Todo List is",
                 this.state.show ? " Shown" : " Hidden"
@@ -112,7 +112,7 @@
                 "Add"
               )
             ),
-            h(UL, { todos, show: this.state.show }),
+            h(UL, {todos, show: this.state.show}),
             h(
               Router,
               {
@@ -121,17 +121,17 @@
               h(Path, {
                 match: createRoutePath(base + "page1(/?)"),
                 component: function () {
-                  return h("div", null, h(A, { href: "page2" }, "go to page2"));
+                  return h("div", null, h(A, {href: "page2"}, "go to page2"));
                 },
               }),
               h(Path, {
                 match: createRoutePath(base + "page2(/?)"),
                 component: function () {
-                  return h("div", null, h(A, { href: "page1" }, "go to page1"));
+                  return h("div", null, h(A, {href: "page1"}, "go to page1"));
                 },
               })
             ),
-            h(A, { href: navigateTo }, "Navigate To:", navigateTo)
+            h(A, {href: navigateTo}, "Navigate To:", navigateTo)
           );
         }
       }

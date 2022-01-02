@@ -35,10 +35,10 @@
         }, [$ref1.current, $ref2.current]);
         return h(
           "div",
-          { onClick: () => setState(!state) },
+          {onClick: () => setState(!state)},
 
-          h("span", { ref: $ref1 }, "Ref1"),
-          state && h(O, { ref: $ref2 })
+          h("span", {ref: $ref1}, "Ref1"),
+          state && h(O, {ref: $ref2})
         );
       }
 

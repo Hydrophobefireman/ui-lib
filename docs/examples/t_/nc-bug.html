@@ -20,13 +20,13 @@
     <div id="app"></div>
 
     <script type="module">
-      const arr = () => Array.from({ length: 5 }).map((_, i) => i);
-      import Component, { h, render, useState } from "../../ui/index.js";
+      const arr = () => Array.from({length: 5}).map((_, i) => i);
+      import Component, {h, render, useState} from "../../ui/index.js";
       function P() {
         const [r, setR] = useState();
-        return h(App, { r: () => setR({}) });
+        return h(App, {r: () => setR({})});
       }
-      function App({ r }) {
+      function App({r}) {
         const [a, setA] = useState(null);
         const [b, setB] = useState(null);
         const [list, setList] = useState(arr);

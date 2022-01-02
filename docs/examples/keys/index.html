@@ -14,14 +14,14 @@
             value: value,
             enumerable: true,
             configurable: true,
-            writable: true
+            writable: true,
           });
         } else {
           obj[key] = value;
         }
         return obj;
       };
-      const getArray = n => {
+      const getArray = (n) => {
         const c = [];
         for (let i = 0; i < n; i++) c.push(i);
         return c;
@@ -46,7 +46,7 @@
         return array;
       }
       const map = (arr, fn) => arr.map(fn);
-      const getDivs = i => h("div", { key: i, "data-key": i }, i);
+      const getDivs = (i) => h("div", {key: i, "data-key": i}, i);
       import Component, {
         Fragment,
         createElement as h,
@@ -55,17 +55,17 @@
         A,
         // absolutePath,
         RouterSubscription,
-        render
+        render,
       } from "../../ui/index.js";
       class App extends Component {
         constructor() {
           super();
           defineProperty(this, "state", {
             scramble: false,
-            ordered: getArray(10)
+            ordered: getArray(10),
           });
         }
-        render({}, { scramble, ordered }) {
+        render({}, {scramble, ordered}) {
           //   const shuffled = shuffle(this.state.ordered);
           const f = map(scramble ? shuffle(ordered) : ordered, getDivs);
           const c = h(
@@ -74,7 +74,7 @@
             h(
               "button",
               {
-                onClick: () => this.setState({ scramble: true })
+                onClick: () => this.setState({scramble: true}),
               },
               "Shuffle Array"
             ),
@@ -83,7 +83,7 @@
               "div",
               null,
               "Raw:",
-              JSON.stringify(f.map(x => x.props.children[0]))
+              JSON.stringify(f.map((x) => x.props.children[0]))
             )
           );
 

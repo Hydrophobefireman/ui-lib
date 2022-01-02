@@ -8,7 +8,13 @@
     <script type="module">
       const updater = (x) => x + 1;
       import * as UI from "../../ui/index.js";
-      import { h, render, useState, Fragment, useEffect } from "../../ui/index.js";
+      import {
+        h,
+        render,
+        useState,
+        Fragment,
+        useEffect,
+      } from "../../ui/index.js";
       window.UI = window.a = UI;
       function Button() {
         const [count, setCount] = useState(0);
@@ -18,14 +24,14 @@
           null,
           h(
             "button",
-            { onClick: () => setCount(updater) },
+            {onClick: () => setCount(updater)},
             "Clicked ",
             count,
             " times"
           ),
           h(
             "button",
-            { onClick: () => updateTime(new Date()) },
+            {onClick: () => updateTime(new Date())},
             "Time: ",
             time.toString()
           )
@@ -40,11 +46,7 @@
           "div",
           null,
           show && h(Effects),
-          h(
-            "div",
-            null,
-            h("button", { onClick: () => set((x) => !x) }, "Toggle")
-          )
+          h("div", null, h("button", {onClick: () => set((x) => !x)}, "Toggle"))
         );
       }
       function Effects() {

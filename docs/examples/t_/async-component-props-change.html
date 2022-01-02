@@ -29,8 +29,8 @@
       class App extends Component {
         constructor() {
           super();
-          this.reset = () => this.setState({ promise: this._gen() });
-          this.state = { promise: this._gen() };
+          this.reset = () => this.setState({promise: this._gen()});
+          this.state = {promise: this._gen()};
         }
         _gen() {
           return () =>
@@ -54,7 +54,7 @@
             h(
               "div",
               null,
-              h("button", { onCLick: this.reset }, "Make new Promise")
+              h("button", {onCLick: this.reset}, "Make new Promise")
             )
           );
         }

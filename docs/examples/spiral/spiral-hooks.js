@@ -16,7 +16,7 @@ const COUNT = 200;
 const LOOPS = 6;
 
 function Main() {
-  const [coords, setCoords] = useState({ x: 0, y: 0 });
+  const [coords, setCoords] = useState({x: 0, y: 0});
   const [big, setBig] = useState(false);
   const [counter, setCounter] = useState(0);
 
@@ -26,7 +26,7 @@ function Main() {
     const touch = navigator.maxTouchPoints > 1;
     addEventListener(
       touch ? "touchmove" : "mousemove",
-      ({ pageX: x, pageY: y }) => setCoords({ x, y })
+      ({pageX: x, pageY: y}) => setCoords({x, y})
     );
     addEventListener(touch ? "touchstart" : "mousedown", (e) => {
       setBig(true);
@@ -58,8 +58,8 @@ function Main() {
 
   return h(
     "div",
-    { id: "main" },
-    h(Cursor, { label: true, x: x, y: y, big: big }),
+    {id: "main"},
+    h(Cursor, {label: true, x: x, y: y, big: big}),
     cursors
   );
 }
@@ -70,9 +70,9 @@ function getClass(big, label) {
   if (label) cl += " label";
   return cl;
 }
-function Cursor({ x, y, label, color, big }) {
+function Cursor({x, y, label, color, big}) {
   let inner = null;
-  if (label) inner = h("span", { class: "label" }, x, ",", y);
+  if (label) inner = h("span", {class: "label"}, x, ",", y);
   return h(
     "div",
     {

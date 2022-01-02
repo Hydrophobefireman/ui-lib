@@ -1,4 +1,4 @@
-import Component, { createElement as h } from "../../../ui/index.js";
+import Component, {createElement as h} from "../../../ui/index.js";
 
 const ESCAPE_KEY = 27;
 const ENTER_KEY = 13;
@@ -8,33 +8,33 @@ export default class TodoItem extends Component {
     super(props);
     this.state = {};
     this.handleSubmit = () => {
-      let { onSave, onDestroy, todo } = this.props,
+      let {onSave, onDestroy, todo} = this.props,
         val = this.state.editText.trim();
       if (val) {
         onSave(todo, val);
-        this.setState({ editText: val });
+        this.setState({editText: val});
       } else {
         onDestroy(todo);
       }
     };
     this.handleEdit = () => {
-      let { onEdit, todo } = this.props;
+      let {onEdit, todo} = this.props;
       onEdit(todo);
-      this.setState({ editText: todo.title });
+      this.setState({editText: todo.title});
     };
-    this.toggle = e => {
-      let { onToggle, todo } = this.props;
+    this.toggle = (e) => {
+      let {onToggle, todo} = this.props;
       onToggle(todo);
       e.preventDefault();
     };
-    this.handleTextInput = e => {
-      this.setState({ editText: e.target.value });
+    this.handleTextInput = (e) => {
+      this.setState({editText: e.target.value});
     };
 
-    this.handleKeyDown = e => {
+    this.handleKeyDown = (e) => {
       if (e.which === ESCAPE_KEY) {
-        let { todo } = this.props;
-        this.setState({ editText: todo.title });
+        let {todo} = this.props;
+        this.setState({editText: todo.title});
         this.props.onCancel(todo);
       } else if (e.which === ENTER_KEY) {
         this.handleSubmit();
@@ -59,41 +59,33 @@ export default class TodoItem extends Component {
     if (node) node.focus();
   }
 
-  render(
-    {
-      todo: { title, completed },
-      onToggle,
-      onDestroy,
-      editing
-    },
-    { editText }
-  ) {
+  render({todo: {title, completed}, onToggle, onDestroy, editing}, {editText}) {
     return h(
       "li",
       {
-        class: "" + (completed ? "completed" : "") + (editing ? "editing" : "")
+        class: "" + (completed ? "completed" : "") + (editing ? "editing" : ""),
       },
       h(
         "div",
         {
-          class: "view"
+          class: "view",
         },
         h("input", {
           class: "toggle",
           type: "checkbox",
           checked: completed,
-          onChange: this.toggle
+          onChange: this.toggle,
         }),
         h(
           "label",
           {
-            onDblClick: this.handleEdit
+            onDblClick: this.handleEdit,
           },
           title
         ),
         h("button", {
           class: "destroy",
-          onClick: this.handleDestroy
+          onClick: this.handleDestroy,
         })
       ),
       editing &&
@@ -102,7 +94,7 @@ export default class TodoItem extends Component {
           value: editText,
           onBlur: this.handleSubmit,
           onInput: this.handleTextInput,
-          onKeyDown: this.handleKeyDown
+          onKeyDown: this.handleKeyDown,
         })
     );
   }

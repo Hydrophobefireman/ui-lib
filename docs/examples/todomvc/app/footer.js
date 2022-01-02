@@ -1,17 +1,17 @@
-import Component, { createElement as h } from "../../../ui/index.js";
-import { pluralize } from "./util.js";
+import Component, {createElement as h} from "../../../ui/index.js";
+import {pluralize} from "./util.js";
 
 export default class TodoFooter extends Component {
-  render({ nowShowing, count, completedCount, onClearCompleted }) {
+  render({nowShowing, count, completedCount, onClearCompleted}) {
     return h(
       "footer",
       {
-        class: "footer"
+        class: "footer",
       },
       h(
         "span",
         {
-          class: "todo-count"
+          class: "todo-count",
         },
         h("strong", null, count),
         " ",
@@ -21,7 +21,7 @@ export default class TodoFooter extends Component {
       h(
         "ul",
         {
-          class: "filters"
+          class: "filters",
         },
         h(
           "li",
@@ -30,7 +30,7 @@ export default class TodoFooter extends Component {
             "a",
             {
               href: "#/",
-              class: nowShowing == "all" && "selected"
+              class: nowShowing == "all" && "selected",
             },
             "All"
           )
@@ -43,7 +43,7 @@ export default class TodoFooter extends Component {
             "a",
             {
               href: "#/active",
-              class: nowShowing == "active" && "selected"
+              class: nowShowing == "active" && "selected",
             },
             "Active"
           )
@@ -55,7 +55,7 @@ export default class TodoFooter extends Component {
             "a",
             {
               href: "#/completed",
-              class: nowShowing == "completed" && "selected"
+              class: nowShowing == "completed" && "selected",
             },
             "Completed"
           )
@@ -66,7 +66,7 @@ export default class TodoFooter extends Component {
           "button",
           {
             class: "clear-completed",
-            onClick: onClearCompleted
+            onClick: onClearCompleted,
           },
           "Clear completed"
         )

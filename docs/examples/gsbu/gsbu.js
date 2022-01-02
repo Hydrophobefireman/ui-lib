@@ -8,7 +8,7 @@ class App extends Component {
   constructor() {
     super();
     this.ref = createRef();
-    this.state = { count: 0 };
+    this.state = {count: 0};
   }
   getSnapshotBeforeUpdate() {
     console.log("ok");
@@ -22,7 +22,7 @@ class App extends Component {
     return h(
       "button",
       {
-        onClick: () => this.setState((x) => ({ count: x.count + 1 })),
+        onClick: () => this.setState((x) => ({count: x.count + 1})),
         ref: this.ref,
       },
       "count ",

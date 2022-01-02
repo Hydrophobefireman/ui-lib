@@ -15,7 +15,7 @@
       class SampleComponent extends Component {
         constructor(props) {
           super(props);
-          this.state = { items: [], text: "" };
+          this.state = {items: [], text: ""};
           this.handleChange = this.handleChange.bind(this);
           this.handleSubmit = this.handleSubmit.bind(this);
         }
@@ -26,13 +26,13 @@
         componentDidUpdate(p, s) {
           console.log(
             "current Props:",
-            { ...this.props },
+            {...this.props},
             "\nOld Props:",
-            { ...p },
+            {...p},
             "\n Current State:",
-            { ...this.state },
+            {...this.state},
             "\n Old State:",
-            { ...s }
+            {...s}
           );
           console.log("componentDidUpdate");
           document.title = `Number of items:${this.state.items.length}`;
@@ -47,7 +47,7 @@
           console.log("componentWillMount");
         }
         marker(i) {
-          this.setState(k => {
+          this.setState((k) => {
             k.items[i]._del = !k.items[i]._del;
             return k;
           });
@@ -61,16 +61,16 @@
             // h(SizeObserver),
             h(TodoList, {
               items: this.state.items,
-              marker: this.marker.bind(this)
+              marker: this.marker.bind(this),
             }),
             h(
               "form",
-              { onsubmit: this.handleSubmit, action: "javascript:" },
-              h("label", { for: "new-todo" }, "What needs to be done?"),
+              {onsubmit: this.handleSubmit, action: "javascript:"},
+              h("label", {for: "new-todo"}, "What needs to be done?"),
               h("input", {
                 id: "new-todo",
                 oninput: this.handleChange,
-                value: this.state.text
+                value: this.state.text,
               }),
               h("button", null, `Add #`, this.state.items.length + 1)
             ),
@@ -80,7 +80,7 @@
         }
 
         handleChange(e) {
-          this.setState({ text: e.target.value });
+          this.setState({text: e.target.value});
         }
 
         handleSubmit(e) {
@@ -90,11 +90,11 @@
           }
           const newItem = {
             text: this.state.text,
-            id: Date.now()
+            id: Date.now(),
           };
-          this.setState(state => ({
+          this.setState((state) => ({
             items: state.items.concat(newItem),
-            text: ""
+            text: "",
           }));
         }
       }
@@ -118,8 +118,8 @@
               onclick: this.oc,
               id: this.props.id,
               style: {
-                textDecoration: this.props._del ? "line-through" : null
-              }
+                textDecoration: this.props._del ? "line-through" : null,
+              },
             },
             this.props.children
           );
@@ -137,7 +137,7 @@
                 index: i,
                 id: item.id,
                 // key: item.id,
-                _del: item._del
+                _del: item._del,
               },
               item.text
             )
@@ -149,12 +149,12 @@
         constructor() {
           super();
 
-          this.state = { clicked: 0 };
+          this.state = {clicked: 0};
         }
         handleClick = () => {
-          this.setState(c => {
+          this.setState((c) => {
             console.log(c);
-            return { clicked: c.clicked + 1 };
+            return {clicked: c.clicked + 1};
           });
         };
         render() {
@@ -164,7 +164,7 @@
             h(
               "button",
               {
-                onclick: this.handleClick
+                onclick: this.handleClick,
               },
               "Clicked :",
               this.state.clicked,
@@ -193,7 +193,7 @@
       class Wrapper extends Component {
         constructor(a) {
           super(a);
-          this.state = { c: true };
+          this.state = {c: true};
         }
         render() {
           return h(

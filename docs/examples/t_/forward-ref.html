@@ -23,7 +23,7 @@
 
       const Div = forwardRef(function Div(props, ref) {
         console.log("ok");
-        return h("div", { ...props, ref });
+        return h("div", {...props, ref});
       });
       console.log(Div);
       function App() {
@@ -31,7 +31,7 @@
         useEffect(() => {
           console.log(r, r.current);
         }, []);
-        return h(Div, { ref: r }, Math.random());
+        return h(Div, {ref: r}, Math.random());
       }
       const x = h(App);
       console.log(x);

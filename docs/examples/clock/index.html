@@ -6,13 +6,13 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Clock</title>
     <script type="module">
-      import Component, { render, createElement as h } from "../../ui/index.js";
+      import Component, {render, createElement as h} from "../../ui/index.js";
       class Clock extends Component {
         constructor() {
           super();
-          this.state = { time: Date.now() };
+          this.state = {time: Date.now()};
         }
-        render({}, { time }) {
+        render({}, {time}) {
           return h(
             "div",
             null,
@@ -22,7 +22,7 @@
         }
         componentDidMount() {
           this.timer = setInterval(
-            () => this.setState({ time: Date.now() }),
+            () => this.setState({time: Date.now()}),
             1000
           );
         }

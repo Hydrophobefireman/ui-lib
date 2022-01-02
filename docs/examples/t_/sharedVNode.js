@@ -1,4 +1,4 @@
-import { useState, useEffect, h, render } from "../../ui/index.js";
+import {useState, useEffect, h, render} from "../../ui/index.js";
 
 function List(props) {
   const [items, setItems] = useState([]);
@@ -11,8 +11,8 @@ function List(props) {
     items.map((item, index) =>
       h(
         "li",
-        { key: item },
-        h("span", { class: "item" }, item),
+        {key: item},
+        h("span", {class: "item"}, item),
         h(
           "button",
           {
@@ -25,7 +25,7 @@ function List(props) {
             },
           },
 
-          h("span", { role: "img", "aria-label": "punch" }, "\uD83E\uDD4A")
+          h("span", {role: "img", "aria-label": "punch"}, "\uD83E\uDD4A")
         )
       )
     )
@@ -34,12 +34,12 @@ function List(props) {
 
 function App() {
   const [num, setNum] = useState(1);
-  const list = h(List, { num: num });
+  const list = h(List, {num: num});
   return h(
     "div",
     null,
     h("h1", null, "React State"),
-    h("button", { onClick: () => setNum(num + 1) }, "Add item"),
+    h("button", {onClick: () => setNum(num + 1)}, "Add item"),
     list,
     list
   );

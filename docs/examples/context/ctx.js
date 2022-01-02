@@ -19,8 +19,8 @@ function App() {
       null,
       h(
         ctx.Provider,
-        { value: v },
-        h("input", { value: v, onInput: (e) => setV(e.target.value) }),
+        {value: v},
+        h("input", {value: v, onInput: (e) => setV(e.target.value)}),
         h(FValue),
         h(CValue),
         h(ctx.Consumer, null, (val) => {

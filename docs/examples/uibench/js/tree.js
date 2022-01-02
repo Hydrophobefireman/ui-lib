@@ -1,4 +1,4 @@
-import Component, { h } from "../../../ui/index.js";
+import Component, {h} from "../../../ui/index.js";
 class TreeLeaf extends Component {
   shouldComponentUpdate(nextProps, nextState) {
     return this.props.data !== nextProps.data;
@@ -8,7 +8,7 @@ class TreeLeaf extends Component {
     return h(
       "li",
       {
-        class: "TreeLeaf"
+        class: "TreeLeaf",
       },
       props.data.id
     );
@@ -31,14 +31,14 @@ class TreeNode extends Component {
         children.push(
           h(TreeNode, {
             key: n.id,
-            data: n
+            data: n,
           })
         );
       } else {
         children.push(
           h(TreeLeaf, {
             key: n.id,
-            data: n
+            data: n,
           })
         );
       }
@@ -47,7 +47,7 @@ class TreeNode extends Component {
     return h(
       "ul",
       {
-        class: "TreeNode"
+        class: "TreeNode",
       },
       children
     );
@@ -63,10 +63,10 @@ export class Tree extends Component {
     return h(
       "div",
       {
-        class: "Tree"
+        class: "Tree",
       },
       h(TreeNode, {
-        data: props.data.root
+        data: props.data.root,
       })
     );
   }

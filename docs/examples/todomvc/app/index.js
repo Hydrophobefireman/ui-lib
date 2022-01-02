@@ -1,4 +1,4 @@
-import Component, { createElement as h } from "../../../ui/index.js";
+import Component, {createElement as h} from "../../../ui/index.js";
 import TodoModel from "./model.js";
 import TodoFooter from "./footer.js";
 import TodoItem from "./item.js";
@@ -6,54 +6,54 @@ import TodoItem from "./item.js";
 const ENTER_KEY = 13;
 
 const FILTERS = {
-  all: todo => true,
-  active: todo => !todo.completed,
-  completed: todo => todo.completed
+  all: (todo) => true,
+  active: (todo) => !todo.completed,
+  completed: (todo) => todo.completed,
 };
 
 export default class App extends Component {
   constructor() {
     super();
     this.state = {};
-    this.handleNewTodoKeyDown = e => {
+    this.handleNewTodoKeyDown = (e) => {
       if (e.keyCode !== ENTER_KEY) return;
       e.preventDefault();
 
       let val = this.state.newTodo.trim();
       if (val) {
         this.model.addTodo(val);
-        this.setState({ newTodo: "" });
+        this.setState({newTodo: ""});
       }
     };
 
-    this.handleNewTodoInput = e => {
-      this.setState({ newTodo: e.target.value });
+    this.handleNewTodoInput = (e) => {
+      this.setState({newTodo: e.target.value});
     };
 
-    this.toggleAll = event => {
+    this.toggleAll = (event) => {
       let checked = event.target.checked;
       this.model.toggleAll(checked);
     };
 
-    this.toggle = todo => {
+    this.toggle = (todo) => {
       this.model.toggle(todo);
     };
 
-    this.destroy = todo => {
+    this.destroy = (todo) => {
       this.model.destroy(todo);
     };
 
-    this.edit = todo => {
-      this.setState({ editing: todo.id });
+    this.edit = (todo) => {
+      this.setState({editing: todo.id});
     };
 
     this.save = (todoToSave, text) => {
       this.model.save(todoToSave, text);
-      this.setState({ editing: null });
+      this.setState({editing: null});
     };
 
     this.cancel = () => {
-      this.setState({ editing: null });
+      this.setState({editing: null});
     };
 
     this.clearCompleted = () => {
@@ -72,11 +72,11 @@ export default class App extends Component {
     if (!FILTERS[nowShowing]) {
       nowShowing = "all";
     }
-    this.setState({ nowShowing });
+    this.setState({nowShowing});
   }
 
-  render({}, { nowShowing = "all", newTodo, editing }) {
-    let { todos } = this.model,
+  render({}, {nowShowing = "all", newTodo, editing}) {
+    let {todos} = this.model,
       shownTodos = todos.filter(FILTERS[nowShowing]),
       activeTodoCount = todos.reduce(
         (a, todo) => a + (todo.completed ? 0 : 1),
@@ -90,7 +90,7 @@ export default class App extends Component {
       h(
         "header",
         {
-          class: "header"
+          class: "header",
         },
         h("h1", null, "todos"),
         h("input", {
@@ -99,35 +99,35 @@ export default class App extends Component {
           value: newTodo || "",
           onKeyDown: this.handleNewTodoKeyDown,
           onInput: this.handleNewTodoInput,
-          autoFocus: true
+          autoFocus: true,
         })
       ),
       todos.length
         ? h(
             "section",
             {
-              class: "main"
+              class: "main",
             },
             h("input", {
               id: "toggle-all",
               class: "toggle-all",
               type: "checkbox",
               onChange: this.toggleAll,
-              checked: activeTodoCount === 0
+              checked: activeTodoCount === 0,
             }),
             h(
               "label",
               {
-                for: "toggle-all"
+                for: "toggle-all",
               },
               "Mark all as complete"
             ),
             h(
               "ul",
               {
-                class: "todo-list"
+                class: "todo-list",
               },
-              shownTodos.map(todo =>
+              shownTodos.map((todo) =>
                 h(TodoItem, {
                   todo: todo,
                   onToggle: this.toggle,
@@ -135,7 +135,7 @@ export default class App extends Component {
                   onEdit: this.edit,
                   editing: editing === todo.id,
                   onSave: this.save,
-                  onCancel: this.cancel
+                  onCancel: this.cancel,
                 })
               )
             )
@@ -146,7 +146,7 @@ export default class App extends Component {
             count: activeTodoCount,
             completedCount: completedCount,
             nowShowing: nowShowing,
-            onClearCompleted: this.clearCompleted
+            onClearCompleted: this.clearCompleted,
           })
         : null
     );

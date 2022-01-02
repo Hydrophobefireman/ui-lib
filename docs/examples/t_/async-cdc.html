@@ -8,14 +8,14 @@
   </head>
   <body>
     <script type="module">
-      import Component, { render, createElement as h } from "../../ui/index.js";
+      import Component, {render, createElement as h} from "../../ui/index.js";
       class K extends Component {
         async componentDidMount() {
           throw new Error("ok");
         }
         componentDidCatch(e) {
           console.log("Caught", e);
-          this.setState({ error: true });
+          this.setState({error: true});
         }
         render() {
           if (this.state.error) return "Caught An Error!";

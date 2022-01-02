@@ -2,7 +2,7 @@
 import Component, {
   createElement as h,
   render,
-  Fragment
+  Fragment,
 } from "../../ui/index.js";
 const SEARCH = "https://api.github.com/search/repositories";
 
@@ -11,16 +11,16 @@ class GithubResults extends Component {
     let res = await fetch(`${SEARCH}?q=${this.props.q}`),
       json = await res.json(),
       results = (json && json.items) || [];
-    this.setState({ results });
+    this.setState({results});
   }
-  render({ q }, { results = [] }) {
+  render({q}, {results = []}) {
     return h(
       "div",
       null,
       h(
         "h1",
         {
-          style: "text-align:center;"
+          style: "text-align:center;",
         },
         "Results For:",
         q
@@ -28,11 +28,11 @@ class GithubResults extends Component {
       h(
         "div",
         {
-          class: "list"
+          class: "list",
         },
-        results.map(result => {
+        results.map((result) => {
           return h(Result, {
-            result
+            result,
           });
         })
       )
@@ -40,10 +40,10 @@ class GithubResults extends Component {
   }
 }
 
-const Result = ({ result }) =>
+const Result = ({result}) =>
   h(
     "div",
-    { class: "res-box" },
+    {class: "res-box"},
     h(
       "div",
       null,
@@ -51,7 +51,7 @@ const Result = ({ result }) =>
         "a",
         {
           href: result.html_url,
-          target: "_blank"
+          target: "_blank",
         },
         result.full_name
       ),
@@ -64,23 +64,23 @@ const Result = ({ result }) =>
 class Form extends Component {
   constructor() {
     super();
-    this.state = { i: "react", b: false };
-    this.set = () => this.setState({ b: true });
+    this.state = {i: "react", b: false};
+    this.set = () => this.setState({b: true});
   }
-  render({}, { i, b }) {
+  render({}, {i, b}) {
     return h(
       Fragment,
       null,
       h(
         "form",
-        { onSubmit: this.set, action: "javascript:" },
+        {onSubmit: this.set, action: "javascript:"},
         h("input", {
           value: i,
-          onInput: e => this.setState({ i: e.target.value, b: false })
+          onInput: (e) => this.setState({i: e.target.value, b: false}),
         }),
         h("button", null, "Search")
       ),
-      b && h(GithubResults, { q: i })
+      b && h(GithubResults, {q: i})
     );
   }
 }

@@ -15,7 +15,7 @@
         useEffect,
       } from "https://cdn.skypack.dev/@hydrophobefireman/ui-lib";
       console.log(sd);
-      const state = sd.createState({ name: "nameState" });
+      const state = sd.createState({name: "nameState"});
       const numA = sd.createState({});
       const numB = sd.createState({});
       // const get = sd.get;
@@ -23,7 +23,7 @@
         const [val, setVal] = sd.useSharedState(state);
         const [__, setA] = sd.useSharedState(numA);
         const [_, setB] = sd.useSharedState(numB);
-        const value = sd.useSelector(({ get }) => {
+        const value = sd.useSelector(({get}) => {
           return (get(numA) || 0) + (get(numB) || 0);
         });
         return h(
@@ -63,11 +63,14 @@
         );
       }
       function Title() {
-        sd.useSelector(({ get }) => {
+        sd.useSelector(({get}) => {
           document.title = "Hello " + (get(state) || "");
         });
       }
-      render(h(()=>[h(App), h(Title)]), document.getElementById("mount"));
+      render(
+        h(() => [h(App), h(Title)]),
+        document.getElementById("mount")
+      );
     </script>
   </body>
 </html>
