@@ -1,5 +1,5 @@
-import { EMPTY_ARRAY, EMPTY_OBJ } from "./constants";
-import { VNode } from "./types/index";
+import {EMPTY_ARRAY, EMPTY_OBJ} from "./constants";
+import {VNode} from "./types/index";
 
 // function identity<T>(x: T): T {
 //   return x;

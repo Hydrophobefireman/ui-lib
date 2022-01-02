@@ -1,6 +1,6 @@
-import { consumeCallable, getCurrentHookValueOrSetDefault } from "./util";
+import {consumeCallable, getCurrentHookValueOrSetDefault} from "./util";
 
-import { getHookStateAtCurrentRender } from "./manage";
+import {getHookStateAtCurrentRender} from "./manage";
 
 type Reducer<T> = (currentValue: T, action: string) => T;
 const obj = {};

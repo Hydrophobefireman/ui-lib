@@ -1,5 +1,5 @@
-import { consumeCallable } from "./util";
-import { useReducer } from "./useReducer";
+import {consumeCallable} from "./util";
+import {useReducer} from "./useReducer";
 
 // the useState hook
 // we accept either a value or a function (incase the value is expensive) as the argument
@@ -10,7 +10,8 @@ type Updater<T> = (arg: T | ((previous?: T) => T)) => void;
 type SetStateHookReturn<T> = [T, (arg: T | Updater<T>) => void];
 
 export function useState<T>(initialState: StateArg<T>): SetStateHookReturn<T> {
-  return useReducer(consumeCallable as any, initialState) as SetStateHookReturn<
-    T
-  >;
+  return useReducer(
+    consumeCallable as any,
+    initialState
+  ) as SetStateHookReturn<T>;
 }

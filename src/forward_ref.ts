@@ -1,12 +1,12 @@
-import { addPluginCallback } from "./config";
-import { ComponentChild, Props, RefType } from "./types";
-import { objectWithoutKeys } from "./util";
+import {addPluginCallback} from "./config";
+import {ComponentChild, Props, RefType} from "./types";
+import {objectWithoutKeys} from "./util";
 
 type RefObj<R> = ((val: R) => void) | RefType<R>;
 export interface ForwardFn<P = {}, T = any> {
   (props: P, ref: RefObj<T>): ComponentChild;
 }
-export function forwardRef<P = Props<{ ref?: any }>, R = any>(C: ForwardFn) {
+export function forwardRef<P = Props<{ref?: any}>, R = any>(C: ForwardFn) {
   function ForwardRef(props: P): JSX.Element {
     const cloned = objectWithoutKeys(props, ["ref"] as any);
     // check if this can cause problems with hooks or not

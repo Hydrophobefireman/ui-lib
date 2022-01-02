@@ -1,7 +1,7 @@
-import { ComponentChildren, VNode } from "../types/index";
-import { createElement } from "../create_element";
-import { cloneElement } from "../clone_element";
-import { flattenArray } from "../util";
+import {ComponentChildren, VNode} from "../types/index";
+import {createElement} from "../create_element";
+import {cloneElement} from "../clone_element";
+import {flattenArray} from "../util";
 
 const ignore = ["boolean", "string", "number"];
 export function createElementIfNeeded(x: any, props?: any): VNode {

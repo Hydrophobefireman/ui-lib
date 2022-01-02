@@ -1,4 +1,4 @@
-import { useMemo } from "./useMemo";
+import {useMemo} from "./useMemo";
 
 export function useCallback<T extends Array<any>, U>(
   fn: (...args: T) => U,

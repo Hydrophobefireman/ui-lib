@@ -3,16 +3,16 @@ import type {
   EffectsDictionary,
   PendingEffects,
 } from "../../component";
+import config from "../../config";
+import {EMPTY_OBJ} from "../../constants";
+import {$push} from "../../util";
 import {
   getHookStateAtCurrentRender,
   layoutPendingCallbacks,
   runEffectCleanup,
   runHookEffectAndAssignCleanup,
 } from "./manage";
-
-import { $push } from "../../util";
-import { EMPTY_OBJ } from "../../constants";
-import { argsChanged } from "./util";
+import {argsChanged} from "./util";
 
 function _$unmount(pending: EffectsDictionary, $this: Component) {
   for (const effect in pending || EMPTY_OBJ) {
@@ -32,6 +32,7 @@ export function effect(
   dependencies: unknown[],
   arr: EffectsDictionary[]
 ) {
+  if (config.isSSR) return;
   const which = arr === layoutPendingCallbacks ? "sync" : "async";
   const state = getHookStateAtCurrentRender();
 
@@ -43,10 +44,11 @@ export function effect(
   let currentHook =
     hookData[hookIndex] || ({} as typeof candidate._hooksData[0]);
 
-  const instanceEffects: PendingEffects = (candidate._pendingEffects = candidate._pendingEffects || {
-    sync: {},
-    async: {},
-  });
+  const instanceEffects: PendingEffects = (candidate._pendingEffects =
+    candidate._pendingEffects || {
+      sync: {},
+      async: {},
+    });
   const pending = instanceEffects[which];
 
   const oldEffect = pending[hookIndex];
@@ -73,7 +75,7 @@ export function effect(
 
   const cleanUp = oldEffect
     ? (oldEffect.resolved = false) ||
-      ((runHookEffectAndAssignCleanup(oldEffect) as any) as false) ||
+      (runHookEffectAndAssignCleanup(oldEffect) as any as false) ||
       oldEffect.cleanUp
     : null;
 
@@ -86,7 +88,7 @@ export function effect(
 
   if (!(candidate as any).__attachedUnmount) {
     (candidate as any).__attachedUnmount = true;
-    
+
     const old = candidate.componentWillUnmount;
     if (!old) {
       candidate.componentWillUnmount = unmount;

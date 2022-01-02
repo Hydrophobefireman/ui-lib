@@ -3,11 +3,11 @@ import {
   LIFECYCLE_DID_UPDATE,
   LifeCycleCallbacks,
 } from "./constants";
-import config, { plugins } from "./config";
+import config, {plugins} from "./config";
 
-import { Component } from "./component";
+import {Component} from "./component";
 
-import { unmount } from "./diff/unmount";
+import {unmount} from "./diff/unmount";
 
 type ProcessOptions = {
   name: LifeCycleCallbacks;

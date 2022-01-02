@@ -1,6 +1,6 @@
-import { Props, VNode } from "./types/index";
-import { assign, createElementChildren, objectWithoutKeys } from "./util";
-import { getVNode, skipProps } from "./create_element";
+import {Props, VNode} from "./types/index";
+import {assign, createElementChildren, objectWithoutKeys} from "./util";
+import {getVNode, skipProps} from "./create_element";
 
 export function cloneElement<P = {}>(
   VNode: VNode<P>,

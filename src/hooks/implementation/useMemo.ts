@@ -3,7 +3,7 @@ import {
   getCurrentHookValueOrSetDefault,
   HookDefault,
 } from "./util";
-import { getHookStateAtCurrentRender } from "./manage";
+import {getHookStateAtCurrentRender} from "./manage";
 
 export function useMemo<T>(memoFunc: () => T, dependencies?: any[]): T {
   const state = getHookStateAtCurrentRender();

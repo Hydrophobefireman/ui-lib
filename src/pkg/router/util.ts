@@ -1,9 +1,9 @@
 import config from "../../config";
-import { RouterSubscription } from "./subscriptions";
+import {RouterSubscription} from "./subscriptions";
 
 export interface RoutePath {
   regex: RegExp;
-  params: { [index: number]: string };
+  params: {[index: number]: string};
 }
 
 export const sessKey = "UI--ROUTE";
@@ -14,18 +14,18 @@ function routeAction(url: string, action?: "pushState" | "replaceState") {
     const u = new URL(url, window.location.href);
     config.memoryRouteStore.setItem(
       sessKey,
-      JSON.stringify({ path: u.pathname, qs: u.search })
+      JSON.stringify({path: u.pathname, qs: u.search})
     );
   }
 }
 
 export function loadURL(url: string) {
   routeAction(url, "pushState");
-  RouterSubscription.emit(url, { type: "load", native: false });
+  RouterSubscription.emit(url, {type: "load", native: false});
 }
 export function redirect(url: string) {
   routeAction(url, "replaceState");
-  RouterSubscription.emit(url, { type: "redirect", native: false });
+  RouterSubscription.emit(url, {type: "redirect", native: false});
 }
 
 function _absolutePath(route: string) {
@@ -42,7 +42,7 @@ export function createRoutePath(pathString: string | RoutePath): RoutePath {
   if (!pathString) throw Error("Invalid value for match: " + pathString);
   if ((pathString as RoutePath).regex != null) return pathString as RoutePath;
   pathString = fixPath(pathString as string);
-  const params: { [index: number]: string } = {};
+  const params: {[index: number]: string} = {};
   let i = 0;
   const pathRegex = pathString
     .split("/")
@@ -56,5 +56,5 @@ export function createRoutePath(pathString: string | RoutePath): RoutePath {
     })
     .join("/");
 
-  return { regex: _absolutePath(pathRegex), params };
+  return {regex: _absolutePath(pathRegex), params};
 }

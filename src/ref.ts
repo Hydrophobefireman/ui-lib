@@ -1,10 +1,10 @@
-import { UIElement, VNode } from "./types/index";
+import {UIElement, VNode} from "./types/index";
 
-import { Component } from "./component";
-import { EMPTY_OBJ } from "./constants";
-import { RefType } from "./types/index";
+import {Component} from "./component";
+import {EMPTY_OBJ} from "./constants";
+import {RefType} from "./types/index";
 
-export type { RefType };
+export type {RefType};
 
 export function setRef<T>(ref: ((value: T) => void) | RefType<T>, value: T) {
   if (!ref) return;
@@ -26,5 +26,5 @@ export function diffReferences(
 }
 
 export function createRef<T>() {
-  return { current: null } as RefType<T>;
+  return {current: null} as RefType<T>;
 }

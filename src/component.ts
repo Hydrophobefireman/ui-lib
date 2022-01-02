@@ -1,18 +1,16 @@
+import config, {plugins} from "./config";
+import {LifeCycleCallbacks, RENDER_MODE_CLIENT} from "./constants";
+import {diff} from "./diff/index";
+import {onDiff} from "./lifeCycleCallbacks";
 import {
   ComponentChild,
-  DOMOps,
   Props,
   UIElement,
   VNode,
   setStateArgType,
 } from "./types/index";
-import config, { plugins } from "./config";
-
-import { ContextProvider } from "./types/index";
-import { LifeCycleCallbacks } from "./constants";
-import { assign } from "./util";
-import { diff } from "./diff/index";
-import { onDiff } from "./lifeCycleCallbacks";
+import {ContextProvider} from "./types/index";
+import {assign} from "./util";
 
 const RENDER_QUEUE: Component[] = [];
 export interface EffectsDictionary {
@@ -37,7 +35,7 @@ export class Component<P = {}, S = {}> {
 
   _pendingEffects?: PendingEffects;
   // our hook data store
-  _hooksData?: { args: any; hookState: any }[];
+  _hooksData?: {args: any; hookState: any}[];
   // tracks component nesting
   _depth?: number;
   // props passed to the component
@@ -49,7 +47,7 @@ export class Component<P = {}, S = {}> {
   // before applying to `Component.state`, pass the next state for `componentWillUpdate`
   _nextState?: S;
   // context of this component and its descendants
-  _sharedContext?: { [id: string]: ContextProvider };
+  _sharedContext?: {[id: string]: ContextProvider};
   context?: any;
 
   render(props?: Props<P>, state?: Readonly<S>, context?: any): ComponentChild {
@@ -92,6 +90,7 @@ export class Component<P = {}, S = {}> {
         depth: this._depth,
         isSvg: false,
         context: this._sharedContext || {},
+        mode: RENDER_MODE_CLIENT,
       }
     ) as UIElement;
     typeof callback === "function" && callback();

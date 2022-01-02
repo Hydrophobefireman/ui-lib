@@ -6,12 +6,12 @@ import {
   Fragment,
   LIFECYCLE_WILL_UNMOUNT,
 } from "../constants";
-import { UIElement, VNode } from "../types/index";
+import {UIElement, VNode} from "../types/index";
 
 import config from "../config";
-import { scheduleLifeCycleCallbacks } from "../lifeCycleCallbacks";
-import { setRef } from "../ref";
-import { domOp } from "../commit";
+import {scheduleLifeCycleCallbacks} from "../lifeCycleCallbacks";
+import {setRef} from "../ref";
+import {domOp} from "../commit";
 
 function warnSetState() {
   config.warnOnUnmountRender &&
@@ -80,7 +80,7 @@ function _processNodeCleanup(VNode: VNode, recursionLevel: number) {
       });
     }
   } else {
-    domOp({ action: BATCH_MODE_CLEAR_POINTERS, VNode, node: dom });
+    domOp({action: BATCH_MODE_CLEAR_POINTERS, VNode, node: dom});
   }
 }
 

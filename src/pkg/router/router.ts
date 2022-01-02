@@ -1,25 +1,23 @@
+import {Component} from "../../component";
+import config from "../../config";
+import {createContext} from "../../context";
+import {createElement} from "../../create_element";
 import {
   ComponentConstructor,
   Props,
   Renderable,
   VNode,
 } from "../../types/index";
-import { RoutePath, createRoutePath, fixPath, sessKey } from "./util";
+import {assign} from "../../util";
+import {createElementIfNeeded} from "./../common";
+import {RouterSubscription} from "./subscriptions";
+import {RoutePath, createRoutePath, fixPath, sessKey} from "./util";
 
-import { Component } from "../../component";
-import { RouterSubscription } from "./subscriptions";
-import { assign } from "../../util";
-import config from "../../config";
-import { createContext } from "../../context";
-import { createElement } from "../../create_element";
-import { createElementIfNeeded } from "./../common";
-
-export const RouteParamContext =
-  createContext<{
-    params: { [k: string]: string };
-    search: URLSearchParams;
-    path: string;
-  }>(null);
+export const RouteParamContext = createContext<{
+  params: {[k: string]: string};
+  search: URLSearchParams;
+  path: string;
+}>(null);
 
 interface PathProps {
   match: RoutePath;
@@ -28,7 +26,7 @@ interface PathProps {
 interface RouterState {
   renderPath?: string;
   child?: VNode;
-  params?: { [k: string]: string };
+  params?: {[k: string]: string};
 }
 interface RouterProps {
   fallbackComponent?: any;
@@ -59,7 +57,7 @@ export class Router extends Component<RouterProps, RouterState> {
       if (!str) return "/";
       return JSON.parse(str).path || "/";
     }
-    return window.location.pathname;
+    return config.window.location.pathname;
   }
 
   static get qs() {
@@ -68,7 +66,7 @@ export class Router extends Component<RouterProps, RouterState> {
       if (!str) return "?";
       return JSON.parse(str).qs || "?";
     }
-    return window.location.search;
+    return config.window.location.search;
   }
   static get searchParams(): URLSearchParams {
     return new URLSearchParams(Router.qs);
@@ -90,13 +88,14 @@ export class Router extends Component<RouterProps, RouterState> {
     const test = regexPath.regex.exec(Router.path);
     return test ? Router._getParams(pathParams, test) : {};
   }
-
+  // @safe
   componentDidMount() {
     this._setRouteMethod();
     RouterSubscription.subscribe(this._routeChangeHandler);
     window.addEventListener("popstate", Router.__emitter);
     this._routeChangeHandler(null);
   }
+  // @safe
   componentWillUnmount() {
     window.removeEventListener("popstate", Router.__emitter);
     RouterSubscription.unsubscribe(this._routeChangeHandler);
@@ -128,7 +127,7 @@ export class Router extends Component<RouterProps, RouterState> {
         params = Router._getParams(pathinfo.params, test);
         child = createElementIfNeeded(
           childProps.component,
-          assign({}, x.props, { params })
+          assign({}, x.props, {params})
         );
         break;
       }
@@ -139,7 +138,7 @@ export class Router extends Component<RouterProps, RouterState> {
         this.props.fallbackComponent || this._notFoundComponent
       );
     }
-    this.setState({ child, params });
+    this.setState({child, params});
   }
 
   render(_: Router["props"], state: Router["state"]): VNode {

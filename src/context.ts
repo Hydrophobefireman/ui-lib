@@ -1,9 +1,9 @@
-import { Component, enqueueRender } from "./component";
-import type { ConsumerCallback, Context, ContextProvider } from "./types/index";
+import {Component, enqueueRender} from "./component";
+import type {ConsumerCallback, Context, ContextProvider} from "./types/index";
 
-import { $push } from "./util";
-import { Fragment } from "./constants";
-import { createElement as h } from "./create_element";
+import {$push} from "./util";
+import {Fragment} from "./constants";
+import {createElement as h} from "./create_element";
 
 let contextId = 0;
 interface ProviderProps<T> {
@@ -15,11 +15,11 @@ export function createContext<T>(def: T): Context<T> {
 
   class Provider extends Component<ProviderProps<T>> {
     _subs: Component[];
-    _o: { [id: string]: Provider };
+    _o: {[id: string]: Provider};
     constructor(props: ProviderProps<T>, context: any) {
       super(props, context);
       this._subs = [];
-      this._o = { [$id]: this };
+      this._o = {[$id]: this};
     }
     getChildContext() {
       return this._o;
@@ -56,7 +56,7 @@ export function createContext<T>(def: T): Context<T> {
 }
 
 function createConsumer<T>() {
-  function Consumer(props: { children?: ConsumerCallback<T> }, context?: T) {
+  function Consumer(props: {children?: ConsumerCallback<T>}, context?: T) {
     const children = props.children;
     if (typeof children === "function") {
       return children(context);

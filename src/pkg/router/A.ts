@@ -1,15 +1,16 @@
-import { Props, VNode } from "../../index";
+import {Component} from "../../component";
+import {createElement} from "../../create_element";
+import {Props, VNode} from "../../index";
+import {assign} from "../../util";
+import {loadURL} from "./util";
 
-import { Component } from "../../component";
-import { assign } from "../../util";
-import { createElement } from "../../create_element";
-import { loadURL } from "./util";
-
+// @safe
 function onLinkClick(e: MouseEvent, preserveScroll: boolean) {
   if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) {
     return;
   }
   if (!preserveScroll) {
+    // dom event.. ok here
     window.scroll(0, 0);
   }
   if (e.stopImmediatePropagation) {
@@ -34,6 +35,7 @@ function _call(
 }
 type AnchorProps = Props<{
   preserveScroll?: boolean;
+  native?: boolean;
 }>;
 export class A extends Component {
   declare props: AnchorProps;
@@ -50,6 +52,9 @@ export class A extends Component {
   }
 
   render(props: Props<{}>): VNode {
-    return createElement("a", assign({}, props, { onClick: this._onClick }));
+    return createElement(
+      "a",
+      assign({}, props, {onClick: !props.native && this._onClick})
+    );
   }
 }

@@ -1,15 +1,12 @@
-import { DiffMeta, UIElement, VNode } from "../types/index";
-import { EMPTY_OBJ, Fragment, NULL_TYPE } from "../constants";
-import { diffChildren, getDom } from "./children";
-import { isFn, toSimpleVNode } from "../toSimpleVNode";
-
-import { diffDomNodes } from "./dom";
-import { diffReferences } from "../ref";
-import { flattenVNodeChildren } from "../create_element";
-import { isValidVNode } from "../util";
-import { unmount } from "./unmount";
-
-// import { processUpdatesQueue } from "../lifeCycleCallbacks";
+import {EMPTY_OBJ, Fragment, NULL_TYPE} from "../constants";
+import {flattenVNodeChildren} from "../create_element";
+import {diffReferences} from "../ref";
+import {isFn, toSimpleVNode} from "../toSimpleVNode";
+import {DiffMeta, UIElement, VNode} from "../types/index";
+import {isValidVNode} from "../util";
+import {diffChildren, getDom} from "./children";
+import {diffDomNodes} from "./dom";
+import {unmount} from "./unmount";
 
 /**
  *
@@ -62,7 +59,6 @@ export function diff(
   if (typeof newVNode.props !== "string" && newType !== NULL_TYPE) {
     /** if we have a function/class Component, get the next rendered VNode */
     newVNode = toSimpleVNode(newVNode, oldVNode, force, meta);
-
     meta.isSvg = newVNode.type === "svg" || meta.isSvg;
   }
 

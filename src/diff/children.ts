@@ -1,10 +1,10 @@
-import { DiffMeta, UIElement, VNode } from "../types/index";
-import { EMPTY_ARRAY, EMPTY_OBJ, NULL_TYPE, Fragment } from "../constants";
-import { createElement } from "../create_element";
+import {DiffMeta, UIElement, VNode} from "../types/index";
+import {EMPTY_ARRAY, EMPTY_OBJ, NULL_TYPE, Fragment} from "../constants";
+import {createElement} from "../create_element";
 
-import { assign } from "../util";
-import { diff } from "./index";
-import { isFn } from "../toSimpleVNode";
+import {assign} from "../util";
+import {diff} from "./index";
+import {isFn} from "../toSimpleVNode";
 
 type VNodeChildren = VNode["_children"];
 
@@ -51,7 +51,7 @@ function diffEachChild(
     let next =
       (getDom(oldChild) || (EMPTY_OBJ as UIElement)).nextSibling || lastSibling;
 
-    const nextMeta: DiffMeta = assign({}, meta, { next });
+    const nextMeta: DiffMeta = assign({}, meta, {next});
 
     diff(newChild, oldChild, parentDom, false, nextMeta);
   }

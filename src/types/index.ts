@@ -1,4 +1,4 @@
-import { Component } from "../component";
+import {Component} from "../component";
 export interface RefType<T> {
   current: T;
 }
@@ -61,7 +61,7 @@ export type setStateArgType<P, S, K extends keyof S> =
   | (Pick<S, K> | Partial<S> | null);
 
 export type Props<P> = Readonly<
-  { children?: ComponentChildren } & JSX.DOMEvents<EventTarget> &
+  {children?: ComponentChildren} & JSX.DOMEvents<EventTarget> &
     JSX.HTMLAttributes &
     Record<string, any> &
     P
@@ -84,10 +84,38 @@ export interface UIElement extends HTMLElement {
 export interface VNodeHost extends HTMLElement {
   _hosts?: VNode;
 }
+
+export interface DocElement {
+  constructor(name: string);
+  setAttribute(key: string, value: string): void;
+  removeAttribute(key: string): void;
+  repr(): string;
+  appendChild(el: DocElement): void;
+  removeChild(el: DocElement): void;
+  insertBefore(el: DocElement, ref: DocElement | null): void;
+}
+
+export interface Doc {
+  head: DocElement;
+  body: DocElement;
+  documentElement: DocElement;
+  get innerHTML(): string;
+  set innerHTML(v: string);
+  createElement(name: string): DocElement;
+  createElementNS(ns: string, name: string): DocElement;
+  createTextNode(n: string): DocElement;
+  createComment(n: string): DocElement;
+}
+
 export type DiffMeta = {
   depth: number;
   isSvg: boolean;
-  context: { [id: string]: ContextProvider };
+  mode:
+    | 0 // client mode
+    | 1 // server render mode
+    | 2; // hydrate mode;
+  _document?: Doc; // a barebones document implementation;
+  context: {[id: string]: ContextProvider};
   contextValue?: any;
   provider?: ContextProvider;
   next?: UIElement;
@@ -98,13 +126,13 @@ export interface ConsumerCallback<T> {
 }
 export interface ContextConsumer<T> {
   (
-    props: { children?: ConsumerCallback<T> | [ConsumerCallback<T>] },
+    props: {children?: ConsumerCallback<T> | [ConsumerCallback<T>]},
     context: T
   ): ComponentChild;
 }
 
-export interface ContextProvider<T = any> extends Component<{ value: T }> {
-  getChildContext(): { [id: string]: Context };
+export interface ContextProvider<T = any> extends Component<{value: T}> {
+  getChildContext(): {[id: string]: Context};
   add(c: Component): void;
 }
 export interface ContextProviderConstructor<P = {}> {
@@ -116,7 +144,7 @@ export interface Context<T = unknown> {
   $id: string;
   def: T;
   Consumer: ContextConsumer<T>;
-  Provider: ContextProviderConstructor<{ value: T }>;
+  Provider: ContextProviderConstructor<{value: T}>;
 }
 
 export interface HookInternal {
@@ -137,6 +165,7 @@ export interface DOMOps {
   VNode?: VNode;
   attr?: string;
   value?: any;
+  isSSR?: boolean;
 }
 
 type ReadonlyVNodeProps =

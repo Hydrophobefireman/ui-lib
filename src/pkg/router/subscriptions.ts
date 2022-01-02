@@ -1,4 +1,4 @@
-import { $push } from "../../util";
+import {$push} from "../../util";
 const _routerSubscriptions: Array<
   (e: PopStateEvent | null, options: {}) => any
 > = [];

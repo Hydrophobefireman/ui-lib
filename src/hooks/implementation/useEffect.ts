@@ -1,5 +1,5 @@
-import { effect } from "./_effect";
-import { rafPendingCallbacks } from "./manage";
+import {effect} from "./_effect";
+import {rafPendingCallbacks} from "./manage";
 
 export function useEffect(
   callback: () => (() => unknown) | unknown,

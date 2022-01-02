@@ -1,4 +1,4 @@
-import { render, h } from "../../ui/index.js";
+import { h, render } from "../../ui/index.js";
 function App() {
   return h("svg", {
     xmlns: "http://www.w3.org/2000/svg",

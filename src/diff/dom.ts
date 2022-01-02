@@ -1,5 +1,5 @@
-import { domOp } from "../commit";
-import { plugins } from "../config";
+import {domOp} from "../commit";
+import {plugins} from "../config";
 import {
   BATCH_MODE_PLACE_NODE,
   BATCH_MODE_REMOVE_ATTRIBUTE,
@@ -10,9 +10,10 @@ import {
   EMPTY_OBJ,
   IS_SVG_ATTR,
   NULL_TYPE,
+  RENDER_MODE_SERVER,
 } from "../constants";
-import { IS_ARIA_PROP } from "../constants";
-import { DiffMeta, Props, UIElement, VNode } from "../types/index";
+import {IS_ARIA_PROP} from "../constants";
+import {DiffMeta, Props, UIElement, VNode} from "../types/index";
 
 export function diffDomNodes(
   newVNode: VNode,
@@ -59,6 +60,8 @@ export function diffDomNodes(
 }
 
 function createDomFromVNode(newVNode: VNode, meta: DiffMeta): UIElement {
+  const document =
+    meta._document || /**should never reach -> */ window.document;
   if (typeof newVNode.props === "string") {
     return document.createTextNode("") as unknown as UIElement;
   } else {
@@ -112,8 +115,8 @@ function diffAttributes(
   __diffNewAttributes(dom, prevAttrs || EMPTY_OBJ, nextAttrs, meta);
 }
 
-const domSourceOfTruth = { value: 1, checked: 1 };
-const UNSAFE_ATTRS = { key: 1, ref: 1, children: 1 };
+const domSourceOfTruth = {value: 1, checked: 1};
+const UNSAFE_ATTRS = {key: 1, ref: 1, children: 1};
 
 function __diffNewAttributes(
   dom: UIElement,
@@ -138,8 +141,15 @@ function __diffNewAttributes(
       domOp({
         node: dom,
         action: BATCH_MODE_SET_STYLE,
-        value: { newValue, oldValue },
+        value: {newValue, oldValue},
       });
+      continue;
+    }
+    if (
+      meta.mode === RENDER_MODE_SERVER &&
+      attr[0] === "o" &&
+      attr[1] === "n"
+    ) {
       continue;
     }
     domOp({
@@ -217,6 +227,7 @@ function diffClass(
     action: BATCH_MODE_SET_ATTRIBUTE,
     attr: meta.isSvg ? "class" : "className",
     value: newValue,
+    isSSR: meta.mode === RENDER_MODE_SERVER,
   });
 }
 
@@ -245,14 +256,20 @@ function __diffTextNodes(dom: UIElement, newVal: string, oldVal: string) {
 }
 
 /** dom helper */
-export function $(dom: UIElement, prop: string, value: any, isSvg?: boolean) {
+export function $(
+  dom: UIElement,
+  prop: string,
+  value: any,
+  isSvg: boolean,
+  isSSR: boolean
+) {
   if (prop[0] === "o" && prop[1] === "n") {
     return $event(dom, prop as keyof JSX.DOMEvents<any>, value);
   }
   const shouldRemove =
     value == null || (value === false && !IS_ARIA_PROP.test(prop));
 
-  if (!isSvg && prop in dom) {
+  if (!isSvg && !isSSR && prop in dom) {
     return (dom[prop] = shouldRemove ? "" : value);
   } else {
     if (shouldRemove) return dom.removeAttribute(prop);

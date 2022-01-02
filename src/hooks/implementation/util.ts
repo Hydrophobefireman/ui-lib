@@ -1,4 +1,4 @@
-import { Component } from "../../component";
+import {Component} from "../../component";
 
 export function argsChanged(oldArgs: any[], newArgs: any[]) {
   return !oldArgs || newArgs.some((arg, index) => arg !== oldArgs[index]);

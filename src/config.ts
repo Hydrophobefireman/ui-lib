@@ -1,6 +1,6 @@
-import { Component } from "./component";
-import { Fragment, LifeCycleCallbacks } from "./constants";
-import { Props, RefType, UIElement, VNode } from "./types/index";
+import {Component} from "./component";
+import {Fragment, LifeCycleCallbacks} from "./constants";
+import {Props, UIElement, VNode} from "./types/index";
 
 export const HAS_PROMISE = typeof Promise !== "undefined";
 
@@ -40,7 +40,7 @@ export function addPluginCallback(options: Partial<IPlugins>): void {
     };
   }
 }
-
+//@safe
 export function reqAnimFrame(cb: () => void) {
   const done: FrameRequestCallback = (e) => {
     cancelAnimationFrame(raf);
@@ -49,17 +49,21 @@ export function reqAnimFrame(cb: () => void) {
   };
   let raf: number;
   let timeout = setTimeout(done, config.RAF_TIMEOUT);
+
   raf = requestAnimationFrame(done);
 }
 
 const config = {
+  // we set it to null here so that we can inject our own global
+  window: typeof window !== "undefined" ? window : (null as any),
   scheduleRender: HAS_RAF ? reqAnimFrame : defer,
   warnOnUnmountRender: false,
   RAF_TIMEOUT: 100,
   debounceEffect: null,
   inMemoryRouter: false,
-  memoryRouteStore: localStorage,
+  memoryRouteStore: typeof window !== "undefined" && window.localStorage,
   unmountOnError: true,
+  isSSR: false,
 };
 
 export default config;

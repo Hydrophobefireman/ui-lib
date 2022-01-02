@@ -1,5 +1,5 @@
-import { plugins } from "./config";
-import { EMPTY_OBJ, Fragment, NULL_TYPE } from "./constants";
+import {plugins} from "./config";
+import {EMPTY_OBJ, Fragment, NULL_TYPE} from "./constants";
 import {
   ComponentChild,
   ComponentChildren,

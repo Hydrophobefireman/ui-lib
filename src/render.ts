@@ -1,11 +1,10 @@
+import {Fragment, RENDER_MODE_CLIENT} from "./constants";
+import {createElement} from "./create_element";
+import {diff} from "./diff/index";
+import {onDiff} from "./lifeCycleCallbacks";
 // import { clearDOM } from "./util";
-import { DOMOps, VNode, VNodeHost } from "./types/index";
-
-import { Fragment } from "./constants";
-import { clearDOM } from "./util";
-import { createElement } from "./create_element";
-import { diff } from "./diff/index";
-import { onDiff } from "./lifeCycleCallbacks";
+import {VNode, VNodeHost} from "./types/index";
+import {clearDOM} from "./util";
 
 export function render(VNode: VNode, parentDom: VNodeHost) {
   let old: VNode;
@@ -21,8 +20,9 @@ export function render(VNode: VNode, parentDom: VNodeHost) {
   }
   diff(normalizedVNode, old, parentDom, false, {
     depth: 0,
-    isSvg: ((parentDom as unknown) as SVGElement).ownerSVGElement !== undefined,
+    isSvg: (parentDom as unknown as SVGElement).ownerSVGElement !== undefined,
     context: {},
+    mode: RENDER_MODE_CLIENT,
   });
   // parentDom._hosts = normalizedVNode;
   onDiff();

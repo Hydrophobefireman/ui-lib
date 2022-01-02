@@ -1,6 +1,6 @@
 {
   "name": "@hydrophobefireman/ui-lib",
-  "version": "1.11.3",
+  "version": "1.20.4-server-test",
   "description": "",
   "main": "dist/ui-lib.modern.js",
   "scripts": {
@@ -9,9 +9,11 @@
     "build:no-minify": "microbundle src/index.ts --compress false -o ./dist -f modern --target web --raw true  --tsconfig tsconfig.json",
     "dev": "microbundle watch src/index.ts -o ./dist -f modern --raw  true --target web --tsconfig tsconfig.json",
     "output": "yarn build:no-minify &&  yarn postbuild",
-    "postbuild": "node build_scripts/postbuild.js ",
-    "prebuild": "node build_scripts/prebuild.js"
+    "postbuild": "node build_scripts/postbuild.cjs ",
+    "prebuild": "node build_scripts/prebuild.cjs",
+    "prepublishOnly": "npm run build"
   },
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Hydrophobefireman/ui-lib.git"

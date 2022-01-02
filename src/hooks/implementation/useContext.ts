@@ -1,6 +1,6 @@
-import { Context } from "../../index";
-import { getCurrentHookValueOrSetDefault } from "./util";
-import { getHookStateAtCurrentRender } from "./manage";
+import {Context} from "../../index";
+import {getCurrentHookValueOrSetDefault} from "./util";
+import {getHookStateAtCurrentRender} from "./manage";
 
 export function useContext<T = any>(ctx: Context<T>): T {
   const state = getHookStateAtCurrentRender();

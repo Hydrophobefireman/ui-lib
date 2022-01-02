@@ -1,8 +1,8 @@
-import { Props, Renderable as UIElement } from "../../types/index";
+import {Props, Renderable as UIElement} from "../../types/index";
 
-import { Component } from "../../component";
-import { createElementIfNeeded } from "../common";
-import { objectWithoutKeys } from "../../util";
+import {Component} from "../../component";
+import {createElementIfNeeded} from "../common";
+import {objectWithoutKeys} from "../../util";
 
 type AsyncPromResponse<T = any> = Promise<UIElement<T>>;
 interface AsyncState {
@@ -35,17 +35,17 @@ export class AsyncComponent extends Component<AsyncProps<any>, AsyncState> {
     this._init();
   }
   _init(): void {
-    this.setState({ inProgress: true });
+    this.setState({inProgress: true});
     const prom = getPromise(this.props);
 
     prom()
       .then((component: UIElement) => {
         prom === getPromise(this.props) &&
-          this.setState({ render: component, inProgress: false, error: false });
+          this.setState({render: component, inProgress: false, error: false});
       })
       .catch((x: Error) => {
         console.error("AsyncComponent:", x);
-        this.setState({ error: true, inProgress: false, stack: x });
+        this.setState({error: true, inProgress: false, stack: x});
       });
   }
   render(props: AsyncComponent["props"], state: AsyncComponent["state"]) {

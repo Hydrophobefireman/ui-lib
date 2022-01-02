@@ -1,4 +1,4 @@
-import type { Component, EffectsDictionary } from "../../component";
+import type {Component, EffectsDictionary} from "../../component";
 import config, {
   HAS_RAF,
   addPluginCallback,

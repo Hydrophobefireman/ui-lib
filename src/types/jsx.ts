@@ -1,8 +1,8 @@
 // modified version of preact's jsx.d.ts
 /// <reference lib="dom" />
-import { VNode, ComponentChildren } from "./index";
-import { Component } from "../component";
-import { RefType } from "../ref";
+import {VNode, ComponentChildren} from "./index";
+import {Component} from "../component";
+import {RefType} from "../ref";
 export interface PropAttrs {
   children?: ComponentChildren;
 }
@@ -728,7 +728,7 @@ declare global {
       srcSet?: string;
       start?: number;
       step?: number | string;
-      style?: string | { [key: string]: string | number };
+      style?: string | {[key: string]: string | number};
       summary?: string;
       tabIndex?: number;
       target?: string;

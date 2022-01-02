@@ -41,3 +41,7 @@ export type LifeCycleCallbacks =
   | "componentDidUpdate";
 
 export const Fragment: any = function Fragment() {};
+
+export const RENDER_MODE_CLIENT = 0;
+export const RENDER_MODE_SERVER = 1;
+export const RENDER_MODE_HYDRATE = 2;

@@ -1,3 +1,18 @@
+import {Component} from "./component";
+import {plugins} from "./config";
+import {
+  EMPTY_OBJ,
+  Fragment,
+  LIFECYCLE_DID_MOUNT,
+  LIFECYCLE_DID_UPDATE,
+  LIFECYCLE_WILL_MOUNT,
+  LIFECYCLE_WILL_UPDATE,
+  RENDER_MODE_SERVER,
+} from "./constants";
+import {isProvider} from "./context";
+import {coerceToVNode} from "./create_element";
+import {scheduleLifeCycleCallbacks} from "./lifeCycleCallbacks";
+import {diffReferences} from "./ref";
 import {
   ComponentConstructor,
   ComponentType,
@@ -6,22 +21,7 @@ import {
   Props,
   VNode,
 } from "./types/index";
-import {
-  EMPTY_OBJ,
-  Fragment,
-  LIFECYCLE_DID_MOUNT,
-  LIFECYCLE_DID_UPDATE,
-  LIFECYCLE_WILL_MOUNT,
-  LIFECYCLE_WILL_UPDATE,
-} from "./constants";
-
-import { Component } from "./component";
-import { assign } from "./util";
-import { coerceToVNode } from "./create_element";
-import { diffReferences } from "./ref";
-import { isProvider } from "./context";
-import { plugins } from "./config";
-import { scheduleLifeCycleCallbacks } from "./lifeCycleCallbacks";
+import {assign} from "./util";
 
 export const isFn = (vnType: any): vnType is ComponentType =>
   typeof vnType === "function" && vnType !== Fragment;
@@ -94,6 +94,9 @@ function renderClassComponent(
   } else {
     nextLifeCycle = LIFECYCLE_DID_MOUNT;
     c = new cls(VNode.props, meta.contextValue);
+    if (meta.mode === RENDER_MODE_SERVER) {
+      c.setState = c.forceUpdate = Fragment;
+    }
     VNode._component = c;
     c._depth = ++meta.depth;
   }
@@ -101,7 +104,8 @@ function renderClassComponent(
   c._VNode = VNode;
   const oldState = c._oldState;
   const oldProps = oldVNode.props;
-
+  // will{Mount,Update} are allowed in server
+  // but setState still remains a noop
   scheduleLifeCycleCallbacks({
     bind: c,
     name: isExisting ? LIFECYCLE_WILL_UPDATE : LIFECYCLE_WILL_MOUNT,
@@ -120,11 +124,13 @@ function renderClassComponent(
   if (isExisting && c.getSnapshotBeforeUpdate != null) {
     snapshot = c.getSnapshotBeforeUpdate(oldProps, oldState);
   }
-  scheduleLifeCycleCallbacks({
-    bind: c,
-    name: nextLifeCycle,
-    args: isExisting ? [oldProps, oldState, snapshot] : [],
-  });
+  if (meta.mode !== RENDER_MODE_SERVER) {
+    scheduleLifeCycleCallbacks({
+      bind: c,
+      name: nextLifeCycle,
+      args: isExisting ? [oldProps, oldState, snapshot] : [],
+    });
+  }
   diffReferences(VNode, oldVNode, c);
   return nextVNode;
 }
@@ -140,7 +146,9 @@ function renderFunctionalComponent(VNode: VNode, meta: DiffMeta) {
      * (doesnt help now but will be useful while implementing hooks)
      */
     c = new Component(VNode.props, meta.contextValue);
-
+    if (meta.mode === RENDER_MODE_SERVER) {
+      c.setState = c.forceUpdate = Fragment;
+    }
     VNode._component = c;
     c.render = getRenderer;
     c.constructor = fn;
@@ -195,7 +203,7 @@ function applyCurrentState(
 }
 
 function isClassComponent(type: VNode["type"]): type is ComponentType {
-  const proto = ((type as any) as ComponentConstructor).prototype;
+  const proto = (type as any as ComponentConstructor).prototype;
   return !!(proto && proto.render);
 }
 

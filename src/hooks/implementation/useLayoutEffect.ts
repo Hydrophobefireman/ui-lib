@@ -1,5 +1,5 @@
-import { effect } from "./_effect";
-import { layoutPendingCallbacks } from "./manage";
+import {effect} from "./_effect";
+import {layoutPendingCallbacks} from "./manage";
 
 export function useLayoutEffect(
   callback: () => (() => unknown) | unknown,
