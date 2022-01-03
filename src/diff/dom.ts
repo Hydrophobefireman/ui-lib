@@ -14,6 +14,7 @@ import {
 } from "../constants";
 import {IS_ARIA_PROP} from "../constants";
 import {DiffMeta, Props, UIElement, VNode} from "../types/index";
+import {config} from "..";
 
 export function diffDomNodes(
   newVNode: VNode,
@@ -60,8 +61,7 @@ export function diffDomNodes(
 }
 
 function createDomFromVNode(newVNode: VNode, meta: DiffMeta): UIElement {
-  const document =
-    meta._document || /**should never reach -> */ window.document;
+  const document = config.window.document;
   if (typeof newVNode.props === "string") {
     return document.createTextNode("") as unknown as UIElement;
   } else {

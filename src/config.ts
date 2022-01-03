@@ -1,6 +1,6 @@
 import {Component} from "./component";
 import {Fragment, LifeCycleCallbacks} from "./constants";
-import {Props, UIElement, VNode} from "./types/index";
+import {CustomWindow, Props, UIElement, VNode} from "./types/index";
 
 export const HAS_PROMISE = typeof Promise !== "undefined";
 
@@ -55,7 +55,7 @@ export function reqAnimFrame(cb: () => void) {
 
 const config = {
   // we set it to null here so that we can inject our own global
-  window: typeof window !== "undefined" ? window : (null as any),
+  window: typeof window !== "undefined" ? window : (null as CustomWindow),
   scheduleRender: HAS_RAF ? reqAnimFrame : defer,
   warnOnUnmountRender: false,
   RAF_TIMEOUT: 100,
@@ -63,7 +63,7 @@ const config = {
   inMemoryRouter: false,
   memoryRouteStore: typeof window !== "undefined" && window.localStorage,
   unmountOnError: true,
-  isSSR: false,
+  isSSR: typeof window === "undefined",
 };
 
 export default config;

@@ -114,7 +114,6 @@ export type DiffMeta = {
     | 0 // client mode
     | 1 // server render mode
     | 2; // hydrate mode;
-  _document?: Doc; // a barebones document implementation;
   context: {[id: string]: ContextProvider};
   contextValue?: any;
   provider?: ContextProvider;
@@ -180,3 +179,7 @@ export type WritableProps = Exclude<keyof VNode, ReadonlyVNodeProps>;
 export type Renderable<T extends any = ComponentType | VNode | string> =
   | T
   | (() => T);
+
+export interface CustomWindow extends Omit<Partial<Window>, "document"> {
+  document: Doc;
+}
