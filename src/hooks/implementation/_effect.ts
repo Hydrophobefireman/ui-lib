@@ -55,7 +55,9 @@ export function effect(
   if (!argsChanged(currentHook.args, dependencies)) {
     // mark the effect as resolved
     // no cleanup will be performed (except on unmount)
-    if (oldEffect) oldEffect.resolved = true;
+    // @TODO CHECK IF THIS BREAKS ANYTHING
+    // I REALLY NEED TO ADD TESTS
+    // if (oldEffect) oldEffect.resolved = true;
     return;
   }
   hookData[hookIndex] = currentHook;

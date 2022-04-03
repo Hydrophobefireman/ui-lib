@@ -1,12 +1,10 @@
+import {Component} from "./component";
+import config, {plugins} from "./config";
 import {
   LIFECYCLE_DID_MOUNT,
   LIFECYCLE_DID_UPDATE,
   LifeCycleCallbacks,
 } from "./constants";
-import config, {plugins} from "./config";
-
-import {Component} from "./component";
-
 import {unmount} from "./diff/unmount";
 
 type ProcessOptions = {
@@ -42,14 +40,20 @@ function __executeCallback(cbObj: ProcessOptions) {
   const args = cbObj.args;
   const hasCatch = typeof component.componentDidCatch == "function";
   const cb = () => func.apply(component, args);
-  try {
-    cb();
-  } catch (e) {
+  function handleError(e: Error) {
     if (hasCatch) return component.componentDidCatch(e);
     if (config.unmountOnError) {
       unmount(component._VNode);
     }
     throw e;
+  }
+  try {
+    const ret = cb();
+    if (ret && ret.then && ret.catch) {
+      ret.catch(handleError);
+    }
+  } catch (e) {
+    handleError(e);
   }
 }
 
