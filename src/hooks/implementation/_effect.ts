@@ -76,8 +76,7 @@ export function effect(
   // what we have as the new effect.
 
   const cleanUp = oldEffect
-    ? (oldEffect.resolved = false) ||
-      (runHookEffectAndAssignCleanup(oldEffect) as any as false) ||
+    ? (runHookEffectAndAssignCleanup(oldEffect) as any as false) ||
       oldEffect.cleanUp
     : null;
 
