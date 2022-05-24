@@ -18,7 +18,8 @@ export {RouterSubscription} from "./pkg/router/subscriptions";
 
 export {useRoute} from "./pkg/router/router-hooks";
 
-export {createRef, RefType} from "./ref";
+export {createRef} from "./ref";
+export type {RefType} from "./ref";
 
 export * from "./hooks/index";
 export * from "./types/index";

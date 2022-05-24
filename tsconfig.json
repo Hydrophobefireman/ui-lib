@@ -1,13 +1,24 @@
 {
   "compilerOptions": {
     "module": "ESNext",
+    "outDir": "dist",
     "alwaysStrict": true,
     "declaration": true,
-    "incremental": true,
     "target": "ESNext",
+    "rootDir": ".",
+    "strictNullChecks": false,
+    "resolveJsonModule": true,
     "moduleResolution": "node",
-    "rootDir": "./src",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "@hydrophobefireman/ui-lib",
+    "noEmitOnError": true,
+    "paths": {
+      "ui-web": ["./src/index"],
+      "ui-web/*": ["./packages/*/src"]
+    }
   },
-  "exclude": ["node_modules", "jsx-runtime.d.ts"]
+  "include": ["src/*", "packages"],
+  "exclude": ["node_modules", "dist/*", "examples/"]
 }

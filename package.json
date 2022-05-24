@@ -1,34 +1,48 @@
 {
   "name": "@hydrophobefireman/ui-lib",
-  "version": "1.21.1",
+  "version": "1.21.2",
   "description": "",
-  "main": "dist/ui-lib.modern.js",
-  "scripts": {
-    "build": "npm run build:minify",
-    "build:minify": "microbundle src/index.ts -o ./dist -f modern,umd --target web --raw true  --tsconfig tsconfig.json",
-    "build:no-minify": "microbundle src/index.ts --compress false -o ./dist -f modern --target web --raw true  --tsconfig tsconfig.json",
-    "dev": "microbundle watch src/index.ts -o ./dist -f modern --raw  true --target web --tsconfig tsconfig.json",
-    "output": "yarn build:no-minify &&  yarn postbuild",
-    "postbuild": "node build_scripts/postbuild.cjs ",
-    "prebuild": "node build_scripts/prebuild.cjs",
-    "prepublishOnly": "npm run build"
-  },
+  "types": "dist/src/index.d.ts",
+  "license": "MIT",
   "type": "module",
+  "homepage": "https://github.com/@hydrophobefireman/ui-lib#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Hydrophobefireman/ui-lib.git"
+    "url": "git+https://github.com/@hydrophobefireman/ui-lib.git"
   },
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Hydrophobefireman/ui-lib/issues"
+  "main": "dist/src/index.js",
+  "module": "dist/src/index.js",
+  "exports": {
+    ".": "./dist/src/index.js",
+    "./package.json": "./package.json",
+    "./jsx-runtime": "./jsx-runtime.js",
+    "./server": "./server/src/index.js"
   },
-  "module": "dist/ui-lib.modern.js",
-  "types": "dist/index.d.ts",
+  "scripts": {
+    "prebuild": "node scripts/clean.cjs",
+    "prepublishOnly": "npm run build &&  node scripts/prepublishOnly.cjs",
+    "postpublish": "node scripts/postpublish.cjs",
+    "postbuild": "node scripts/postbuild.cjs",
+    "create-package": "node scripts/create-package.cjs",
+    "build": "tsc",
+    "prepare": "husky install"
+  },
   "sideEffects": false,
-  "homepage": "https://github.com/Hydrophobefireman/ui-lib#readme",
   "devDependencies": {
-    "microbundle": "^0.14.2",
+    "@types/node": "^17.0.23",
+    "husky": "^7.0.4",
+    "prettier": "^2.6.2",
+    "pretty-quick": "^3.1.3",
     "typescript": "^4.6.3"
   },
-  "dependencies": {}
+  "libBase": {
+    "exports": {
+      ".": "./dist/src/index.js",
+      "./package.json": "./package.json",
+      "./jsx-runtime": "./jsx-runtime.js"
+    }
+  },
+  "libPackages": [
+    "server"
+  ]
 }
