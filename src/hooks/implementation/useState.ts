@@ -6,10 +6,9 @@ import {useReducer} from "./useReducer";
 // internally we simply use a useReducer hook
 
 type StateArg<T> = T | (() => T);
-type Updater<T> = (arg: T | ((previous?: T) => T)) => void;
-type SetStateHookReturn<T> = [T, (arg: T | Updater<T>) => void];
-
-export function useState<T>(initialState: StateArg<T>): SetStateHookReturn<T> {
+type Updater<T> = (arg: T | ((previous: T) => T)) => void;
+type SetStateHookReturn<T> = [T, Updater<T>];
+export function useState<T>(initialState?: StateArg<T>): SetStateHookReturn<T> {
   return useReducer(
     consumeCallable as any,
     initialState
