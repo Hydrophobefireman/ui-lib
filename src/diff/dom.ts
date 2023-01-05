@@ -133,8 +133,10 @@ function __diffNewAttributes(
     if (newValue === oldValue) continue;
 
     attr = attr === "class" ? "className" : attr;
-
-    if (attr === "className") {
+    if (attr == "_nodeContext") {
+      dom._nodeContext = newValue;
+      continue;
+    } else if (attr === "className") {
       diffClass(dom, newValue, oldValue, meta);
       continue;
     } else if (attr === "style") {

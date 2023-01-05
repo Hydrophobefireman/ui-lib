@@ -1,6 +1,6 @@
 {
   "name": "@hydrophobefireman/ui-lib",
-  "version": "1.21.4",
+  "version": "1.5.0",
   "description": "",
   "types": "dist/src/index.d.ts",
   "license": "MIT",

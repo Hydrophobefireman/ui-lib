@@ -71,9 +71,10 @@ function removePointers(VNode: VNode, dom: UIElement) {
 }
 const DOM_POINTERS: Record<
   Exclude<keyof UIElement, keyof HTMLElement | keyof Text>,
-  number
+  1
 > = {
   _VNode: 1,
+  _nodeContext: 1,
   _events: 1,
 };
 

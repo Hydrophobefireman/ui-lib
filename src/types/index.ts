@@ -1,4 +1,5 @@
 import {Component} from "../component";
+import {UILibEventTarget} from "./jsx";
 export interface RefType<T> {
   current: T;
 }
@@ -32,7 +33,7 @@ export type ComponentProps<
   ? JSX.IntrinsicElements[C]
   : never;
 
-export type EventListenerDict = JSX.DOMEvents<EventTarget>;
+export type EventListenerDict = JSX.DOMEvents<UILibEventTarget>;
 export type createElementPropType<P> = Props<P> | null;
 export interface ComponentType<P = {}>
   extends ComponentConstructor<P>,
@@ -61,7 +62,7 @@ export type setStateArgType<P, S, K extends keyof S> =
   | (Pick<S, K> | Partial<S> | null);
 
 export type Props<P> = Readonly<
-  {children?: ComponentChildren} & JSX.DOMEvents<EventTarget> &
+  {children?: ComponentChildren} & JSX.DOMEvents<UILibEventTarget> &
     JSX.HTMLAttributes &
     Record<string, any> &
     P
@@ -79,6 +80,7 @@ export interface UIElement extends HTMLElement {
   _events?: Partial<Record<keyof JSX.DOMEvents<any>, JSX.EventHandler<any>>>;
   _VNode?: VNode;
   data?: string | number;
+  _nodeContext?: any;
 }
 
 export interface VNodeHost extends HTMLElement {
