@@ -133,7 +133,7 @@ function __diffNewAttributes(
     if (newValue === oldValue) continue;
 
     attr = attr === "class" ? "className" : attr;
-    if (attr == "_nodeContext") {
+    if (attr === "_nodeContext") {
       dom._nodeContext = newValue;
       continue;
     } else if (attr === "className") {
