@@ -10,7 +10,7 @@ import {
 // the useEffect hook itself heavily relies on requestAnimationFrame
 // thus we have to use setTimeout to preventthe animation from practically
 // slowing down by 2x
-config.scheduleRender = cb=>cb();
+config.scheduleRender = cb=>requestAnimationFrame(cb);
 /** @jsx h */
 const COUNT = 200;
 const LOOPS = 6;
