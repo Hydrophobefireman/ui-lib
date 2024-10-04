@@ -6,11 +6,11 @@ import {
   useCallback,
   useEffect,
   config,
-} from "../../ui/index.js";
+} from "https://esm.sh/@hydrophobefireman/ui-lib";
 // the useEffect hook itself heavily relies on requestAnimationFrame
 // thus we have to use setTimeout to preventthe animation from practically
 // slowing down by 2x
-config.scheduleRender = setTimeout.bind(window);
+config.scheduleRender = cb=>cb();
 /** @jsx h */
 const COUNT = 200;
 const LOOPS = 6;
