@@ -1,6 +1,6 @@
 {
   "name": "@hydrophobefireman/ui-lib",
-  "version": "2.0.1",
+  "version": "2.2.0",
   "description": "",
   "types": "dist/src/index.d.ts",
   "license": "MIT",
@@ -15,8 +15,7 @@
   "exports": {
     ".": "./dist/src/index.js",
     "./package.json": "./package.json",
-    "./jsx-runtime": "./jsx-runtime.js",
-    "./jsx-dev-runtime": "./jsx-runtime.js"
+    "./jsx-runtime": "./jsx-runtime.js"
   },
   "scripts": {
     "prebuild": "node scripts/clean.cjs",
