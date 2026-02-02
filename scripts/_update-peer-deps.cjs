@@ -9,7 +9,7 @@ const {
 
 async function updatePackages() {
   const packageJson = await fromPackageJson();
-  const {libPackages, version, peerDependencies, libBase} = packageJson;
+  const {libPackages, version, peerDependencies, exports} = packageJson;
 
   await Promise.all(
     libPackages.map(async (x) => {
@@ -20,13 +20,11 @@ async function updatePackages() {
       js.type = "module";
       js.peerDependencies = Object.assign({}, peerDependencies);
       await writeFile(subPackageJson, prettyJSON(js));
-    })
+    }),
   );
-  const exportsField = Object.assign({}, libBase.exports);
   libPackages.forEach((packageName) => {
-    exportsField[`./${packageName}`] = `./${packageName}/src/index.js`;
+    exports[`./${packageName}`] = `./${packageName}/src/index.js`;
   });
-  packageJson.exports = exportsField;
   packageJson.libPackages = libPackages.sort();
   await writeFile(packageJsonLoc, prettyJSON(packageJson));
 }

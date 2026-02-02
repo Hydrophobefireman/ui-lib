@@ -1,6 +1,6 @@
 {
   "name": "@hydrophobefireman/ui-lib",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "",
   "types": "dist/src/index.d.ts",
   "license": "MIT",
@@ -34,13 +34,6 @@
     "prettier": "^3.8.1",
     "pretty-quick": "^4.2.2",
     "typescript": "^5.9.3"
-  },
-  "libBase": {
-    "exports": {
-      ".": "./dist/src/index.js",
-      "./package.json": "./package.json",
-      "./jsx-runtime": "./jsx-runtime.js"
-    }
   },
   "libPackages": []
 }
