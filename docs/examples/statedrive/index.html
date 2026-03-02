@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -8,7 +8,7 @@
   <body>
     <div id="mount"></div>
     <script type="module">
-      import * as sd from "https://cdn.skypack.dev/statedrive";
+      import * as sd from "https://cdn.skypack.dev/@hydrophobefireman/ui-lib";
       import {
         h,
         render,
@@ -47,7 +47,7 @@
               onInput(e) {
                 setA(+e.target.value);
               },
-            })
+            }),
           ),
           h(
             "div",
@@ -57,9 +57,9 @@
               onInput(e) {
                 setB(+e.target.value);
               },
-            })
+            }),
           ),
-          h("div", null, "Value ", value)
+          h("div", null, "Value ", value),
         );
       }
       function Title() {
@@ -69,7 +69,7 @@
       }
       render(
         h(() => [h(App), h(Title)]),
-        document.getElementById("mount")
+        document.getElementById("mount"),
       );
     </script>
   </body>
