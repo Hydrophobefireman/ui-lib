@@ -1,4 +1,4 @@
-import Component, {h} from "../../../ui/index.js";
+import Component, {h} from "https://esm.sh/@hydrophobefireman/ui-lib";
 class TreeLeaf extends Component {
   shouldComponentUpdate(nextProps, nextState) {
     return this.props.data !== nextProps.data;
@@ -10,7 +10,7 @@ class TreeLeaf extends Component {
       {
         class: "TreeLeaf",
       },
-      props.data.id
+      props.data.id,
     );
   }
 }
@@ -32,14 +32,14 @@ class TreeNode extends Component {
           h(TreeNode, {
             key: n.id,
             data: n,
-          })
+          }),
         );
       } else {
         children.push(
           h(TreeLeaf, {
             key: n.id,
             data: n,
-          })
+          }),
         );
       }
     }
@@ -49,7 +49,7 @@ class TreeNode extends Component {
       {
         class: "TreeNode",
       },
-      children
+      children,
     );
   }
 }
@@ -67,7 +67,7 @@ export class Tree extends Component {
       },
       h(TreeNode, {
         data: props.data.root,
-      })
+      }),
     );
   }
 }

@@ -1,4 +1,7 @@
-import Component, {createElement as h} from "../../../ui/index.js";
+import Component, {
+  createElement as h,
+} from "https://esm.sh/@hydrophobefireman/ui-lib";
+
 import {pluralize} from "./util.js";
 
 export default class TodoFooter extends Component {
@@ -16,7 +19,7 @@ export default class TodoFooter extends Component {
         h("strong", null, count),
         " ",
         pluralize(count, "item"),
-        " left"
+        " left",
       ),
       h(
         "ul",
@@ -32,8 +35,8 @@ export default class TodoFooter extends Component {
               href: "#/",
               class: nowShowing == "all" && "selected",
             },
-            "All"
-          )
+            "All",
+          ),
         ),
 
         h(
@@ -45,8 +48,8 @@ export default class TodoFooter extends Component {
               href: "#/active",
               class: nowShowing == "active" && "selected",
             },
-            "Active"
-          )
+            "Active",
+          ),
         ),
         h(
           "li",
@@ -57,9 +60,9 @@ export default class TodoFooter extends Component {
               href: "#/completed",
               class: nowShowing == "completed" && "selected",
             },
-            "Completed"
-          )
-        )
+            "Completed",
+          ),
+        ),
       ),
       completedCount > 0 &&
         h(
@@ -68,8 +71,8 @@ export default class TodoFooter extends Component {
             class: "clear-completed",
             onClick: onClearCompleted,
           },
-          "Clear completed"
-        )
+          "Clear completed",
+        ),
     );
   }
 }

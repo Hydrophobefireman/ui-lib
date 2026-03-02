@@ -1,4 +1,4 @@
-import Component, {h} from "../../../ui/index.js";
+import Component, {h} from "https://esm.sh/@hydrophobefireman/ui-lib";
 
 class AnimBox extends Component {
   //   shouldComponentUpdate(nextProps, nextState) {
@@ -34,7 +34,7 @@ export class Anim extends Component {
         h(AnimBox, {
           key: item.id,
           data: item,
-        })
+        }),
       );
     }
 
@@ -43,7 +43,7 @@ export class Anim extends Component {
       {
         class: "Anim",
       },
-      children
+      children,
     );
   }
 }

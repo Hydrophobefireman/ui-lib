@@ -24,7 +24,7 @@
         h,
         AsyncComponent as asnc,
         render,
-      } from "../../ui/index.js";
+      } from "https://esm.sh/@hydrophobefireman/ui-lib";
 
       class App extends Component {
         constructor() {
@@ -37,8 +37,8 @@
             new Promise((resolve) =>
               setTimeout(
                 () => resolve((p) => h("div", p, new Date().toString())),
-                1000
-              )
+                1000,
+              ),
             );
         }
         render() {
@@ -54,8 +54,8 @@
             h(
               "div",
               null,
-              h("button", {onCLick: this.reset}, "Make new Promise")
-            )
+              h("button", {onCLick: this.reset}, "Make new Promise"),
+            ),
           );
         }
       }

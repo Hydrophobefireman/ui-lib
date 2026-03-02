@@ -7,7 +7,7 @@
     <div id="app"></div>
     <script type="module">
       const updater = (x) => x + 1;
-      import * as UI from "../../ui/index.js";
+      import * as UI from "https://esm.sh/@hydrophobefireman/ui-lib";
       import {
         h,
         render,
@@ -17,7 +17,7 @@
         Component,
         createRef,
         useRef,
-      } from "../../ui/index.js";
+      } from "https://esm.sh/@hydrophobefireman/ui-lib";
       window.UI = window.a = UI;
       class O extends Component {
         render() {
@@ -38,7 +38,7 @@
           {onClick: () => setState(!state)},
 
           h("span", {ref: $ref1}, "Ref1"),
-          state && h(O, {ref: $ref2})
+          state && h(O, {ref: $ref2}),
         );
       }
 

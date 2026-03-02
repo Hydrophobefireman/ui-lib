@@ -16,7 +16,7 @@ import Component, {
   render,
   createElement as h,
   createRef,
-} from "../../ui/index.js";
+} from "https://esm.sh/@hydrophobefireman/ui-lib";
 const {memoize} = (globalThis || self).decko;
 let {pow, sqrt, sin, cos, atan2} = Math;
 
@@ -34,22 +34,22 @@ class Main extends Component {
         this.position =
           this.ref.current &&
           this.ref.current.querySelector(".logo").getBoundingClientRect();
-      }
+      },
     );
     _defineProperty(
       this,
       "handleMouseMove",
 
       (e) => {
-        if (this.timer) clearTimeout(this.timer), (this.timer = null);
+        if (this.timer) (clearTimeout(this.timer), (this.timer = null));
         let t = (e.touches && e.touches[0]) || e;
         this.setState({
           x: t.pageX - (this.position ? this.position.left : 0),
           y: t.pageY - (this.position ? this.position.top : 0),
         });
 
-        return e.preventDefault(), false;
-      }
+        return (e.preventDefault(), false);
+      },
     );
     _defineProperty(
       this,
@@ -58,7 +58,7 @@ class Main extends Component {
       memoize((index) => {
         let rnd = () => (Math.random() * 255) | 0;
         return `rgb(${rnd()},${rnd()},${rnd()})`;
-      })
+      }),
     );
     _defineProperty(
       this,
@@ -70,7 +70,7 @@ class Main extends Component {
           text,
           color: this.color(i),
         }));
-      })
+      }),
     );
   } // hook up touch/mouse follower and run the gross demo
   componentDidMount() {
@@ -97,20 +97,22 @@ class Main extends Component {
           "p",
           null,
           h("strong", null, "Hint:"),
-          " You can change the text while moving your mouse."
+          " You can change the text while moving your mouse.",
         ),
         h(
           "textarea",
           {onInput: (e) => this.setState({text: e.target.value})},
-          text
-        )
+          text,
+        ),
       ),
 
       h(
         "div",
         {class: "logo"},
-        lines.map(({text, color}, index) => h(Line, {index, text, x, y, color}))
-      )
+        lines.map(({text, color}, index) =>
+          h(Line, {index, text, x, y, color}),
+        ),
+      ),
     );
   }
 }
@@ -134,7 +136,7 @@ const Line = ({x = 0, y = 0, index, text, color: background}) => {
     return h(
       "span",
       {style: {background, transform, left: `${left}px`, top: `${top}px`}},
-      letter
+      letter,
     );
   });
   return h(
@@ -146,7 +148,7 @@ const Line = ({x = 0, y = 0, index, text, color: background}) => {
         height: "40px",
       },
     },
-    letters
+    letters,
   );
 };
 

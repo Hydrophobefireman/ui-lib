@@ -1,4 +1,9 @@
-import {useState, useEffect, h, render} from "../../ui/index.js";
+import {
+  h,
+  render,
+  useEffect,
+  useState,
+} from "https://esm.sh/@hydrophobefireman/ui-lib";
 
 function List(props) {
   const [items, setItems] = useState([]);
@@ -25,10 +30,10 @@ function List(props) {
             },
           },
 
-          h("span", {role: "img", "aria-label": "punch"}, "\uD83E\uDD4A")
-        )
-      )
-    )
+          h("span", {role: "img", "aria-label": "punch"}, "\uD83E\uDD4A"),
+        ),
+      ),
+    ),
   );
 }
 
@@ -41,7 +46,7 @@ function App() {
     h("h1", null, "React State"),
     h("button", {onClick: () => setNum(num + 1)}, "Add item"),
     list,
-    list
+    list,
   );
 }
 

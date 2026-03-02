@@ -2,7 +2,7 @@ import Component, {
   createRef,
   createElement as h,
   render,
-} from "../../ui/index.js";
+} from "https://esm.sh/@hydrophobefireman/ui-lib";
 
 class App extends Component {
   constructor() {
@@ -26,7 +26,7 @@ class App extends Component {
         ref: this.ref,
       },
       "count ",
-      this.state.count
+      this.state.count,
     );
   }
 }

@@ -1,4 +1,6 @@
-import Component, {createElement as h} from "../../../ui/index.js";
+import Component, {
+  createElement as h,
+} from "https://esm.sh/@hydrophobefireman/ui-lib";
 
 const ESCAPE_KEY = 27;
 const ENTER_KEY = 13;
@@ -81,12 +83,12 @@ export default class TodoItem extends Component {
           {
             onDblClick: this.handleEdit,
           },
-          title
+          title,
         ),
         h("button", {
           class: "destroy",
           onClick: this.handleDestroy,
-        })
+        }),
       ),
       editing &&
         h("input", {
@@ -95,7 +97,7 @@ export default class TodoItem extends Component {
           onBlur: this.handleSubmit,
           onInput: this.handleTextInput,
           onKeyDown: this.handleKeyDown,
-        })
+        }),
     );
   }
 }

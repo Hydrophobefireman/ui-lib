@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -56,7 +56,7 @@
         // absolutePath,
         RouterSubscription,
         render,
-      } from "../../ui/index.js";
+      } from "https://esm.sh/@hydrophobefireman/ui-lib";
       class App extends Component {
         constructor() {
           super();
@@ -76,15 +76,15 @@
               {
                 onClick: () => this.setState({scramble: true}),
               },
-              "Shuffle Array"
+              "Shuffle Array",
             ),
             f,
             h(
               "div",
               null,
               "Raw:",
-              JSON.stringify(f.map((x) => x.props.children[0]))
-            )
+              JSON.stringify(f.map((x) => x.props.children[0])),
+            ),
           );
 
           return c;

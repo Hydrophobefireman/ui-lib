@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -10,7 +10,7 @@
         render,
         createElement as h,
         Fragment,
-      } from "../../ui/index.js";
+      } from "https://esm.sh/@hydrophobefireman/ui-lib";
       class Obs extends Component {
         constructor() {
           super();
@@ -30,7 +30,7 @@
             Fragment,
             null,
             h("div", null, "The Height is: ", height, "px"),
-            h("div", null, "The Width is: ", w, "px")
+            h("div", null, "The Width is: ", w, "px"),
           );
         }
       }

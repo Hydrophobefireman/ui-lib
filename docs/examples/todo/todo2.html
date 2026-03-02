@@ -6,7 +6,7 @@
   <body>
     <div id="app"></div>
     <script type="module">
-      import * as ok from "../../ui/index.js";
+      import * as ok from "https://esm.sh/@hydrophobefireman/ui-lib";
       window.a = ok;
       const Component = a.default;
       const h = a.createElement;
@@ -32,7 +32,7 @@
             "\n Current State:",
             {...this.state},
             "\n Old State:",
-            {...s}
+            {...s},
           );
           console.log("componentDidUpdate");
           document.title = `Number of items:${this.state.items.length}`;
@@ -72,9 +72,9 @@
                 oninput: this.handleChange,
                 value: this.state.text,
               }),
-              h("button", null, `Add #`, this.state.items.length + 1)
+              h("button", null, `Add #`, this.state.items.length + 1),
             ),
-            this.state.items.length % 2 ? "hello" : "world"
+            this.state.items.length % 2 ? "hello" : "world",
           );
           return e;
         }
@@ -121,7 +121,7 @@
                 textDecoration: this.props._del ? "line-through" : null,
               },
             },
-            this.props.children
+            this.props.children,
           );
         }
       }
@@ -139,9 +139,9 @@
                 // key: item.id,
                 _del: item._del,
               },
-              item.text
-            )
-          )
+              item.text,
+            ),
+          ),
         );
         return y;
       }
@@ -168,15 +168,15 @@
               },
               "Clicked :",
               this.state.clicked,
-              " times"
+              " times",
             ),
             h(
               "div",
               null,
               h("span", null, "ok"),
               this.state.clicked % 2 ? h(OddNumber) : void 0,
-              "test"
-            )
+              "test",
+            ),
           );
           return c;
         }
@@ -200,7 +200,7 @@
             Fragment,
             null,
             h(SampleComponent),
-            h("div", null, h(Counter))
+            h("div", null, h(Counter)),
           );
         }
       }

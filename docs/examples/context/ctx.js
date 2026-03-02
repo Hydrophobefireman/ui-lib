@@ -5,7 +5,7 @@ import Component, {
   render,
   useContext,
   useState,
-} from "../../ui/index.js";
+} from "https://esm.sh/@hydrophobefireman/ui-lib";
 
 const ctx = createContext("bruh");
 
@@ -25,9 +25,9 @@ function App() {
         h(CValue),
         h(ctx.Consumer, null, (val) => {
           return h("div", null, "Consumer (value: ", val, " )");
-        })
-      )
-    )
+        }),
+      ),
+    ),
   );
 }
 class CValue extends Component {

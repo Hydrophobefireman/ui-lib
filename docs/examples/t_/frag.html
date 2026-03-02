@@ -8,7 +8,7 @@
     <button id="render">Render</button>
     <script type="module">
       const updater = (x) => x + 1;
-      import * as UI from "../../ui/index.js";
+      import * as UI from "https://esm.sh/@hydrophobefireman/ui-lib";
       import {
         h,
         render,
@@ -18,7 +18,7 @@
         Component,
         createRef,
         useRef,
-      } from "../../ui/index.js";
+      } from "https://esm.sh/@hydrophobefireman/ui-lib";
 
       function App() {
         return h("div", null, Math.random());

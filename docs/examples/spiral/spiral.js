@@ -1,4 +1,9 @@
-import {Component, render, h, config} from "../../ui/index.js";
+import {
+  Component,
+  config,
+  h,
+  render,
+} from "https://esm.sh/@hydrophobefireman/ui-libs";
 function _defineProperty(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
@@ -84,7 +89,7 @@ class Main extends Component {
       "div",
       {id: "main"},
       h(Cursor, {label: true, x: x, y: y, big: big}),
-      cursors
+      cursors,
     );
   }
 }
@@ -111,7 +116,7 @@ class Cursor extends Component {
           borderColor: color,
         },
       },
-      inner
+      inner,
     );
   }
 }

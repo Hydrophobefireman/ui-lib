@@ -21,7 +21,11 @@
 
     <script type="module">
       const arr = () => Array.from({length: 5}).map((_, i) => i);
-      import Component, {h, render, useState} from "../../ui/index.js";
+      import Component, {
+        h,
+        render,
+        useState,
+      } from "https://esm.sh/@hydrophobefireman/ui-lib";
       function P() {
         const [r, setR] = useState();
         return h(App, {r: () => setR({})});
@@ -44,7 +48,7 @@
             {
               onClick: reRender,
             },
-            "re render"
+            "re render",
           );
         }
         return h(
@@ -54,9 +58,9 @@
           h(
             "div",
             null,
-            list.map((i) => h("div", null, i))
+            list.map((i) => h("div", null, i)),
           ),
-          h(NewComponentOnReRenders, null)
+          h(NewComponentOnReRenders, null),
         );
       }
       render(h(P), document.getElementById("app"));

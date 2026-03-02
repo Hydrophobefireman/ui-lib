@@ -32,7 +32,7 @@
         render,
         Path,
         useParams,
-      } from "../../ui/index.js";
+      } from "https://esm.sh/@hydrophobefireman/ui-lib";
       const p = Router.path;
       function App() {
         return h(
@@ -47,7 +47,7 @@
           h(Path, {
             match: "/test/:num",
             component: h(Fragment, null, [h(() => console.log("ok")), h(func)]),
-          })
+          }),
         );
       }
       function func(p) {

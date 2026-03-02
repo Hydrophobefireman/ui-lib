@@ -8,7 +8,7 @@
     <button id="render">Render</button>
     <script type="module">
       const updater = (x) => x + 1;
-      import * as UI from "../../ui/index.js";
+      import * as UI from "https://esm.sh/@hydrophobefireman/ui-lib";
       import {
         h,
         render,
@@ -19,7 +19,7 @@
         createRef,
         useRef,
         forwardRef,
-      } from "../../ui/index.js";
+      } from "https://esm.sh/@hydrophobefireman/ui-lib";
 
       const Div = forwardRef(function Div(props, ref) {
         console.log("ok");

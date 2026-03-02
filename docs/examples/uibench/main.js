@@ -1,4 +1,9 @@
-import {render, createElement as h, config} from "../../ui/index.js";
+import {
+  config,
+  createElement as h,
+  render,
+} from "https://esm.sh/@hydrophobefireman/ui-lib";
+
 import {Main} from "./js/main.js";
 uibench.init("ui-lib", "??");
 document.addEventListener("DOMContentLoaded", (e) => {
@@ -6,6 +11,6 @@ document.addEventListener("DOMContentLoaded", (e) => {
   uibench.run(
     (state) => render(h(Main, {data: state}), container),
     (samples) =>
-      render(h("pre", null, JSON.stringify(samples, null, " ")), container)
+      render(h("pre", null, JSON.stringify(samples, null, " ")), container),
   );
 });

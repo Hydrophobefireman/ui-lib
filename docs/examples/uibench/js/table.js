@@ -1,4 +1,4 @@
-import Component, {h} from "../../../ui/index.js";
+import Component, {h} from "https://esm.sh/@hydrophobefireman/ui-lib";
 class TableCell extends Component {
   constructor(props) {
     super(props);
@@ -21,7 +21,7 @@ class TableCell extends Component {
         class: "TableCell",
         onClick: this.onClick,
       },
-      props.text
+      props.text,
     );
   }
 }
@@ -52,7 +52,7 @@ class TableRow extends Component {
         h(TableCell, {
           key: i,
           text: cells[i],
-        })
+        }),
       );
     }
 
@@ -62,7 +62,7 @@ class TableRow extends Component {
         class: classes,
         "data-id": data.id,
       },
-      children
+      children,
     );
   }
 }
@@ -82,7 +82,7 @@ export class Table extends Component {
         h(TableRow, {
           key: item.id,
           data: item,
-        })
+        }),
       );
     }
 
@@ -91,7 +91,7 @@ export class Table extends Component {
       {
         class: "Table",
       },
-      h("tbody", null, children)
+      h("tbody", null, children),
     );
   }
 }

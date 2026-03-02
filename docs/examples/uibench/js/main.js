@@ -1,6 +1,7 @@
-import Component, {h} from "../../../ui/index.js";
-import {Table} from "./table.js";
+import Component, {h} from "https://esm.sh/@hydrophobefireman/ui-lib";
+
 import {Anim} from "./anim.js";
+import {Table} from "./table.js";
 import {Tree} from "./tree.js";
 export class Main extends Component {
   shouldComponentUpdate(nextProps, nextState) {
@@ -31,7 +32,7 @@ export class Main extends Component {
       {
         class: "Main",
       },
-      section
+      section,
     );
   }
 }

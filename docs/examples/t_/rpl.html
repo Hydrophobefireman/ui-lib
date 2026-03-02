@@ -7,14 +7,14 @@
     <div id="app"></div>
     <script type="module">
       const updater = (x) => x + 1;
-      import * as UI from "../../ui/index.js";
+      import * as UI from "https://esm.sh/@hydrophobefireman/ui-lib";
       import {
         h,
         render,
         useState,
         Fragment,
         useEffect,
-      } from "../../ui/index.js";
+      } from "https://esm.sh/@hydrophobefireman/ui-lib";
       window.UI = window.a = UI;
       function Button() {
         const [count, setCount] = useState(0);
@@ -27,14 +27,14 @@
             {onClick: () => setCount(updater)},
             "Clicked ",
             count,
-            " times"
+            " times",
           ),
           h(
             "button",
             {onClick: () => updateTime(new Date())},
             "Time: ",
-            time.toString()
-          )
+            time.toString(),
+          ),
         );
       }
       function Hide() {
@@ -46,7 +46,11 @@
           "div",
           null,
           show && h(Effects),
-          h("div", null, h("button", {onClick: () => set((x) => !x)}, "Toggle"))
+          h(
+            "div",
+            null,
+            h("button", {onClick: () => set((x) => !x)}, "Toggle"),
+          ),
         );
       }
       function Effects() {
@@ -55,7 +59,7 @@
           let _;
           _ = setInterval(
             () => console.log("timer") || setTime(new Date()),
-            1000
+            1000,
           );
           console.log("new effect", _);
           return () => {
@@ -71,7 +75,7 @@
           null,
           h("div", null, h(Button)),
           h("div", null, h(Button)),
-          h(Ok)
+          h(Ok),
         );
       };
       render(h(App), document.getElementById("app"));

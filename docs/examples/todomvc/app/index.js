@@ -1,7 +1,10 @@
-import Component, {createElement as h} from "../../../ui/index.js";
-import TodoModel from "./model.js";
+import Component, {
+  createElement as h,
+} from "https://esm.sh/@hydrophobefireman/ui-lib";
+
 import TodoFooter from "./footer.js";
 import TodoItem from "./item.js";
+import TodoModel from "./model.js";
 
 const ENTER_KEY = 13;
 
@@ -80,7 +83,7 @@ export default class App extends Component {
       shownTodos = todos.filter(FILTERS[nowShowing]),
       activeTodoCount = todos.reduce(
         (a, todo) => a + (todo.completed ? 0 : 1),
-        0
+        0,
       ),
       completedCount = todos.length - activeTodoCount;
 
@@ -100,7 +103,7 @@ export default class App extends Component {
           onKeyDown: this.handleNewTodoKeyDown,
           onInput: this.handleNewTodoInput,
           autoFocus: true,
-        })
+        }),
       ),
       todos.length
         ? h(
@@ -120,7 +123,7 @@ export default class App extends Component {
               {
                 for: "toggle-all",
               },
-              "Mark all as complete"
+              "Mark all as complete",
             ),
             h(
               "ul",
@@ -136,9 +139,9 @@ export default class App extends Component {
                   editing: editing === todo.id,
                   onSave: this.save,
                   onCancel: this.cancel,
-                })
-              )
-            )
+                }),
+              ),
+            ),
           )
         : null,
       activeTodoCount || completedCount
@@ -148,7 +151,7 @@ export default class App extends Component {
             nowShowing: nowShowing,
             onClearCompleted: this.clearCompleted,
           })
-        : null
+        : null,
     );
   }
 }

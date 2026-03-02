@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -8,7 +8,10 @@
   </head>
   <body>
     <script type="module">
-      import Component, {render, createElement as h} from "../../ui/index.js";
+      import Component, {
+        render,
+        createElement as h,
+      } from "https://esm.sh/@hydrophobefireman/ui-lib";
       class K extends Component {
         async componentDidMount() {
           throw new Error("ok");

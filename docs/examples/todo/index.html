@@ -31,7 +31,7 @@
         addPluginCallback,
         render,
         Path,
-      } from "../../ui/index.js";
+      } from "https://esm.sh/@hydrophobefireman/ui-lib";
       const f = Fragment;
       addPluginCallback("domNodeCreated", console.log);
       class UL extends Component {
@@ -39,7 +39,7 @@
           const c = h(
             "ul",
             null,
-            show ? todos.map((x) => h("li", null, x.text)) : null
+            show ? todos.map((x) => h("li", null, x.text)) : null,
           );
           return c;
         }
@@ -72,7 +72,7 @@
         componentWillMount() {
           console.log("willMount");
           RouterSubscription.subscribe((e) =>
-            this.setState({navigateTo: e !== base ? base : "page1"})
+            this.setState({navigateTo: e !== base ? base : "page1"}),
           );
         }
         componentDidMount() {
@@ -91,8 +91,8 @@
                   onClick: () => this.setState((p) => ({show: !p.show})),
                 },
                 "Todo List is",
-                this.state.show ? " Shown" : " Hidden"
-              )
+                this.state.show ? " Shown" : " Hidden",
+              ),
             ),
             h(
               "form",
@@ -109,8 +109,8 @@
                 {
                   type: "submit",
                 },
-                "Add"
-              )
+                "Add",
+              ),
             ),
             h(UL, {todos, show: this.state.show}),
             h(
@@ -129,9 +129,9 @@
                 component: function () {
                   return h("div", null, h(A, {href: "page1"}, "go to page1"));
                 },
-              })
+              }),
             ),
-            h(A, {href: navigateTo}, "Navigate To:", navigateTo)
+            h(A, {href: navigateTo}, "Navigate To:", navigateTo),
           );
         }
       }
@@ -146,7 +146,7 @@
             return Foo;
           },
         }),
-        document.getElementById("app")
+        document.getElementById("app"),
       );
     </script>
     <a href="todo2.html">The other todo</a>

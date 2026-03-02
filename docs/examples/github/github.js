@@ -1,9 +1,9 @@
 /**@see https://preactjs.com/repl */
 import Component, {
+  Fragment,
   createElement as h,
   render,
-  Fragment,
-} from "../../ui/index.js";
+} from "https://esm.sh/@hydrophobefireman/ui-lib";
 const SEARCH = "https://api.github.com/search/repositories";
 
 class GithubResults extends Component {
@@ -23,7 +23,7 @@ class GithubResults extends Component {
           style: "text-align:center;",
         },
         "Results For:",
-        q
+        q,
       ),
       h(
         "div",
@@ -34,8 +34,8 @@ class GithubResults extends Component {
           return h(Result, {
             result,
           });
-        })
-      )
+        }),
+      ),
     );
   }
 }
@@ -53,12 +53,12 @@ const Result = ({result}) =>
           href: result.html_url,
           target: "_blank",
         },
-        result.full_name
+        result.full_name,
       ),
       "🌟",
-      h("strong", null, result.stargazers_count)
+      h("strong", null, result.stargazers_count),
     ),
-    h("p", null, result.description)
+    h("p", null, result.description),
   );
 
 class Form extends Component {
@@ -78,9 +78,9 @@ class Form extends Component {
           value: i,
           onInput: (e) => this.setState({i: e.target.value, b: false}),
         }),
-        h("button", null, "Search")
+        h("button", null, "Search"),
       ),
-      b && h(GithubResults, {q: i})
+      b && h(GithubResults, {q: i}),
     );
   }
 }

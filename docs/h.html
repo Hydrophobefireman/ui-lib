@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -12,18 +12,18 @@
       </div>
     </div>
     <script type="module">
-      import {h, render} from "./ui/index.js";
+      import {h, render} from "https://esm.sh/@hydrophobefireman/ui-lib";
       const button = document.querySelector("button");
       const App = h(
         "div",
         {"data-untouched": false},
-        h("button", {onClick: () => console.log("Evt")}, "Rendered App")
+        h("button", {onClick: () => console.log("Evt")}, "Rendered App"),
       );
       //   render(h(App), document.querySelector("#root"));
       button.addEventListener(
         "click",
         () => render(App, document.querySelector("#root")),
-        {once: true}
+        {once: true},
       );
     </script>
   </body>
