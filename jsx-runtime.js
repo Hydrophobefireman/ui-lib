@@ -1,6 +1,8 @@
-export {
-  createElement as jsx,
-  createElement as jsxs,
-  createElement as jsxDEV,
-  Fragment,
-} from "@hydrophobefireman/ui-lib";
+import {Fragment, createElement} from "@hydrophobefireman/ui-lib";
+
+function jsxDEV(el, props, ..._rest) {
+  return createElement(el, props);
+}
+let jsx = jsxDEV;
+let jsxs = jsxDEV;
+export {Fragment, jsx, jsxs, jsxDEV};
