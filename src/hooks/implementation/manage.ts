@@ -1,10 +1,10 @@
-import type {Component, EffectsDictionary} from "../../component";
+import type {Component, EffectsDictionary} from "../../component.js";
 import config, {
   HAS_RAF,
   addPluginCallback,
   defer,
   reqAnimFrame,
-} from "../../config";
+} from "../../config.js";
 
 let hookIndex = 0;
 
@@ -14,39 +14,57 @@ export const rafPendingCallbacks: EffectsDictionary[] = [];
 export const layoutPendingCallbacks: EffectsDictionary[] = [];
 
 export function runEffectCleanup(effect: EffectsDictionary[0]) {
-  // only called if the effect itself returns a function
+  // Clear the pointer before invoking user code so a throwing cleanup cannot
+  // leave stale bookkeeping behind or run twice.
   const cl = effect.cleanUp;
-  if (typeof cl === "function") {
-    cl();
-    effect.cleanUp = null;
-  }
+  effect.cleanUp = null;
+  if (typeof cl === "function") cl();
 }
 
 export function runHookEffectAndAssignCleanup(effect: EffectsDictionary[0]) {
-  let ret = effect.cb;
-  if (ret && typeof (ret = ret()) === "function") {
-    effect.cleanUp = ret;
-  }
-  // make sure we can't run this effect again
-  effect.resolved = true;
+  const cb = effect.cb;
   effect.cb = null;
+  effect.resolved = true;
+  if (!cb) return;
+  const ret = cb();
+  if (typeof ret === "function") effect.cleanUp = ret;
 }
 export function effectCbHandler(effect: EffectsDictionary[0]) {
-  // we run this cleanup first to ensure any older effect has been successfully completed
-  // an effect will be completed when both it's callback and it's cleanup (if provided have been finished)
-  // only run cleanup on unresolved effects
-  // i.e effects that have their dependency arrays updated
-  effect.resolved || runEffectCleanup(effect);
+  if (!effect || effect.disposed) return;
+  // A cleanup inherited from the previous run always precedes the new callback.
+  runEffectCleanup(effect);
   runHookEffectAndAssignCleanup(effect);
 }
 
 function _runEffect(arr: EffectsDictionary[]) {
-  arr.forEach((x) => {
-    for (const i in x) {
-      const value = x[i];
-      effectCbHandler(value);
+  // Drain a snapshot. Work scheduled by an effect during this flush stays in
+  // `arr` for the next flush instead of being discarded.
+  const snapshots = arr.splice(0);
+  const pending: EffectsDictionary[0][] = [];
+  for (const effects of snapshots) {
+    for (const i in effects) {
+      // Remove pending work from the instance dictionary. The record itself
+      // remains reachable from the hook for unmount cleanup. Detach all records
+      // before user code can enqueue new work in the same dictionaries.
+      pending.push(effects[i]);
+      delete effects[i];
     }
-  });
+  }
+  let failed = false;
+  let firstError: unknown;
+  for (const effect of pending) {
+    try {
+      effectCbHandler(effect);
+    } catch (error) {
+      // Finish draining independent effects, but still report the first error.
+      // A throwing cleanup must not leave an unqueued callback retained either.
+      effect.cb = null;
+      effect.resolved = true;
+      if (!failed) firstError = error;
+      failed = true;
+    }
+  }
+  if (failed) throw firstError;
 }
 function useEffectCallbacks() {
   return _runEffect(rafPendingCallbacks);
@@ -57,11 +75,30 @@ function layoutEffectCallbacks() {
   return _runEffect(layoutPendingCallbacks);
 }
 const effectScheduler = HAS_RAF ? reqAnimFrame : defer;
+let passiveFlushScheduled = false;
+
+function schedulePassiveEffects() {
+  if (passiveFlushScheduled) return;
+  passiveFlushScheduled = true;
+  const scheduler = config.debounceEffect || effectScheduler;
+  scheduler(() => {
+    passiveFlushScheduled = false;
+    useEffectCallbacks();
+  });
+}
+
+/** Remove an instance's pending dictionary from both global queues. */
+export function removePendingEffects(pending: EffectsDictionary) {
+  if (!pending) return;
+  for (const arr of [layoutPendingCallbacks, rafPendingCallbacks]) {
+    const index = arr.indexOf(pending);
+    if (index > -1) arr.splice(index, 1);
+  }
+}
 
 function diffEnd() {
-  const scheduler = config.debounceEffect || effectScheduler;
   layoutEffectCallbacks();
-  scheduler(useEffectCallbacks);
+  if (rafPendingCallbacks.length) schedulePassiveEffects();
 }
 
 function prepForNextHookCandidate(c: Component) {

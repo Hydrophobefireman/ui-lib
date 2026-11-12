@@ -1,19 +1,19 @@
-import {plugins} from "./config";
-import {EMPTY_OBJ, Fragment, NULL_TYPE} from "./constants";
-import {
+import {plugins} from "./config.js";
+import {EMPTY_OBJ, Fragment, NULL_TYPE} from "./constants.js";
+import type {
   ComponentChild,
   ComponentChildren,
   Renderable,
   VNode,
   createElementPropType,
-} from "./types/index";
+} from "./types/index.js";
 import {
   assign,
   create,
   createElementChildren,
   flattenArray,
   objectWithoutKeys,
-} from "./util";
+} from "./util.js";
 
 export const skipProps: (keyof VNode)[] = ["key", "ref"];
 
@@ -84,7 +84,8 @@ export function coerceToVNode(VNode: ComponentChild | VNode): VNode {
     const vn = getVNode(
       (VNode as VNode).type,
       (VNode as VNode).props,
-      (VNode as VNode).key
+      (VNode as VNode).key,
+      (VNode as VNode).ref
     );
     return vn;
   }

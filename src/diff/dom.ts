@@ -1,9 +1,10 @@
-import {domOp} from "../commit";
-import {plugins} from "../config";
+import {domOp} from "../commit.js";
+import config, {plugins} from "../config.js";
 import {
   BATCH_MODE_PLACE_NODE,
   BATCH_MODE_REMOVE_ATTRIBUTE,
   BATCH_MODE_REMOVE_ATTRIBUTE_NS,
+  BATCH_MODE_REMOVE_SVG_ATTRIBUTE,
   BATCH_MODE_SET_ATTRIBUTE,
   BATCH_MODE_SET_STYLE,
   BATCH_MODE_SET_SVG_ATTRIBUTE,
@@ -11,10 +12,8 @@ import {
   IS_SVG_ATTR,
   NULL_TYPE,
   RENDER_MODE_SERVER,
-} from "../constants";
-import {IS_ARIA_PROP} from "../constants";
-import {DiffMeta, Props, UIElement, VNode} from "../types/index";
-import {config} from "..";
+} from "../constants.js";
+import type {DiffMeta, DOMOps, Props, UIElement, VNode} from "../types/index.js";
 
 export function diffDomNodes(
   newVNode: VNode,
@@ -109,7 +108,7 @@ function diffAttributes(
   const nextAttrs = newVNode.props;
 
   if (prevAttrs != null) {
-    __removeOldAttributes(dom, prevAttrs, nextAttrs);
+    __removeOldAttributes(dom, prevAttrs, nextAttrs, meta);
   }
 
   __diffNewAttributes(dom, prevAttrs || EMPTY_OBJ, nextAttrs, meta);
@@ -165,46 +164,6 @@ function __diffNewAttributes(
   }
 }
 
-export function diffStyle(
-  dom: UIElement,
-  newValue: string | object,
-  oldValue: string | object
-) {
-  oldValue = oldValue || "";
-
-  // incase someone sets their style to null
-  // fastest way to remove previous props
-  newValue = newValue || "";
-  const st = dom.style;
-
-  if (typeof newValue === "string") {
-    st.cssText = newValue;
-
-    return;
-  }
-
-  const oldValueIsString = typeof oldValue === "string";
-
-  if (oldValueIsString) {
-    st.cssText = "";
-  } else {
-    for (const styleProp in oldValue as object) {
-      if (newValue[styleProp] == null) {
-        st[styleProp] = "";
-      }
-    }
-  }
-
-  for (const i in newValue) {
-    const prop = newValue[i];
-
-    if (oldValueIsString || prop !== oldValue[i]) {
-      if (i[0] == "-") {
-        st.setProperty(i, prop);
-      } else st[i] = prop;
-    }
-  }
-}
 const trim = (k: string) => k.trim();
 
 function diffClass(
@@ -236,64 +195,32 @@ function diffClass(
 export function __removeOldAttributes(
   dom: UIElement,
   prev: Props<any>,
-  next: Props<any>
+  next: Props<any>,
+  meta: DiffMeta
 ) {
   for (let i in prev) {
-    if (!UNSAFE_ATTRS[i] && next[i] == null && prev[i] != null) {
-      const attributeRemovalMode =
-        i === (i = i.replace(IS_SVG_ATTR, ""))
-          ? BATCH_MODE_REMOVE_ATTRIBUTE
-          : BATCH_MODE_REMOVE_ATTRIBUTE_NS;
-      domOp({
-        node: dom,
-        action: attributeRemovalMode,
-        attr: i,
-      });
+    if (UNSAFE_ATTRS[i] || next[i] != null || prev[i] == null) continue;
+
+    let attr = i;
+    if (meta.isSvg && (attr === "class" || attr === "className")) {
+      attr = "class";
     }
+    const isXlink = attr !== (attr = attr.replace(IS_SVG_ATTR, ""));
+    const isEvent = attr[0] === "o" && attr[1] === "n";
+
+    let action: DOMOps["action"];
+    if (isXlink) action = BATCH_MODE_REMOVE_ATTRIBUTE_NS;
+    else if (meta.isSvg && !isEvent) action = BATCH_MODE_REMOVE_SVG_ATTRIBUTE;
+    else action = BATCH_MODE_REMOVE_ATTRIBUTE;
+
+    domOp({
+      node: dom,
+      action,
+      attr,
+    });
   }
 }
 
 function __diffTextNodes(dom: UIElement, newVal: string, oldVal: string) {
   return newVal === oldVal || (dom.nodeValue = newVal);
-}
-
-/** dom helper */
-export function $(
-  dom: UIElement,
-  prop: string,
-  value: any,
-  isSvg: boolean,
-  isSSR: boolean
-) {
-  if (prop[0] === "o" && prop[1] === "n") {
-    return $event(dom, prop as keyof JSX.DOMEvents<any>, value);
-  }
-  const shouldRemove =
-    value == null || (value === false && !IS_ARIA_PROP.test(prop));
-
-  if (!isSvg && !isSSR && prop in dom) {
-    return (dom[prop] = shouldRemove ? "" : value);
-  } else {
-    if (shouldRemove) return dom.removeAttribute(prop);
-    return dom.setAttribute(prop, value);
-  }
-}
-function $event(
-  dom: UIElement,
-  event: string,
-  listener: JSX.EventHandler<any>
-) {
-  event = event.substr(2).toLowerCase();
-  const eventDict = dom._events;
-  if (listener == null) {
-    dom.removeEventListener(event, eventListenerProxy);
-    delete eventDict[event];
-  } else {
-    eventDict[event] || dom.addEventListener(event, eventListenerProxy);
-    eventDict[event] = listener;
-  }
-}
-
-function eventListenerProxy(e: Event) {
-  return (this as UIElement)._events[e.type].call(this as EventTarget, e);
 }

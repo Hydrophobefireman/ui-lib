@@ -2,30 +2,49 @@ import type {
   Component,
   EffectsDictionary,
   PendingEffects,
-} from "../../component";
-import config from "../../config";
-import {EMPTY_OBJ} from "../../constants";
-import {$push} from "../../util";
+} from "../../component.js";
+import config from "../../config.js";
+import {$push} from "../../util.js";
 import {
   getHookStateAtCurrentRender,
   layoutPendingCallbacks,
+  removePendingEffects,
   runEffectCleanup,
-  runHookEffectAndAssignCleanup,
-} from "./manage";
-import {argsChanged} from "./util";
+} from "./manage.js";
+import {argsChanged, getCurrentHookValueOrSetDefault} from "./util.js";
 
-function _$unmount(pending: EffectsDictionary, $this: Component) {
-  for (const effect in pending || EMPTY_OBJ) {
-    runEffectCleanup(pending[effect]);
-  }
-  $this._pendingEffects = null;
-}
 function unmount(this: Component) {
-  const p = this._pendingEffects || EMPTY_OBJ;
-  const pending$sync = p.sync;
-  const pending$async = p.async;
-  _$unmount(pending$sync, this);
-  _$unmount(pending$async, this);
+  const pending = this._pendingEffects;
+  const seen = new Set<EffectsDictionary[0]>();
+
+  const cleanupRecord = (effect: EffectsDictionary[0]) => {
+    if (!effect || seen.has(effect)) return;
+    seen.add(effect);
+    effect.disposed = true;
+    effect.cb = null;
+    effect.resolved = true;
+    runEffectCleanup(effect);
+  };
+
+  const cleanupDictionary = (effects: EffectsDictionary) => {
+    for (const i in effects) cleanupRecord(effects[i]);
+  };
+
+  if (pending) {
+    // Queued work that has not run yet must never run after unmount.
+    cleanupDictionary(pending.sync);
+    cleanupDictionary(pending.async);
+    removePendingEffects(pending.sync);
+    removePendingEffects(pending.async);
+  }
+  // Effects that already ran are no longer pending but still own a cleanup.
+  const hooks = this._hooksData;
+  if (hooks) {
+    for (const hook of hooks) {
+      if (hook && hook.effect) cleanupRecord(hook.effect);
+    }
+  }
+  this._pendingEffects = null;
 }
 export function effect(
   callback: () => (() => unknown) | unknown,
@@ -41,8 +60,11 @@ export function effect(
 
   const hookData = candidate._hooksData;
 
-  let currentHook =
-    hookData[hookIndex] || ({} as typeof candidate._hooksData[0]);
+  const currentHook = getCurrentHookValueOrSetDefault(
+    hookData,
+    hookIndex,
+    () => ({})
+  );
 
   const instanceEffects: PendingEffects = (candidate._pendingEffects =
     candidate._pendingEffects || {
@@ -51,40 +73,28 @@ export function effect(
     });
   const pending = instanceEffects[which];
 
-  const oldEffect = pending[hookIndex];
+  const oldEffect = currentHook.effect as EffectsDictionary[0];
   if (!argsChanged(currentHook.args, dependencies)) {
-    // mark the effect as resolved
-    // no cleanup will be performed (except on unmount)
-    // @TODO CHECK IF THIS BREAKS ANYTHING
-    // I REALLY NEED TO ADD TESTS
-    // if (oldEffect) oldEffect.resolved = true;
+    // Unchanged dependencies keep the existing pending/mounted effect.
     return;
   }
-  hookData[hookIndex] = currentHook;
+
   currentHook.args = dependencies;
 
-  // TODO
-  // in case we have an unused effect (callback not called yet)
-  // attempt to defer the old effect as well, maybe wrap them together in a separate effect
-  // as in this case we could end up blocking the render iff -
-  // - previous callback hasn't been called yet
-  // - previous callback is an expensive function
-  // the cleanup does not matter as we will call it right before we call the new effect
-  // however it is important that we call the effect right here for now as in the rare event
-  // where the callback hasn't been called, we could end up with no cleanup either
-  // another approach could be to leave the uncalled function and it's cleanup and start with
-  // what we have as the new effect.
+  // If the previous callback never ran there is nothing to clean up. If it did
+  // run, carry its cleanup forward so it executes immediately before the next
+  // callback instead of running user code during render.
+  const cleanUp = oldEffect ? oldEffect.cleanUp : null;
+  if (oldEffect) oldEffect.disposed = true;
 
-  const cleanUp = oldEffect
-    ? (runHookEffectAndAssignCleanup(oldEffect) as any as false) ||
-      oldEffect.cleanUp
-    : null;
-
-  pending[hookIndex] = {
+  const effectRecord: EffectsDictionary[0] = {
     cb: callback,
     cleanUp,
+    resolved: false,
+    disposed: false,
   };
-  // only push effect if we haven't already added it to the queue
+  currentHook.effect = effectRecord;
+  pending[hookIndex] = effectRecord;
   $push(arr, pending);
 
   if (!(candidate as any).__attachedUnmount) {

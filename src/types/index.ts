@@ -1,5 +1,19 @@
-import {Component} from "../component";
-import {UILibEventTarget} from "./jsx";
+import type {Component} from "../component.js";
+import type {UILibEventTarget} from "./jsx.js";
+import type {
+  BATCH_MODE_CLEAR_POINTERS,
+  BATCH_MODE_PLACE_NODE,
+  BATCH_MODE_REMOVE_ATTRIBUTE,
+  BATCH_MODE_REMOVE_ATTRIBUTE_NS,
+  BATCH_MODE_REMOVE_ELEMENT,
+  BATCH_MODE_REMOVE_SVG_ATTRIBUTE,
+  BATCH_MODE_SET_ATTRIBUTE,
+  BATCH_MODE_SET_STYLE,
+  BATCH_MODE_SET_SVG_ATTRIBUTE,
+  RENDER_MODE_CLIENT,
+  RENDER_MODE_HYDRATE,
+  RENDER_MODE_SERVER,
+} from "../constants.js";
 export interface RefType<T> {
   current: T;
 }
@@ -76,8 +90,14 @@ export type ComponentChild =
   | undefined;
 export type ComponentChildren = ComponentChild[];
 
+export interface EventHandlerRecord {
+  bubble?: JSX.EventHandler<any>;
+  capture?: JSX.EventHandler<any>;
+  bubbleProxy?: EventListener;
+  captureProxy?: EventListener;
+}
 export interface UIElement extends HTMLElement {
-  _events?: Partial<Record<keyof JSX.DOMEvents<any>, JSX.EventHandler<any>>>;
+  _events?: Record<string, EventHandlerRecord>;
   _VNode?: VNode;
   data?: string | number;
   _nodeContext?: any;
@@ -113,9 +133,9 @@ export type DiffMeta = {
   depth: number;
   isSvg: boolean;
   mode:
-    | 0 // client mode
-    | 1 // server render mode
-    | 2; // hydrate mode;
+    | typeof RENDER_MODE_CLIENT
+    | typeof RENDER_MODE_SERVER
+    | typeof RENDER_MODE_HYDRATE;
   context: {[id: string]: ContextProvider};
   contextValue?: any;
   provider?: ContextProvider;
@@ -135,6 +155,7 @@ export interface ContextConsumer<T> {
 export interface ContextProvider<T = any> extends Component<{value: T}> {
   getChildContext(): {[id: string]: Context};
   add(c: Component): void;
+  remove(c: Component): void;
 }
 export interface ContextProviderConstructor<P = {}> {
   new (props: P, context: any): ContextProvider<P>;
@@ -155,13 +176,15 @@ export interface HookInternal {
 export interface DOMOps {
   node: UIElement;
   action:
-    | 1 // BATCH_MODE_SET_ATTRIBUTE | BATCH_MODE_REMOVE_ATTRIBUTE
-    | 2 // BATCH_MODE_REMOVE_ELEMENT
-    | 3 // BATCH_MODE_SET_STYLE
-    | 4 // BATCH_MODE_PLACE_NODE
-    | 5 //  BATCH_MODE_SET_SVG_ATTRIBUTE
-    | 6 // BATCH_MODE_REMOVE_ATTRIBUTE_NS
-    | 7; // BATCH_MODE_REMOVE_POINTERS
+    | typeof BATCH_MODE_SET_ATTRIBUTE
+    | typeof BATCH_MODE_REMOVE_ATTRIBUTE
+    | typeof BATCH_MODE_REMOVE_ELEMENT
+    | typeof BATCH_MODE_SET_STYLE
+    | typeof BATCH_MODE_PLACE_NODE
+    | typeof BATCH_MODE_SET_SVG_ATTRIBUTE
+    | typeof BATCH_MODE_REMOVE_ATTRIBUTE_NS
+    | typeof BATCH_MODE_CLEAR_POINTERS
+    | typeof BATCH_MODE_REMOVE_SVG_ATTRIBUTE;
   refDom?: HTMLElement;
   VNode?: VNode;
   attr?: string;

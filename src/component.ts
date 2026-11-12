@@ -1,16 +1,17 @@
-import config, {plugins} from "./config";
-import {LifeCycleCallbacks, RENDER_MODE_CLIENT} from "./constants";
-import {diff} from "./diff/index";
-import {onDiff} from "./lifeCycleCallbacks";
-import {
+import config, {plugins} from "./config.js";
+import {RENDER_MODE_CLIENT} from "./constants.js";
+import type {LifeCycleCallbacks} from "./constants.js";
+import {diff} from "./diff/index.js";
+import {onDiff} from "./lifeCycleCallbacks.js";
+import type {
   ComponentChild,
   Props,
   UIElement,
   VNode,
   setStateArgType,
-} from "./types/index";
-import {ContextProvider} from "./types/index";
-import {assign} from "./util";
+  ContextProvider,
+} from "./types/index.js";
+import {assign} from "./util.js";
 
 const RENDER_QUEUE: Component[] = [];
 export interface EffectsDictionary {
@@ -18,6 +19,8 @@ export interface EffectsDictionary {
     cb: () => any;
     cleanUp?: () => any;
     resolved?: boolean;
+    /** queued work was superseded or unmounted */
+    disposed?: boolean;
   };
 }
 export interface PendingEffects {
@@ -35,7 +38,12 @@ export class Component<P = {}, S = {}> {
 
   _pendingEffects?: PendingEffects;
   // our hook data store
-  _hooksData?: {args: any; hookState: any}[];
+  _hooksData?: {
+    args?: any;
+    hookState?: any;
+    reducer?: any;
+    effect?: any;
+  }[];
   // tracks component nesting
   _depth?: number;
   // props passed to the component
@@ -48,6 +56,8 @@ export class Component<P = {}, S = {}> {
   _nextState?: S;
   // context of this component and its descendants
   _sharedContext?: {[id: string]: ContextProvider};
+  // provider this component (or its contextType) is subscribed to
+  _contextProvider?: ContextProvider;
   context?: any;
 
   render(props?: Props<P>, state?: Readonly<S>, context?: any): ComponentChild {
@@ -127,6 +137,7 @@ export class Component<P = {}, S = {}> {
 }
 
 export function enqueueRender(c: Component) {
+  if (c._dirty) return;
   c._dirty = true;
   if (RENDER_QUEUE.push(c) === 1) {
     config.scheduleRender(process);
@@ -135,7 +146,9 @@ export function enqueueRender(c: Component) {
 
 function process() {
   let p: Component;
-  RENDER_QUEUE.sort((x, y) => x._depth - y._depth);
+  // _depth is larger for descendants. Sorting descending and popping from the
+  // end processes parents before children deterministically.
+  RENDER_QUEUE.sort((x, y) => y._depth - x._depth);
   while ((p = RENDER_QUEUE.pop())) {
     if (p._dirty) {
       p._dirty = false;

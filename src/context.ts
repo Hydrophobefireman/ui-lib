@@ -1,9 +1,9 @@
-import {Component, enqueueRender} from "./component";
-import type {ConsumerCallback, Context, ContextProvider} from "./types/index";
+import {Component, enqueueRender} from "./component.js";
+import type {ConsumerCallback, Context} from "./types/index.js";
 
-import {$push} from "./util";
-import {Fragment} from "./constants";
-import {createElement as h} from "./create_element";
+import {$push} from "./util.js";
+import {Fragment} from "./constants.js";
+import {createElement as h} from "./create_element.js";
 
 let contextId = 0;
 interface ProviderProps<T> {
@@ -24,20 +24,49 @@ export function createContext<T>(def: T): Context<T> {
     getChildContext() {
       return this._o;
     }
+    componentWillUnmount() {
+      this._subs.length = 0;
+    }
     shouldComponentUpdate(p: ProviderProps<T>) {
-      this.props.deopt &&
-        p.value !== this.props.value &&
-        this._subs.some((x) => enqueueRender(x));
+      // Changed values must reach subscribers even when an intermediate
+      // component blocks normal child rendering. `deopt` remains accepted for
+      // backwards compatibility but is no longer needed to enable this.
+      if (!Object.is(p.value, this.props.value)) {
+        const subs = this._subs.slice();
+        for (let i = 0; i < subs.length; i++) {
+          if (this._subs.indexOf(subs[i]) > -1) enqueueRender(subs[i]);
+        }
+      }
       return true;
     }
     add(c: Component) {
-      const s = this._subs;
-      $push(s, c);
-      const old = c.componentWillUnmount;
-      c.componentWillUnmount = () => {
-        s.splice(s.indexOf(c), 1);
-        old && old.call(c);
-      };
+      $push(this._subs, c);
+      const subscriptions: Provider[] =
+        (c as any).__contextProviders ||
+        ((c as any).__contextProviders = []);
+      if (subscriptions.indexOf(this as any) > -1) return;
+      subscriptions.push(this as any);
+      if (!(c as any).__contextUnmountAttached) {
+        (c as any).__contextUnmountAttached = true;
+        const old = c.componentWillUnmount;
+        c.componentWillUnmount = function () {
+          const providers: Provider[] = (c as any).__contextProviders || [];
+          for (let i = providers.length - 1; i >= 0; i--) {
+            providers[i].remove(c);
+          }
+          (c as any).__contextProviders = [];
+          old && old.call(c);
+        };
+      }
+    }
+    remove(c: Component) {
+      const index = this._subs.indexOf(c);
+      if (index > -1) this._subs.splice(index, 1);
+      const subscriptions: Provider[] = (c as any).__contextProviders;
+      if (subscriptions) {
+        const subIndex = subscriptions.indexOf(this as any);
+        if (subIndex > -1) subscriptions.splice(subIndex, 1);
+      }
     }
     render() {
       return h(Fragment, null, this.props.children);
@@ -65,8 +94,4 @@ function createConsumer<T>() {
   }
 
   return Consumer;
-}
-
-export function isProvider(p: any): p is ContextProvider {
-  return typeof p.getChildContext === "function";
 }

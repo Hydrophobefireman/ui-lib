@@ -3,13 +3,14 @@ import {
   BATCH_MODE_PLACE_NODE,
   BATCH_MODE_REMOVE_ATTRIBUTE_NS,
   BATCH_MODE_REMOVE_ELEMENT,
+  BATCH_MODE_REMOVE_SVG_ATTRIBUTE,
   BATCH_MODE_SET_ATTRIBUTE,
   BATCH_MODE_SET_STYLE,
   BATCH_MODE_SET_SVG_ATTRIBUTE,
   IS_SVG_ATTR,
-} from "./constants";
-import {$, diffStyle} from "./diff/dom";
-import {DOMOps, UIElement, VNode, WritableProps} from "./types/index";
+} from "./constants.js";
+import {diffStyle, setDOMProperty} from "./diff/dom-properties.js";
+import type {DOMOps, UIElement, VNode, WritableProps} from "./types/index.js";
 
 export function domOp(op: DOMOps) {
   const dom = op.node;
@@ -25,7 +26,7 @@ export function domOp(op: DOMOps) {
       break;
     case BATCH_MODE_SET_ATTRIBUTE:
       // in case of removeAttribute, `op.attr===undefined`
-      $(dom, attr, value, false, op.isSSR);
+      setDOMProperty(dom, attr, value, false, op.isSSR);
       break;
     case BATCH_MODE_SET_STYLE:
       diffStyle(dom, value.newValue, value.oldValue);
@@ -40,6 +41,11 @@ export function domOp(op: DOMOps) {
     case BATCH_MODE_REMOVE_ATTRIBUTE_NS:
       dom.removeAttributeNS("http://www.w3.org/1999/xlink", attr);
       break;
+    case BATCH_MODE_REMOVE_SVG_ATTRIBUTE:
+      // SVG properties such as viewBox are read-only DOM accessors, so removal
+      // must always go through the attribute API.
+      dom.removeAttribute(attr);
+      break;
     case BATCH_MODE_SET_SVG_ATTRIBUTE:
       const isSVGSpecificAttr = attr !== (attr = attr.replace(IS_SVG_ATTR, ""));
 
@@ -49,7 +55,7 @@ export function domOp(op: DOMOps) {
             attr.toLowerCase(),
             value
           )
-        : $(dom, attr, value, true, op.isSSR);
+        : setDOMProperty(dom, attr, value, true, op.isSSR);
       break;
     default:
       break;
@@ -79,7 +85,7 @@ const DOM_POINTERS: Record<
 };
 
 const VNode_POINTERS: Record<
-  WritableProps | "_children" | "key" | "ref",
+  WritableProps | "_children",
   1 | null
 > = {
   _children: 1,
@@ -88,9 +94,10 @@ const VNode_POINTERS: Record<
   _renders: 1,
   _parentDom: 1,
   _used: 1,
-  key: 1,
-  ref: 1,
 };
+
+// key/ref are declarative metadata, not live ownership pointers. Keep them so
+// an explicitly reused VNode can mount again after its old tree is torn down.
 
 function clearDomNodePointers(dom: UIElement) {
   _clearPointers(DOM_POINTERS, dom);

@@ -5,13 +5,13 @@ import {
   EMPTY_OBJ,
   Fragment,
   LIFECYCLE_WILL_UNMOUNT,
-} from "../constants";
-import {UIElement, VNode} from "../types/index";
+} from "../constants.js";
+import type {UIElement, VNode} from "../types/index.js";
 
-import config from "../config";
-import {scheduleLifeCycleCallbacks} from "../lifeCycleCallbacks";
-import {setRef} from "../ref";
-import {domOp} from "../commit";
+import config from "../config.js";
+import {scheduleLifeCycleCallbacks} from "../lifeCycleCallbacks.js";
+import {setRef} from "../ref.js";
+import {domOp} from "../commit.js";
 
 function warnSetState() {
   config.warnOnUnmountRender &&
@@ -36,6 +36,7 @@ export function unmount(VNode: VNode, recursionLevel?: number): void {
     component.forceUpdate = warnSetState;
     /** todo check for side effects */
     component._VNode = null;
+    component._dirty = false;
 
     scheduleLifeCycleCallbacks({
       name: LIFECYCLE_WILL_UNMOUNT,

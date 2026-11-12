@@ -1,5 +1,5 @@
-import {consumeCallable} from "./util";
-import {useReducer} from "./useReducer";
+import {consumeCallable} from "./util.js";
+import {useReducer} from "./useReducer.js";
 
 // the useState hook
 // we accept either a value or a function (incase the value is expensive) as the argument

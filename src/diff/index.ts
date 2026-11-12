@@ -1,12 +1,12 @@
-import {EMPTY_OBJ, Fragment, NULL_TYPE} from "../constants";
-import {flattenVNodeChildren} from "../create_element";
-import {diffReferences} from "../ref";
-import {isFn, toSimpleVNode} from "../toSimpleVNode";
-import {DiffMeta, UIElement, VNode} from "../types/index";
-import {isValidVNode} from "../util";
-import {diffChildren, getDom} from "./children";
-import {diffDomNodes} from "./dom";
-import {unmount} from "./unmount";
+import {BAILOUT, EMPTY_OBJ, Fragment, NULL_TYPE} from "../constants.js";
+import {flattenVNodeChildren} from "../create_element.js";
+import {diffReferences} from "../ref.js";
+import {isFn, toSimpleVNode} from "../toSimpleVNode.js";
+import type {DiffMeta, UIElement, VNode} from "../types/index.js";
+import {isValidVNode} from "../util.js";
+import {diffChildren, getDom} from "./children.js";
+import {diffDomNodes} from "./dom.js";
+import {unmount} from "./unmount.js";
 
 /**
  *
@@ -59,6 +59,10 @@ export function diff(
   if (typeof newVNode.props !== "string" && newType !== NULL_TYPE) {
     /** if we have a function/class Component, get the next rendered VNode */
     newVNode = toSimpleVNode(newVNode, oldVNode, force, meta);
+    if (newVNode === BAILOUT) {
+      /** shouldComponentUpdate returned false; subtree is retained as-is */
+      return;
+    }
     meta.isSvg = newVNode.type === "svg" || meta.isSvg;
   }
 
@@ -67,8 +71,6 @@ export function diff(
     oldVNode = oldVNode._renders;
   }
   if (newVNode !== tmp) {
-    /** SCU returned False */
-    if (newVNode === EMPTY_OBJ) return;
     // we received a new VNode from calling Component.render, start a new diff
     return diff(newVNode, oldVNode, parentDom, force, meta);
   }

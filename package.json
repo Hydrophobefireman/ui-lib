@@ -13,10 +13,22 @@
   "main": "dist/src/index.js",
   "module": "dist/src/index.js",
   "exports": {
-    ".": "./dist/src/index.js",
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js",
+      "default": "./dist/src/index.js"
+    },
     "./package.json": "./package.json",
-    "./jsx-runtime": "./jsx-runtime.js",
-    "./jsx-dev-runtime": "./jsx-dev-runtime.js"
+    "./jsx-runtime": {
+      "types": "./jsx-runtime.d.ts",
+      "import": "./jsx-runtime.js",
+      "default": "./jsx-runtime.js"
+    },
+    "./jsx-dev-runtime": {
+      "types": "./jsx-dev-runtime.d.ts",
+      "import": "./jsx-dev-runtime.js",
+      "default": "./jsx-dev-runtime.js"
+    }
   },
   "scripts": {
     "prebuild": "node scripts/clean.cjs",
@@ -25,15 +37,16 @@
     "postbuild": "node scripts/postbuild.cjs",
     "create-package": "node scripts/create-package.cjs",
     "build": "tsc",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
     "prepare": "husky install"
   },
   "sideEffects": false,
   "devDependencies": {
-    "@types/node": "^25.2.0",
+    "@types/node": "^26.6.6",
     "husky": "^9.1.7",
-    "prettier": "^3.8.1",
+    "prettier": "^3.10.1",
     "pretty-quick": "^4.2.2",
-    "typescript": "^5.9.3"
+    "typescript": "^7.0.2"
   },
   "libPackages": []
 }

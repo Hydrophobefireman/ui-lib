@@ -1,8 +1,7 @@
-import {UIElement, VNode} from "./types/index";
+import type {UIElement, VNode, RefType} from "./types/index.js";
 
-import {Component} from "./component";
-import {EMPTY_OBJ} from "./constants";
-import {RefType} from "./types/index";
+import type {Component} from "./component.js";
+import {EMPTY_OBJ} from "./constants.js";
 
 export type {RefType};
 
@@ -19,10 +18,10 @@ export function diffReferences(
 ) {
   const newRef = newVNode.ref;
   const oldRef = (oldVNode || EMPTY_OBJ).ref;
-  if (newRef && newRef !== oldRef) {
-    setRef(newRef, domOrComponent);
-    oldRef && setRef(oldVNode.ref, null);
-  }
+  if (newRef === oldRef) return;
+  // Clear first so callback refs observe old=null before new=value.
+  if (oldRef) setRef(oldRef, null);
+  if (newRef) setRef(newRef, domOrComponent);
 }
 
 export function createRef<T>() {

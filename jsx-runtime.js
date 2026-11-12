@@ -1,8 +1,20 @@
 import {Fragment, createElement} from "@hydrophobefireman/ui-lib";
 
-function jsxDEV(el, props, ..._rest) {
-  return createElement(el, props);
+function create(type, props, key) {
+  // Automatic JSX passes its explicit key as the third argument. Copy props so
+  // callers' objects are never mutated and explicit keys (including 0/"") win.
+  if (key !== undefined) props = Object.assign({}, props, {key});
+  return createElement(type, props);
 }
-let jsx = jsxDEV;
-let jsxs = jsxDEV;
-export {Fragment, jsx, jsxs, jsxDEV};
+
+export function jsx(type, props, key) {
+  return create(type, props, key);
+}
+
+export const jsxs = jsx;
+
+export function jsxDEV(type, props, key) {
+  return create(type, props, key);
+}
+
+export {Fragment};

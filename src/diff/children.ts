@@ -1,10 +1,10 @@
-import {DiffMeta, UIElement, VNode} from "../types/index";
-import {EMPTY_ARRAY, EMPTY_OBJ, NULL_TYPE, Fragment} from "../constants";
-import {createElement} from "../create_element";
+import type {DiffMeta, UIElement, VNode} from "../types/index.js";
+import {EMPTY_ARRAY, EMPTY_OBJ, NULL_TYPE, Fragment} from "../constants.js";
+import {createElement} from "../create_element.js";
 
-import {assign} from "../util";
-import {diff} from "./index";
-import {isFn} from "../toSimpleVNode";
+import {assign} from "../util.js";
+import {diff} from "./index.js";
+import {isFn} from "../toSimpleVNode.js";
 
 type VNodeChildren = VNode["_children"];
 

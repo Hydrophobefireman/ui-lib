@@ -1,10 +1,11 @@
-import {Component} from "./component";
-import {Fragment, LifeCycleCallbacks} from "./constants";
-import {CustomWindow, Props, UIElement, VNode} from "./types/index";
+import {Fragment} from "./constants.js";
+import type {LifeCycleCallbacks} from "./constants.js";
+import type {Component} from "./component.js";
+import type {CustomWindow, Props, UIElement, VNode} from "./types/index.js";
 
 export const HAS_PROMISE = typeof Promise !== "undefined";
 
-export const defer: <T>(cb: () => T) => Promise<T> = HAS_PROMISE
+export const defer = HAS_PROMISE
   ? Promise.prototype.then.bind(Promise.resolve())
   : <T>(f: () => T) => setTimeout(f);
 
@@ -33,10 +34,11 @@ export function addPluginCallback(options: Partial<IPlugins>): void {
   for (const type in options) {
     const cb = options[type as keyof IPlugins];
     if (!cb) throw new Error("invalid callback: " + cb);
-    let oldType = plugins[type];
+    const oldType = plugins[type as keyof IPlugins] as (...args: any[]) => any;
+    const callback = cb as (...args: any[]) => any;
     plugins[type] = function () {
-      oldType.apply(0, arguments);
-      cb.apply(0, arguments);
+      oldType.apply(0 as any, arguments as any);
+      callback.apply(0 as any, arguments as any);
     };
   }
 }
