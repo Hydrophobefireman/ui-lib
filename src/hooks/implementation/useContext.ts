@@ -1,6 +1,6 @@
-import {Context} from "../../index";
-import {getCurrentHookValueOrSetDefault} from "./util";
-import {getHookStateAtCurrentRender} from "./manage";
+import type {Context} from "../../types/index.js";
+import {getCurrentHookValueOrSetDefault} from "./util.js";
+import {getHookStateAtCurrentRender} from "./manage.js";
 
 export function useContext<T = any>(ctx: Context<T>): T {
   const state = getHookStateAtCurrentRender();
@@ -8,17 +8,20 @@ export function useContext<T = any>(ctx: Context<T>): T {
 
   const index = state[1];
   const provider =
-    component._sharedContext && component._sharedContext[ctx.$id];
-  if (!provider) return ctx.def as T;
+    (component._sharedContext && component._sharedContext[ctx.$id]) || null;
   const hooksData = component._hooksData;
-  getCurrentHookValueOrSetDefault(hooksData, index, {
+  const data = getCurrentHookValueOrSetDefault(hooksData, index, () => ({
     args: null,
     hookState: false,
-  });
-  const data = hooksData[index];
-  if (!data.hookState) {
-    data.hookState = true;
-    provider.add(component);
+  }));
+
+  // Track the actual provider identity so moving between providers (or from a
+  // provider back to the default value) does not leave a stale subscription.
+  const previousProvider = data.args;
+  if (previousProvider !== provider) {
+    if (previousProvider) previousProvider.remove(component);
+    data.args = provider;
+    if (provider) provider.add(component);
   }
-  return provider.props.value;
+  return provider ? provider.props.value : (ctx.def as T);
 }

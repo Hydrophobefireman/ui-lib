@@ -1,5 +1,7 @@
 export const EMPTY_OBJ: any = {};
 export const EMPTY_ARRAY: any[] = [];
+/** Explicit result for a component render skipped by shouldComponentUpdate. */
+export const BAILOUT: any = {};
 
 export const IS_ARIA_PROP = /^aria[\-A-Z]/;
 export const IS_SVG_ATTR = /^xlink:?/;
@@ -12,6 +14,7 @@ export const BATCH_MODE_PLACE_NODE = 4;
 export const BATCH_MODE_SET_SVG_ATTRIBUTE = 5;
 export const BATCH_MODE_REMOVE_ATTRIBUTE_NS = 6;
 export const BATCH_MODE_CLEAR_POINTERS = 7;
+export const BATCH_MODE_REMOVE_SVG_ATTRIBUTE = 8;
 
 /**
  * Special constant to mark `null` elements
@@ -33,12 +36,12 @@ export const LIFECYCLE_DID_UPDATE = "componentDidUpdate";
 export const LIFECYCLE_WILL_UNMOUNT = "componentWillUnmount";
 
 export type LifeCycleCallbacks =
-  | "componentWillMount"
-  | "componentDidMount"
-  | "componentWillUnmount"
+  | typeof LIFECYCLE_WILL_MOUNT
+  | typeof LIFECYCLE_DID_MOUNT
+  | typeof LIFECYCLE_WILL_UNMOUNT
   | "shouldComponentUpdate"
-  | "componentWillUpdate"
-  | "componentDidUpdate";
+  | typeof LIFECYCLE_WILL_UPDATE
+  | typeof LIFECYCLE_DID_UPDATE;
 
 export const Fragment: any = function Fragment() {};
 

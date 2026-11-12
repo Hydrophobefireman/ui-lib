@@ -1,8 +1,18 @@
 import {Fragment, createElement} from "@hydrophobefireman/ui-lib";
 
-function jsxDEV(el, props, ...rest) {
-  return createElement(el, props);
+function create(type, props, key) {
+  if (key !== undefined) props = Object.assign({}, props, {key});
+  return createElement(type, props);
 }
-let jsx = jsxDEV;
-let jsxs = jsxDEV;
-export {Fragment, jsx, jsxs, jsxDEV};
+
+export function jsx(type, props, key) {
+  return create(type, props, key);
+}
+
+export const jsxs = jsx;
+
+export function jsxDEV(type, props, key) {
+  return create(type, props, key);
+}
+
+export {Fragment};

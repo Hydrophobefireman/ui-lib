@@ -1,6 +1,7 @@
-import {Component} from "./component";
-import {plugins} from "./config";
+import {Component} from "./component.js";
+import {plugins} from "./config.js";
 import {
+  BAILOUT,
   EMPTY_OBJ,
   Fragment,
   LIFECYCLE_DID_MOUNT,
@@ -8,20 +9,20 @@ import {
   LIFECYCLE_WILL_MOUNT,
   LIFECYCLE_WILL_UPDATE,
   RENDER_MODE_SERVER,
-} from "./constants";
-import {isProvider} from "./context";
-import {coerceToVNode} from "./create_element";
-import {scheduleLifeCycleCallbacks} from "./lifeCycleCallbacks";
-import {diffReferences} from "./ref";
-import {
+} from "./constants.js";
+import {isProvider} from "./context-utils.js";
+import {coerceToVNode} from "./create_element.js";
+import {scheduleLifeCycleCallbacks} from "./lifeCycleCallbacks.js";
+import {diffReferences} from "./ref.js";
+import type {
   ComponentConstructor,
   ComponentType,
   DiffMeta,
   FunctionComponent,
   Props,
   VNode,
-} from "./types/index";
-import {assign} from "./util";
+} from "./types/index.js";
+import {assign} from "./util.js";
 
 export const isFn = (vnType: any): vnType is ComponentType =>
   typeof vnType === "function" && vnType !== Fragment;
@@ -55,7 +56,7 @@ export function toSimpleVNode(
       /** run hooks */
       next = renderFunctionalComponent(VNode, meta);
     }
-    VNode._renders = next;
+    if (next !== BAILOUT) VNode._renders = next;
     meta.provider = meta.contextValue = undefined;
     const c = VNode._component;
 
@@ -88,7 +89,19 @@ function renderClassComponent(
     if (c.shouldComponentUpdate != null && !forceUpdate) {
       const scu = c.shouldComponentUpdate(VNode.props, c._nextState || c.state);
       if (scu === false) {
-        return EMPTY_OBJ;
+        // Keep the live rendered subtree and advance all instance bookkeeping.
+        // The bailout is an explicit outcome; it must never replace `_renders`.
+        setContext(c, meta);
+        c._VNode = VNode;
+        c.props = VNode.props;
+        c.state = applyCurrentState(c, cls, VNode);
+        c._oldState = null;
+        c._nextState = null;
+        // Pending state was accepted here; an already-queued render is redundant.
+        c._dirty = false;
+        VNode._renders = oldVNode._renders;
+        diffReferences(VNode, oldVNode, c);
+        return BAILOUT;
       }
     }
   } else {
@@ -102,7 +115,9 @@ function renderClassComponent(
   }
   setContext(c, meta);
   c._VNode = VNode;
-  const oldState = c._oldState;
+  // Props-only updates have no _oldState, so the current state is the previous
+  // state passed to componentDidUpdate.
+  const oldState = c._oldState || c.state;
   const oldProps = oldVNode.props;
   // will{Mount,Update} are allowed in server
   // but setState still remains a noop
@@ -116,6 +131,7 @@ function renderClassComponent(
   c._oldState = null;
   c._nextState = null;
   c.props = VNode.props;
+  c._dirty = false;
 
   const nextVNode = coerceToVNode(
     c.render(c.props, c.state, meta.contextValue)
@@ -157,13 +173,20 @@ function renderFunctionalComponent(VNode: VNode, meta: DiffMeta) {
   } else {
     c = VNode._component;
   }
+  // Hooks' setState reads props from the instance, so it must always be current.
+  c.props = VNode.props;
   setContext(c, meta);
   c._VNode = VNode;
 
   plugins._hookSetup(c);
-  nextVNode = coerceToVNode(c.render(VNode.props, null, meta.contextValue));
-  // remove reference of this component
-  plugins._hookSetup(null);
+  try {
+    nextVNode = coerceToVNode(c.render(VNode.props, null, meta.contextValue));
+    // The latest hook state was just rendered; drop a queued duplicate update.
+    c._dirty = false;
+  } finally {
+    // A throwing render must not leave hooks usable outside a component.
+    plugins._hookSetup(null);
+  }
 
   return nextVNode;
 }
@@ -211,5 +234,13 @@ function setContext(c: Component, meta: DiffMeta) {
   c._sharedContext = meta.context;
   c.context = meta.contextValue;
   const provider = meta.provider;
-  provider && provider.add(c);
+  const previousProvider = c._contextProvider;
+  if (previousProvider !== provider) {
+    if (previousProvider) previousProvider.remove(c);
+    c._contextProvider = provider;
+    if (provider) provider.add(c);
+  } else if (provider) {
+    // Idempotent; keeps older call sites safe.
+    provider.add(c);
+  }
 }

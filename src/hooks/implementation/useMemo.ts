@@ -1,9 +1,9 @@
 import {
   argsChanged,
   getCurrentHookValueOrSetDefault,
-  HookDefault,
-} from "./util";
-import {getHookStateAtCurrentRender} from "./manage";
+} from "./util.js";
+import type {HookDefault} from "./util.js";
+import {getHookStateAtCurrentRender} from "./manage.js";
 
 export function useMemo<T>(memoFunc: () => T, dependencies?: any[]): T {
   const state = getHookStateAtCurrentRender();
@@ -13,17 +13,18 @@ export function useMemo<T>(memoFunc: () => T, dependencies?: any[]): T {
 
   const hookData = candidate._hooksData;
 
-  let currentHook: HookDefault = hookData[hookIndex] || <any>{};
+  const currentHook: HookDefault = getCurrentHookValueOrSetDefault(
+    hookData,
+    hookIndex,
+    () => ({})
+  );
 
   if (!argsChanged(currentHook.args, dependencies))
     return currentHook.hookState;
 
-  hookData[hookIndex] = null;
-  currentHook = getCurrentHookValueOrSetDefault(hookData, hookIndex, () => ({
-    hookState: memoFunc(),
-  }));
-
+  const nextValue = memoFunc();
+  currentHook.hookState = nextValue;
   currentHook.args = dependencies;
 
-  return currentHook.hookState;
+  return nextValue;
 }

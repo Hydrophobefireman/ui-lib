@@ -1,5 +1,5 @@
-import config from "../../config";
-import {RouterSubscription} from "./subscriptions";
+import config from "../../config.js";
+import {RouterSubscription} from "./subscriptions.js";
 
 export interface RoutePath {
   regex: RegExp;
@@ -32,6 +32,11 @@ function _absolutePath(route: string) {
   return RegExp(`^${route}(/?)$`);
 }
 
+const REGEX_SPECIAL_CHARS = /[.*+?^${}()|[\]\\]/g;
+function escapeRouteSegment(segment: string) {
+  return segment.replace(REGEX_SPECIAL_CHARS, "\\$&");
+}
+
 const pathFixRegex = /\/+$/;
 export function fixPath(path: string): string {
   if (path.length === 1) return path;
@@ -52,7 +57,8 @@ export function createRoutePath(pathString: string | RoutePath): RoutePath {
         params[++i] = partialPath.substr(1); // matches will start at 1
         return "([^?\\/]+)"; //match all non whitespace lazily
       }
-      return partialPath;
+      // String routes are literal. Use {regex, params} for advanced matching.
+      return escapeRouteSegment(partialPath);
     })
     .join("/");
 

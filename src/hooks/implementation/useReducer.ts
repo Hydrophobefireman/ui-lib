@@ -1,6 +1,6 @@
-import {consumeCallable, getCurrentHookValueOrSetDefault} from "./util";
+import {consumeCallable, getCurrentHookValueOrSetDefault} from "./util.js";
 
-import {getHookStateAtCurrentRender} from "./manage";
+import {getHookStateAtCurrentRender} from "./manage.js";
 
 type Reducer<T> = (currentValue: T, action: string) => T;
 const obj = {};
@@ -27,11 +27,18 @@ export function useReducer<T = any>(
     })
   );
 
+  // The dispatch function is stable, but the reducer always comes from the
+  // latest render. Without this, dispatch would keep using the first reducer.
+  currentHook.reducer = reducer;
+
   return [
     currentHook.hookState as T,
     currentHook.args ||
       (currentHook.args = (action?: any) => {
-        const next = (reducer as Reducer<T>)(currentHook.hookState, action);
+        const next = (currentHook.reducer as Reducer<T>)(
+          currentHook.hookState,
+          action
+        );
         currentHook.hookState = next;
         candidate.setState(obj);
       }),

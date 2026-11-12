@@ -1,8 +1,8 @@
-import {Component} from "../component";
-import {RefType} from "../ref";
+import type {Component} from "../component.js";
+import type {RefType} from "../ref.js";
 // modified version of preact's jsx.d.ts
 /// <reference lib="dom" />
-import {ComponentChildren, VNode} from "./index";
+import type {ComponentChildren, VNode} from "./index.js";
 export interface PropAttrs {
   children?: ComponentChildren;
 }

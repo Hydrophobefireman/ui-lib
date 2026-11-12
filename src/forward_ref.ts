@@ -1,6 +1,6 @@
-import {addPluginCallback} from "./config";
-import {ComponentChild, Props, RefType} from "./types";
-import {objectWithoutKeys} from "./util";
+import {addPluginCallback} from "./config.js";
+import type {ComponentChild, Props, RefType} from "./types/index.js";
+import {objectWithoutKeys} from "./util.js";
 
 type RefObj<R> = ((val: R) => void) | RefType<R>;
 export interface ForwardFn<P = {}, T = any> {

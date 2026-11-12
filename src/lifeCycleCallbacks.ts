@@ -1,11 +1,11 @@
-import {Component} from "./component";
-import config, {plugins} from "./config";
+import type {Component} from "./component.js";
+import config, {plugins} from "./config.js";
 import {
   LIFECYCLE_DID_MOUNT,
   LIFECYCLE_DID_UPDATE,
-  LifeCycleCallbacks,
-} from "./constants";
-import {unmount} from "./diff/unmount";
+} from "./constants.js";
+import type {LifeCycleCallbacks} from "./constants.js";
+import {unmount} from "./diff/unmount.js";
 
 type ProcessOptions = {
   name: LifeCycleCallbacks;
@@ -32,7 +32,7 @@ export function scheduleLifeCycleCallbacks(options: ProcessOptions): any {
 function __executeCallback(cbObj: ProcessOptions) {
   const fName = cbObj.name;
   const component = cbObj.bind;
-  const func = component[fName];
+  const func = component[fName] as (...args: any[]) => any;
   plugins.lifeCycle(fName, component);
   component._lastLifeCycleMethod = fName;
   if (!func) return;
@@ -40,7 +40,7 @@ function __executeCallback(cbObj: ProcessOptions) {
   const args = cbObj.args;
   const hasCatch = typeof component.componentDidCatch == "function";
   const cb = () => func.apply(component, args);
-  function handleError(e: Error) {
+  function handleError(e: any) {
     if (hasCatch) return component.componentDidCatch(e);
     if (config.unmountOnError) {
       unmount(component._VNode);
@@ -48,7 +48,7 @@ function __executeCallback(cbObj: ProcessOptions) {
     throw e;
   }
   try {
-    const ret = cb();
+    const ret: any = cb();
     if (ret && ret.then && ret.catch) {
       ret.catch(handleError);
     }
